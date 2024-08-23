@@ -4,8 +4,8 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>h:/Min enhet/Gymnasiearbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/Player-1.png</File>
-    <File>h:/Min enhet/Gymnasiearbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/testitem.fx</File>
+    <File>H:/Min enhet/Gymnasiearbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/Player-1.png</File>
+    <File>H:/Min enhet/Gymnasiearbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/testitem.fx</File>
   </SourceFiles>
   <DestFiles>
     <File xsi:nil="true" />
