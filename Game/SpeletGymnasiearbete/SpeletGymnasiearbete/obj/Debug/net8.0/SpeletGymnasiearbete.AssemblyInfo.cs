@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SpeletGymnasiearbete")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b6136f281e1c88b93e0448cdf149b0500ad3236a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8cd2f782f5badfebece3bf261016f626f05dabfd")]
 [assembly: System.Reflection.AssemblyProductAttribute("SpeletGymnasiearbete")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SpeletGymnasiearbete")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
