@@ -25,9 +25,3 @@
 /processorParam:TextureFormat=Color
 /build:Player-1.png
 
-#begin testitem.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:testitem.fx
-

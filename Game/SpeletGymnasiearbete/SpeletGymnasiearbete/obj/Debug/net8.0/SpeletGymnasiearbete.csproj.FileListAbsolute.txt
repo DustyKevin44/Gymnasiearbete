@@ -1,3 +1,5 @@
+H:\Min enhet\Gymnasiearbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\bin\Debug\net8.0\Content\Player-1.xnb
+H:\Min enhet\Gymnasiearbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\bin\Debug\net8.0\Content\testitem.xnb
 H:\Min enhet\Gymnasiearbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\bin\Debug\net8.0\SpeletGymnasiearbete.exe
 H:\Min enhet\Gymnasiearbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\bin\Debug\net8.0\SpeletGymnasiearbete.deps.json
 H:\Min enhet\Gymnasiearbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\bin\Debug\net8.0\SpeletGymnasiearbete.runtimeconfig.json
