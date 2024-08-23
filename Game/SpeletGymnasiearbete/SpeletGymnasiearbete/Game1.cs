@@ -9,6 +9,7 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private Texture2D _playerTexture;
+  
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -29,7 +30,7 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
        
         // TODO: use this.Content to load your game content here
-        _playerTexture = Content.Load<Texture2D>("Player-1");
+        _playerTexture = Content.Load<Texture2D>("image (1)");
     }
 
     protected override void Update(GameTime gameTime)
@@ -38,7 +39,7 @@ public class Game1 : Game
             Exit();
 
         // TODO: Add your update logic here
-
+       
         base.Update(gameTime);
     }
 

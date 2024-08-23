@@ -4,9 +4,11 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
+    <File>H:/Min enhet/Gymnasiearbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/image (1).png</File>
     <File>H:/Min enhet/Gymnasiearbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/Player-1.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
 </SourceFileCollection>
