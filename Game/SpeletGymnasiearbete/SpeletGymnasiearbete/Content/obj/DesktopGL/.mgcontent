@@ -4,11 +4,9 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>h:/Min enhet/Gymnasiearbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/image (1).png</File>
-    <File>h:/Min enhet/Gymnasiearbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/Player-1.png</File>
+    <File>c:/Users/marti/Desktop/GitHub-Gymnasiearbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/Player-1.png</File>
   </SourceFiles>
   <DestFiles>
-    <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
 </SourceFileCollection>

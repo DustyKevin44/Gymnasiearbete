@@ -25,7 +25,6 @@ H:\Min enhet\Gymnasiearbete\Gymnasiearbete\game\SpeletGymnasiearbete\SpeletGymna
 H:\Min enhet\Gymnasiearbete\Gymnasiearbete\game\SpeletGymnasiearbete\SpeletGymnasiearbete\obj\Debug\net8.0\SpeletGymnasiearbete.pdb
 H:\Min enhet\Gymnasiearbete\Gymnasiearbete\game\SpeletGymnasiearbete\SpeletGymnasiearbete\obj\Debug\net8.0\SpeletGymnasiearbete.genruntimeconfig.cache
 H:\Min enhet\Gymnasiearbete\Gymnasiearbete\game\SpeletGymnasiearbete\SpeletGymnasiearbete\obj\Debug\net8.0\ref\SpeletGymnasiearbete.dll
-C:\Users\marti\Desktop\GitHub-Gymnasiearbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\bin\Debug\net8.0\Content\image (1).xnb
 C:\Users\marti\Desktop\GitHub-Gymnasiearbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\bin\Debug\net8.0\Content\Player-1.xnb
 C:\Users\marti\Desktop\GitHub-Gymnasiearbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\bin\Debug\net8.0\SpeletGymnasiearbete.exe
 C:\Users\marti\Desktop\GitHub-Gymnasiearbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\bin\Debug\net8.0\SpeletGymnasiearbete.deps.json
