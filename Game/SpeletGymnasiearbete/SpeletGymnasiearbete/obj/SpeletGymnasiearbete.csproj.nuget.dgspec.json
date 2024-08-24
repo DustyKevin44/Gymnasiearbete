@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\marti\\Desktop\\GitHub-Gymnasiearbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj": {}
+    "C:\\Users\\Dusty\\Desktop\\Gymnasiearbete-1\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj": {}
   },
   "projects": {
-    "C:\\Users\\marti\\Desktop\\GitHub-Gymnasiearbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj": {
+    "C:\\Users\\Dusty\\Desktop\\Gymnasiearbete-1\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\marti\\Desktop\\GitHub-Gymnasiearbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
+        "projectUniqueName": "C:\\Users\\Dusty\\Desktop\\Gymnasiearbete-1\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
         "projectName": "SpeletGymnasiearbete",
-        "projectPath": "C:\\Users\\marti\\Desktop\\GitHub-Gymnasiearbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
-        "packagesPath": "C:\\Users\\marti\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\marti\\Desktop\\GitHub-Gymnasiearbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\obj\\",
+        "projectPath": "C:\\Users\\Dusty\\Desktop\\Gymnasiearbete-1\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
+        "packagesPath": "C:\\Users\\Dusty\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Dusty\\Desktop\\Gymnasiearbete-1\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\marti\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Dusty\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"

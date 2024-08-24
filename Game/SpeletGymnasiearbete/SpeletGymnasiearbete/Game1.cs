@@ -51,6 +51,7 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
+        // Hej Viggo på test
         _spriteBatch.Begin();
         _spriteBatch.Draw(_playerTexture, _player_position, Color.White);
         _spriteBatch.End();
