@@ -238,19 +238,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Dusty\\.nuget\\packages\\": {}
+    "C:\\Users\\marti\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "H:\\Min enhet\\Gymnasiearbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
+      "projectUniqueName": "C:\\Users\\marti\\Desktop\\GitHub-Gymnasiearbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
       "projectName": "SpeletGymnasiearbete",
-      "projectPath": "H:\\Min enhet\\Gymnasiearbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
-      "packagesPath": "C:\\Users\\Dusty\\.nuget\\packages\\",
-      "outputPath": "H:\\Min enhet\\Gymnasiearbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\obj\\",
+      "projectPath": "C:\\Users\\marti\\Desktop\\GitHub-Gymnasiearbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
+      "packagesPath": "C:\\Users\\marti\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\marti\\Desktop\\GitHub-Gymnasiearbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Dusty\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\marti\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
