@@ -1,17 +1,18 @@
 using static SpeletGymnasiearbete.Node2D;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using Microsoft.Xna.Framework;
+#nullable enable
 
 namespace SpeletGymnasiearbete;
 
 public class Sprite2D : Node2D
 {
-    private Texture2D _texture;
+    public Sprite2D(Vector2 position,
+                    float rotation = 0f,
+                    Vector2? scale = null,
+                    List<Node>? children = null
+    ) : base(position, rotation, scale, children) {}
 
-    public Texture2D Texture {
-        get => _texture;
-        set { if (value is Texture2D) { _texture = value; }}
-    }
+    public Texture2D? Texture;
 }

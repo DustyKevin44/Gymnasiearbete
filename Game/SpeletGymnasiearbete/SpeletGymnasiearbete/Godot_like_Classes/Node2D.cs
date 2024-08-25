@@ -1,15 +1,23 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using static SpeletGymnasiearbete.Node;
+#nullable enable
 
 namespace SpeletGymnasiearbete;
 
 public class Node2D : Node
 {
-    private Vector2 _position = Vector2.Zero;
-    private Vector2 _scale = Vector2.One;
-    private double _rotation = 0d;
+    private Vector2 _position;
+    private Vector2 _scale;
+    private float _rotation;
 
+    public Node2D(Vector2 position, float rotation = 0f, Vector2? scale = null, List<Node>? children = null) : base(children)
+    {
+        _position = position;
+        _scale = (scale is null) ? Vector2.One : (Vector2)scale;
+        _rotation = rotation;
+    }
 
     // Make properties scalable
     private T PropegateThroughAncestors<T, BASE>(Func<BASE, T> getValue, T localValue, Func<T, T, T> combine)
@@ -28,14 +36,8 @@ public class Node2D : Node
         set => _scale = value;
     }
 
-    public double Rotation {
-        get => PropegateThroughAncestors<double, Node2D>(node => node.Rotation, _rotation, (local, parent) => local + parent);
+    public float Rotation {
+        get => PropegateThroughAncestors<float, Node2D>(node => node.Rotation, _rotation, (local, parent) => local + parent);
         set => _rotation = value;
     }
-
-    private void draw() {}
-
-    private void process(double delta) {}
-    
-    private void physics_process(double delta) {}
 }

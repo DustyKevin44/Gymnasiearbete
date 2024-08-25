@@ -46,30 +46,24 @@ public class Game1 : Game
     {
         /* --- node tree --- */
 
-        _root = new Node();
-        _player = new Node2D();
-
-        Sprite2D sprite = new Sprite2D();
-        Sprite2D bg = new Sprite2D();
-
-
-        _root.add_child(_player);
-        _root.add_child(bg);
-
-        _player.add_child(sprite);
-
-        System.Console.WriteLine(_player.Position);
-
-        _sprite_group[(int)SPRITE.player] = sprite;
-        _sprite_group[(int)SPRITE.background] = bg;
-
+        _root = new Node([
+            _player = new Node2D(
+                new Vector2(0, 0),
+                children:
+                [
+                    _sprite_group[(int)SPRITE.player] = new Sprite2D(Vector2.Zero)
+                ]
+            ),
+            _sprite_group[(int)SPRITE.background] = new Sprite2D(Vector2.Zero)
+        ]);
 
         /* --- Scripts --- */
 
-        _player.Script = (GameTime deltaTime) => {
+        _player._process = (GameTime deltaTime) => {
             InputNode.Update();
-            _player.Position += InputNode.Direction * _player_speed * (deltaTime.ElapsedGameTime.Milliseconds / 1000f);
-            return 0;
+            _player.Position += InputNode.DirectionNormalized * _player_speed * (float)deltaTime.ElapsedGameTime.TotalSeconds;
+            System.Console.WriteLine(_player.Position);
+            return true;
         };
 
         base.Initialize();
@@ -91,7 +85,7 @@ public class Game1 : Game
     protected override void Update(GameTime deltaTime)
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) { Exit(); }
-
+        _root.Update(deltaTime);
         _root.Update_children(deltaTime);
         base.Update(deltaTime);
     }

@@ -1,5 +1,6 @@
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
+using System.Linq;
 using Microsoft.Xna.Framework;
 namespace SpeletGymnasiearbete;
 #nullable enable
@@ -7,26 +8,24 @@ namespace SpeletGymnasiearbete;
 public class Node
 {
     private Node? _parent; // if null Node is the root node
-    private List<Node> _children = new List<Node>();
+    private List<Node> _children;
+    public override String ToString() { return this.GetType().Name; }
 
-    public System.Func<GameTime, int>? Script;
-
-    public override System.String ToString() { return this.GetType().Name; }
-
-    private void Update(GameTime deltaTime) {
-        if (Script is not null) {
-            int ErrCode = Script(deltaTime);
-            if (ErrCode != 0) { System.Console.WriteLine("Script Failed: " + ErrCode); }
-        }
+    public Func<GameTime, bool> _process = (delta) => true;
+    public void Update(GameTime gameTime) {
+        _process(gameTime);
     }
+
+    public Node(List<Node>? children = null)
+    { _children = (children is null) ? new() : [.. children]; }
 
     public void add_child(Node node) {
         _children.Add(node);
         node._parent = this;
     }
 
-    public List<Node> get_children() {
-        return _children;
+    public IReadOnlyList<Node> get_children() {
+        return _children.AsReadOnly<Node>();
     }
 
     public void Update_children(GameTime deltaTime) {
@@ -37,7 +36,7 @@ public class Node
         }
     }
 
-    public List<Node> get_siblings()
+    public IReadOnlyList<Node> get_siblings()
     {
         if (get_parent() is Node parent) { return parent.get_children(); }
         return new List<Node>();
@@ -73,5 +72,23 @@ public class Node
             root = parent;
         }
         return root;
+    }
+
+    public void PrintTree(string nl = "|", string indent = "---")
+    {
+        Console.Write("ROOT");
+        Node root = get_root();
+        root.PrintBranch();
+    }
+
+    public void PrintBranch(string nl = "|", string indent = "---", int depth = 0)
+    {
+        string ls = " " + ((depth == 0) ? "" : nl);
+        string ind = string.Concat(Enumerable.Repeat(indent, depth));
+        Console.WriteLine(ls + ind + GetType().Name);
+        foreach(Node child in _children)
+        {
+            child.PrintBranch(nl, indent);
+        }
     }
 }
