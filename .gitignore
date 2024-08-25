@@ -1,0 +1,31 @@
+# .NET files
+*.dll
+*.exe
+*.pdb
+*.mdb
+*.config
+*.vspscc
+*.vssscc
+
+# Visual Studio Code settings
+.vscode/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono auto generated files
+mono_crash.*
+
+# Directories for build results
+bin/
+obj/
+
+# Rider project files
+.idea/
+*.sln.iml
+
+# Add other files or folders as needed
