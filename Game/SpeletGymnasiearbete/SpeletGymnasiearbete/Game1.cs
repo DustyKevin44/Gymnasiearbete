@@ -1,10 +1,118 @@
-﻿using System;
+﻿using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+
 namespace SpeletGymnasiearbete;
 
+
+enum SPRITE {
+    background,
+    player,
+
+    _COUNT
+}
+
+
+public class Game1 : Game
+{
+    private GraphicsDeviceManager _graphics;
+    private SpriteBatch _sprite_batch;
+    private Node _root;
+    private Sprite2D[] _sprite_group = new Sprite2D[(int)SPRITE._COUNT];
+
+    private float _player_speed = 500f;
+    private Node2D _player;
+
+    public Game1()
+    {
+        _graphics = new GraphicsDeviceManager(this);
+        Content.RootDirectory = "Content";
+        IsMouseVisible = true;
+    }
+
+    public Texture2D CreateTexture(int width, int height, Color color)
+    {
+        Texture2D texture = new Texture2D(GraphicsDevice, width, height);
+        Color[] data = new Color[width*height];
+        for(int pixel=0; pixel<data.Count(); pixel++) { data[pixel] = color; }
+        texture.SetData(data);
+        return texture;
+    }
+
+    
+    protected override void Initialize()
+    {
+        /* --- node tree --- */
+
+        _root = new Node();
+        _player = new Node2D();
+
+        Sprite2D sprite = new Sprite2D();
+        Sprite2D bg = new Sprite2D();
+
+
+        _root.add_child(_player);
+        _root.add_child(bg);
+
+        _player.add_child(sprite);
+
+        System.Console.WriteLine(_player.Position);
+
+        _sprite_group[(int)SPRITE.player] = sprite;
+        _sprite_group[(int)SPRITE.background] = bg;
+
+
+        /* --- Scripts --- */
+
+        _player.Script = (GameTime deltaTime) => {
+            InputNode.Update();
+            _player.Position += InputNode.Direction * _player_speed * (deltaTime.ElapsedGameTime.Milliseconds / 1000f);
+            return 0;
+        };
+
+        base.Initialize();
+    }
+
+    protected override void LoadContent()
+    {
+        _sprite_batch = new SpriteBatch(GraphicsDevice);
+
+        _sprite_group[(int)SPRITE.background].Texture = CreateTexture(
+            GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
+            GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height,
+            Color.SteelBlue
+        );
+
+        _sprite_group[(int)SPRITE.player].Texture = Content.Load<Texture2D>("Player-1");
+    }
+
+    protected override void Update(GameTime deltaTime)
+    {
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) { Exit(); }
+
+        _root.Update_children(deltaTime);
+        base.Update(deltaTime);
+    }
+
+    protected override void Draw(GameTime deltaTime)
+    {
+        _sprite_batch.Begin();
+        foreach (Sprite2D sprite in _sprite_group)
+        {
+            _sprite_batch.Draw(sprite.Texture, sprite.Position, Color.White);
+        }
+        _sprite_batch.End();
+        base.Draw(deltaTime);
+    }
+}
+
+
+
+
+
+/*
 public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
@@ -12,12 +120,12 @@ public class Game1 : Game
     private Texture2D _playerTexture;    
     private Vector2 _player_position;
 
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-       
     }
 
     protected override void Initialize()
@@ -37,8 +145,6 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
 
         // TODO: Add your update logic here
         Vector2 mouse_position = Mouse.GetState().Position.ToVector2();
@@ -58,3 +164,4 @@ public class Game1 : Game
         base.Draw(gameTime);
     }
 }
+*/
