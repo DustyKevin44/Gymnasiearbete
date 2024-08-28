@@ -20,6 +20,7 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _sprite_batch;
     private Node _root;
+    private Camera2D _active_camera;
     private Sprite2D[] _sprite_group = new Sprite2D[(int)SPRITE._COUNT];
 
     private float _player_speed = 500f;
@@ -46,15 +47,17 @@ public class Game1 : Game
     {
         /* --- node tree --- */
 
-        _root = new Node([
-            _player = new Node2D(
-                new Vector2(0, 0),
-                children:
-                [
-                    _sprite_group[(int)SPRITE.player] = new Sprite2D(Vector2.Zero)
+        _root = new Node( children: [
+            _active_camera = new Camera2D(),
+            new Node2D(
+                new Vector2(100, 100),
+                children: [
+                    _player = new Node2D( children: [
+                        _sprite_group[(int)SPRITE.player] = new Sprite2D()
+                    ])
                 ]
             ),
-            _sprite_group[(int)SPRITE.background] = new Sprite2D(Vector2.Zero)
+            _sprite_group[(int)SPRITE.background] = new Sprite2D()
         ]);
 
         /* --- Scripts --- */
@@ -62,10 +65,10 @@ public class Game1 : Game
         _player._process = (GameTime deltaTime) => {
             InputNode.Update();
             _player.Position += InputNode.DirectionNormalized * _player_speed * (float)deltaTime.ElapsedGameTime.TotalSeconds;
-            System.Console.WriteLine(_player.Position);
             return true;
         };
 
+        _root.PrintTree();
         base.Initialize();
     }
 
@@ -95,7 +98,8 @@ public class Game1 : Game
         _sprite_batch.Begin();
         foreach (Sprite2D sprite in _sprite_group)
         {
-            _sprite_batch.Draw(sprite.Texture, sprite.Position, Color.White);
+            _sprite_batch.Draw(sprite.Texture, sprite.Position - _active_camera.Position, Color.White);
+            System.Console.WriteLine(sprite.Position);
         }
         _sprite_batch.End();
         base.Draw(deltaTime);

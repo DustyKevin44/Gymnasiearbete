@@ -8,7 +8,7 @@ namespace SpeletGymnasiearbete;
 
 public class Sprite2D : Node2D
 {
-    public Sprite2D(Vector2 position,
+    public Sprite2D(Vector2? position = null,
                     float rotation = 0f,
                     Vector2? scale = null,
                     List<Node>? children = null

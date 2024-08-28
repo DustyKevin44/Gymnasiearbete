@@ -12,9 +12,9 @@ public class Node2D : Node
     private Vector2 _scale;
     private float _rotation;
 
-    public Node2D(Vector2 position, float rotation = 0f, Vector2? scale = null, List<Node>? children = null) : base(children)
+    public Node2D(Vector2? position = null, float rotation = 0f, Vector2? scale = null, List<Node>? children = null) : base(children)
     {
-        _position = position;
+        _position = (position is null) ? new Vector2(0, 0) : (Vector2)position;
         _scale = (scale is null) ? Vector2.One : (Vector2)scale;
         _rotation = rotation;
     }

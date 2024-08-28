@@ -17,7 +17,10 @@ public class Node
     }
 
     public Node(List<Node>? children = null)
-    { _children = (children is null) ? new() : [.. children]; }
+    {
+        _children = (children is null) ? [] : children;
+        foreach(Node child in _children) { child._parent = this; }
+    }
 
     public void add_child(Node node) {
         _children.Add(node);
@@ -84,11 +87,11 @@ public class Node
     public void PrintBranch(string nl = "|", string indent = "---", int depth = 0)
     {
         string ls = " " + ((depth == 0) ? "" : nl);
-        string ind = string.Concat(Enumerable.Repeat(indent, depth));
-        Console.WriteLine(ls + ind + GetType().Name);
+        string ind = string.Concat(Enumerable.Repeat("   ", (depth <= 1) ? 0 : depth*2-1));
+        Console.WriteLine(ind + ls + indent + GetType().Name);
         foreach(Node child in _children)
         {
-            child.PrintBranch(nl, indent);
+            child.PrintBranch(nl, indent, depth+1);
         }
     }
 }

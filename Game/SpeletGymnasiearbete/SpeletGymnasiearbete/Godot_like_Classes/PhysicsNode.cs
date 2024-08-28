@@ -13,7 +13,7 @@ class PhysicsNode : Node2D
     public System.Func<bool>? PhysicsCollisionBehaviour;
 
     public PhysicsNode (
-        Vector2 position,
+        Vector2? position = null,
         float rotation = 0f,
         Vector2? scale = null,
         System.Func<PhysicsNode, bool>? CollisionLogic = null,
