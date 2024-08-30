@@ -1,59 +1,95 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SpeletGymnasiearbete.Classes;
 
+using static SpeletGymnasiearbete.Utils;  // Globals
 namespace SpeletGymnasiearbete;
 
 public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch;
-    private Texture2D _playerTexture;    
-    private Vector2 _player_position;
+    // Player
+    private Sprite Player;
+    private float _player_speed = 400f;
+    // Bullet
+    private List<Bullet> _bullets = [];
+    private Texture2D bullet_sprite;
+    private float _bullet_speed = 400f;
+    private Timer _bullet_cooldown = new(1, false);
 
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-       
+        Window.AllowUserResizing = true;
     }
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
+        Player = new Sprite(null, new Classes.Vector2(_graphics.GraphicsDevice.PresentationParameters.Bounds.Center.ToVector2()));
+        _bullet_cooldown.StartTimer();
 
         base.Initialize();
     }
 
     protected override void LoadContent()
     {
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
-       
-        // TODO: use this.Content to load your game content here
-        _playerTexture = Content.Load<Texture2D>("Player-1");
+        Globals.SetSpriteBatch(new SpriteBatch(GraphicsDevice));
+        Globals.SetContentManager(Content);
+        Globals.SetGraphicsDeviceManager(_graphics);
+
+        Player.Texture = Globals.ContentManager.Load<Texture2D>("Player-1");
+        bullet_sprite = Globals.CreateTexture(10, 10, Color.OrangeRed, Globals.CircleShader);
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+        KeyboardState keyboard = Keyboard.GetState();
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboard.IsKeyDown(Keys.Escape))
             Exit();
 
-        // TODO: Add your update logic here
-        Vector2 mouse_position = Mouse.GetState().Position.ToVector2();
-        _player_position = mouse_position - _playerTexture.Bounds.Size.ToVector2() / 2;
-        
+        // handle directional input and move player, TODO: controller support
+        Microsoft.Xna.Framework.Vector2 direction = new(
+            x: (keyboard.IsKeyDown(Keys.D) ? 1f : 0f) - (keyboard.IsKeyDown(Keys.A) ? 1f : 0f),
+            y: (keyboard.IsKeyDown(Keys.S) ? 1f : 0f) - (keyboard.IsKeyDown(Keys.W) ? 1f : 0f));
+        if (direction.Length() != 0) direction.Normalize();
+        Player.Position.Value += direction * _player_speed * GameTimeToDelta(gameTime);
+
+        // Update timer
+        _bullet_cooldown.Update(gameTime);
+
+        // Shoot bullets, TODO: controller support
+        MouseState mouse = Mouse.GetState();
+        if (mouse.LeftButton == ButtonState.Pressed && _bullet_cooldown.Finished)
+        {
+            Microsoft.Xna.Framework.Vector2 bullet_dir = mouse.Position.ToVector2() - Player.Position.Value;
+            bullet_dir.Normalize();
+            _bullets.Add(new Bullet(bullet_sprite, new Classes.Vector2(Player.Position.Value + Player.Texture.Bounds.Size.ToVector2() / 2), new Classes.Vector2(bullet_dir * _bullet_speed)));
+            _bullet_cooldown.StartTimer();
+        }
+
+        // Update every bullet and remove dead ones
+        _bullets.RemoveAll((bullet) => {
+            bullet.Update(gameTime);
+            return bullet.Object_is_dying;
+        });
+
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        // TODO: Add your drawing code here
-        _spriteBatch.Begin();
-        _spriteBatch.Draw(_playerTexture, _player_position, Color.White);
-        _spriteBatch.End();
+        // Draw player
+        Player.Draw();
+        
+        // Draw bullets
+        foreach(Sprite bullet in _bullets) { bullet.Draw(); }
+
         base.Draw(gameTime);
     }
 }
