@@ -1,23 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SpeletGymnasiearbete.Classes;
 
-using static SpeletGymnasiearbete.Utils;  // Globals
+using static SpeletGymnasiearbete.Utils;  // Globals and utilities
 namespace SpeletGymnasiearbete;
 
 public class Game1 : Game
 {
-    private GraphicsDeviceManager _graphics;
+    private readonly GraphicsDeviceManager _graphics;
     // Player
     private Sprite Player;
     private float _player_speed = 400f;
     // Bullet
-    private List<Bullet> _bullets = [];
+    private readonly List<Bullet> _bullets = [];
     private Texture2D bullet_sprite;
-    private float _bullet_speed = 400f;
-    private Timer _bullet_cooldown = new(1, false);
+    private readonly float _bullet_speed = 400f;
+    private readonly Timer _bullet_cooldown = new(0.1f, false);
 
     public Game1()
     {
@@ -29,6 +30,7 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
+        // Create the player at the center of the screen with the sprite to be loaded later
         Player = new Sprite(null, new Classes.Vector2(_graphics.GraphicsDevice.PresentationParameters.Bounds.Center.ToVector2()));
         _bullet_cooldown.StartTimer();
 
@@ -37,11 +39,14 @@ public class Game1 : Game
 
     protected override void LoadContent()
     {
+        // Add useful properties to Globals
         Globals.SetSpriteBatch(new SpriteBatch(GraphicsDevice));
         Globals.SetContentManager(Content);
         Globals.SetGraphicsDeviceManager(_graphics);
 
+        // Load player Texture
         Player.Texture = Globals.ContentManager.Load<Texture2D>("Player-1");
+        // Create new bullet Texture (OrangeRed circle with the radius 5)
         bullet_sprite = Globals.CreateTexture(10, 10, Color.OrangeRed, Globals.CircleShader);
     }
 
@@ -51,11 +56,13 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboard.IsKeyDown(Keys.Escape))
             Exit();
 
-        // handle directional input and move player, TODO: controller support
+        // Handle directional input and move player, TODO: controller support
         Microsoft.Xna.Framework.Vector2 direction = new(
             x: (keyboard.IsKeyDown(Keys.D) ? 1f : 0f) - (keyboard.IsKeyDown(Keys.A) ? 1f : 0f),
             y: (keyboard.IsKeyDown(Keys.S) ? 1f : 0f) - (keyboard.IsKeyDown(Keys.W) ? 1f : 0f));
+        // Make diagonals as fast a axials
         if (direction.Length() != 0) direction.Normalize();
+        // Update the player position
         Player.Position.Value += direction * _player_speed * GameTimeToDelta(gameTime);
 
         // Update timer
@@ -65,15 +72,28 @@ public class Game1 : Game
         MouseState mouse = Mouse.GetState();
         if (mouse.LeftButton == ButtonState.Pressed && _bullet_cooldown.Finished)
         {
-            Microsoft.Xna.Framework.Vector2 bullet_dir = mouse.Position.ToVector2() - Player.Position.Value;
-            bullet_dir.Normalize();
-            _bullets.Add(new Bullet(bullet_sprite, new Classes.Vector2(Player.Position.Value + Player.Texture.Bounds.Size.ToVector2() / 2), new Classes.Vector2(bullet_dir * _bullet_speed)));
+            // Get the distance from the bullet to the mouse
+            Microsoft.Xna.Framework.Vector2 bullet_dir = mouse.Position.ToVector2() - Player.Position.Value - Player.Texture.Bounds.Size.ToVector2() / 2;
+            // Get the direction of the distance Vector
+            if (bullet_dir != Microsoft.Xna.Framework.Vector2.Zero) bullet_dir.Normalize();
+            // if the direction is to nowhere (0, 0) then Random direction
+            else { bullet_dir = Microsoft.Xna.Framework.Vector2.One; bullet_dir.Rotate(new Random().NextSingle() * MathHelper.TwoPi); }  // TODO: use generated seed instead of default
+
+            // Create a Vector representing the direction to the mouse with the amplitude '_bullet_speed'
+            Classes.Vector2 bullet_velo = new(bullet_dir * _bullet_speed);
+            // Add some of the The relative velocity from the player to the bullet
+            bullet_velo.Value += direction * _player_speed / 2f;
+
+            // Spawn a bullet at the Player position with a velocity of 'bullet_velo'
+            _bullets.Add(new Bullet(bullet_sprite, new Classes.Vector2(Player.Position.Value + Player.Texture.Bounds.Size.ToVector2() / 2), bullet_velo));
+            // Start the cooldown so that it doesn't create a Bullet every frame the left mouse button is held
             _bullet_cooldown.StartTimer();
         }
 
-        // Update every bullet and remove dead ones
+        // Update every bullet
         _bullets.RemoveAll((bullet) => {
             bullet.Update(gameTime);
+            // If Bullet is marked for deletion remove it from the list so that it can be collected by the garbage collector
             return bullet.Object_is_dying;
         });
 
@@ -82,11 +102,11 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
+        // Clear previous draw calls and fill the background
         _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // Draw player
         Player.Draw();
-        
         // Draw bullets
         foreach(Sprite bullet in _bullets) { bullet.Draw(); }
 

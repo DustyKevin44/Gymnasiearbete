@@ -21,8 +21,10 @@ public sealed class Utils
     public void SetSpriteBatch(SpriteBatch spriteBatch) { SpriteBatch = spriteBatch; }
     public void SetGraphicsDeviceManager(GraphicsDeviceManager graphicsDeviceManager) { GraphicsDeviceManager = graphicsDeviceManager; }
 
+    // Convert GameTime object to delta time float
     public static float GameTimeToDelta(GameTime gameTime) { return (float)gameTime.ElapsedGameTime.TotalSeconds; }
 
+    // Creates a Texture with the dimentions (widt, height) the Color 'color' and optionally shaded using a FakeShaderTM
     public Texture2D CreateTexture(int width, int height, Color color, Func<int, int, int, int, Color, Color> Shader = null)
     {
         Texture2D texture = new(GraphicsDeviceManager.GraphicsDevice, width, height);
@@ -36,6 +38,7 @@ public sealed class Utils
         return texture;
     }
 
+    // A CreateTexture FakeShaderTM that makes the Texture into a circle of radius 'min(width, height)/2' and Color 'color'
     public Func<int, int, int, int, Color, Color> CircleShader = (int x, int y, int width, int height, Color color) =>
     {
         float radius = Math.Min(width, height) / 2;

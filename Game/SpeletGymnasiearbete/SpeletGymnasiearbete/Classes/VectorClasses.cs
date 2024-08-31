@@ -3,11 +3,13 @@ using System;
 
 namespace SpeletGymnasiearbete.Classes;
 
+// Base Vector2
 public interface IVector2
 {
     Microsoft.Xna.Framework.Vector2 Value { get; set; }
 }
 
+// Wrapper for Xna Vector2 to make StickyVector2 compatible
 public class Vector2 : IVector2
 {
     public Microsoft.Xna.Framework.Vector2 Value { get; set; }
