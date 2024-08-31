@@ -23,8 +23,9 @@ public class Sprite : IGameObject
     {
         if (Texture is not null)
         {
+            IVector2 camera_pos = (Globals.Active_Camera is Camera camera) ? camera.Position : new Vector2();
             Globals.SpriteBatch.Begin();
-            Globals.SpriteBatch.Draw(Texture, Position.Value, Tint);
+            Globals.SpriteBatch.Draw(Texture, Position.Value - camera_pos.Value, Tint);
             Globals.SpriteBatch.End();
         }
     }

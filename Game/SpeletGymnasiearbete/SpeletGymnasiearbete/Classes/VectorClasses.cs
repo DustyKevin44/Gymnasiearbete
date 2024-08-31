@@ -14,7 +14,8 @@ public class Vector2 : IVector2
 {
     public Microsoft.Xna.Framework.Vector2 Value { get; set; }
 
-    public Vector2() { Value = new Microsoft.Xna.Framework.Vector2(); }
+    public Vector2() { Value = Microsoft.Xna.Framework.Vector2.Zero; }
+    public Vector2(Vector2 other) { Value = other.Value; }
     public Vector2(Microsoft.Xna.Framework.Vector2 other) { Value = other; }
     public Vector2(float v) { Value = new Microsoft.Xna.Framework.Vector2(value: v); }
     public Vector2(float x, float y) { Value = new Microsoft.Xna.Framework.Vector2(x: x, y: y); }

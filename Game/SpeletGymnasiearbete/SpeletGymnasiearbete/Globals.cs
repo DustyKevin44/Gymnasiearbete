@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-
 namespace SpeletGymnasiearbete;
 
 public sealed class Utils
@@ -16,6 +15,7 @@ public sealed class Utils
     public GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 
     public static Utils Globals { get { lock (_lock) { _global ??= new Utils(); return _global; } } }
+    public Classes.Camera Active_Camera;
 
     public void SetContentManager(ContentManager contentManager) { ContentManager = contentManager; }
     public void SetSpriteBatch(SpriteBatch spriteBatch) { SpriteBatch = spriteBatch; }

@@ -19,6 +19,8 @@ public class Game1 : Game
     private Texture2D bullet_sprite;
     private readonly float _bullet_speed = 400f;
     private readonly Timer _bullet_cooldown = new(0.1f, false);
+    // Isometric Grid
+    private IsometricGrid _IsoGrid;
 
     public Game1()
     {
@@ -33,6 +35,10 @@ public class Game1 : Game
         // Create the player at the center of the screen with the sprite to be loaded later
         Player = new Sprite(null, new Classes.Vector2(_graphics.GraphicsDevice.PresentationParameters.Bounds.Center.ToVector2()));
         _bullet_cooldown.StartTimer();
+        // Create the isometric grid
+        _IsoGrid = new(new Classes.Vector2(300, 200), null, 5, 5, 32*4, 32*4);
+        // Create Camera
+        Globals.Active_Camera = new(new Classes.Vector2());
 
         base.Initialize();
     }
@@ -44,6 +50,8 @@ public class Game1 : Game
         Globals.SetContentManager(Content);
         Globals.SetGraphicsDeviceManager(_graphics);
 
+        // Load debug tile Texture
+        _IsoGrid._missing_texture = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
         // Load player Texture
         Player.Texture = Globals.ContentManager.Load<Texture2D>("Player-1");
         // Create new bullet Texture (OrangeRed circle with the radius 5)
@@ -97,6 +105,13 @@ public class Game1 : Game
             return bullet.Object_is_dying;
         });
 
+        // Move camera
+        Globals.Active_Camera.Position.Value = Microsoft.Xna.Framework.Vector2.SmoothStep(
+            Globals.Active_Camera.Position.Value,
+            Player.Position.Value - Globals.GraphicsDeviceManager.GraphicsDevice.PresentationParameters.Bounds.Size.ToVector2() / 2 + Player.Texture.Bounds.Size.ToVector2() / 2,
+            0.3f
+        );
+
         base.Update(gameTime);
     }
 
@@ -105,6 +120,8 @@ public class Game1 : Game
         // Clear previous draw calls and fill the background
         _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
+        // Draw Isometric grid
+        _IsoGrid.Draw();
         // Draw player
         Player.Draw();
         // Draw bullets

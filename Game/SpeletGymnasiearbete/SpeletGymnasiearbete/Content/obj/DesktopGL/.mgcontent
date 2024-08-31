@@ -4,9 +4,11 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>c:/Users/marti/Desktop/GitHub-Gymnasiearbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/Player-1.png</File>
+    <File>c:/Users/Viggo/OneDrive/Skrivbord/GymnasieArbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/IsoDebugTile.png</File>
+    <File>c:/Users/Viggo/OneDrive/Skrivbord/GymnasieArbete/Gymnasiearbete/Game/SpeletGymnasiearbete/SpeletGymnasiearbete/Content/Player-1.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
 </SourceFileCollection>

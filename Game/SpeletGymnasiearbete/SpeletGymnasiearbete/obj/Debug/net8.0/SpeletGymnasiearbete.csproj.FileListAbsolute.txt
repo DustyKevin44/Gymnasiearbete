@@ -79,3 +79,4 @@ C:\Users\Viggo\OneDrive\Skrivbord\GymnasieArbete\Gymnasiearbete\Game\SpeletGymna
 C:\Users\Viggo\OneDrive\Skrivbord\GymnasieArbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\obj\Debug\net8.0\SpeletGymnasiearbete.pdb
 C:\Users\Viggo\OneDrive\Skrivbord\GymnasieArbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\obj\Debug\net8.0\SpeletGymnasiearbete.genruntimeconfig.cache
 C:\Users\Viggo\OneDrive\Skrivbord\GymnasieArbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\obj\Debug\net8.0\ref\SpeletGymnasiearbete.dll
+C:\Users\Viggo\OneDrive\Skrivbord\GymnasieArbete\Gymnasiearbete\Game\SpeletGymnasiearbete\SpeletGymnasiearbete\bin\Debug\net8.0\Content\IsoDebugTile.xnb
