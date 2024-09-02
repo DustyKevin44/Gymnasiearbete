@@ -33,12 +33,12 @@ public class Game1 : Game
     protected override void Initialize()
     {
         // Create the player at the center of the screen with the sprite to be loaded later
-        Player = new Sprite(null, new Classes.Vector2(_graphics.GraphicsDevice.PresentationParameters.Bounds.Center.ToVector2()));
+        Player = new Sprite(null, _graphics.GraphicsDevice.PresentationParameters.Bounds.Center.ToVector2());
         _bullet_cooldown.StartTimer();
         // Create the isometric grid
-        _IsoGrid = new(new Classes.Vector2(300, 200), null, 5, 5, 32*4, 32*4);
+        _IsoGrid = new(new Vector2(300, 200), null, 100, 5, 32*3, 32*3);
         // Create Camera
-        Globals.Active_Camera = new(new Classes.Vector2());
+        Globals.Active_Camera = new(new Vector2());
 
         base.Initialize();
     }
@@ -65,13 +65,13 @@ public class Game1 : Game
             Exit();
 
         // Handle directional input and move player, TODO: controller support
-        Microsoft.Xna.Framework.Vector2 direction = new(
+        Vector2 direction = new(
             x: (keyboard.IsKeyDown(Keys.D) ? 1f : 0f) - (keyboard.IsKeyDown(Keys.A) ? 1f : 0f),
             y: (keyboard.IsKeyDown(Keys.S) ? 1f : 0f) - (keyboard.IsKeyDown(Keys.W) ? 1f : 0f));
-        // Make diagonals as fast a axials
+        // Makes diagonals as fast a axials TODO: make diagonals follow tile angle
         if (direction.Length() != 0) direction.Normalize();
         // Update the player position
-        Player.Position.Value += direction * _player_speed * GameTimeToDelta(gameTime);
+        Player.Position += direction * _player_speed * GameTimeToDelta(gameTime);
 
         // Update timer
         _bullet_cooldown.Update(gameTime);
@@ -81,19 +81,20 @@ public class Game1 : Game
         if (mouse.LeftButton == ButtonState.Pressed && _bullet_cooldown.Finished)
         {
             // Get the distance from the bullet to the mouse
-            Microsoft.Xna.Framework.Vector2 bullet_dir = mouse.Position.ToVector2() - Player.Position.Value - Player.Texture.Bounds.Size.ToVector2() / 2;
+            Vector2 camera_pos = (Globals.Active_Camera is Camera camera) ? camera.Position : new Vector2();
+            Vector2 bullet_dir = mouse.Position.ToVector2() + camera_pos - Player.Position - Player.Texture.Bounds.Size.ToVector2() / 2;
             // Get the direction of the distance Vector
-            if (bullet_dir != Microsoft.Xna.Framework.Vector2.Zero) bullet_dir.Normalize();
+            if (bullet_dir != Vector2.Zero) bullet_dir.Normalize();
             // if the direction is to nowhere (0, 0) then Random direction
-            else { bullet_dir = Microsoft.Xna.Framework.Vector2.One; bullet_dir.Rotate(new Random().NextSingle() * MathHelper.TwoPi); }  // TODO: use generated seed instead of default
+            else { bullet_dir = Vector2.One; bullet_dir.Rotate(new Random().NextSingle() * MathHelper.TwoPi); }  // TODO: use generated seed instead of default
 
             // Create a Vector representing the direction to the mouse with the amplitude '_bullet_speed'
-            Classes.Vector2 bullet_velo = new(bullet_dir * _bullet_speed);
+            Vector2 bullet_velo = bullet_dir * _bullet_speed;
             // Add some of the The relative velocity from the player to the bullet
-            bullet_velo.Value += direction * _player_speed / 2f;
+            bullet_velo += direction * _player_speed / 2f;
 
             // Spawn a bullet at the Player position with a velocity of 'bullet_velo'
-            _bullets.Add(new Bullet(bullet_sprite, new Classes.Vector2(Player.Position.Value + Player.Texture.Bounds.Size.ToVector2() / 2), bullet_velo));
+            _bullets.Add(new Bullet(bullet_sprite, Player.Position + Player.Texture.Bounds.Size.ToVector2() / 2, bullet_velo));
             // Start the cooldown so that it doesn't create a Bullet every frame the left mouse button is held
             _bullet_cooldown.StartTimer();
         }
@@ -106,10 +107,10 @@ public class Game1 : Game
         });
 
         // Move camera
-        Globals.Active_Camera.Position.Value = Microsoft.Xna.Framework.Vector2.SmoothStep(
-            Globals.Active_Camera.Position.Value,
-            Player.Position.Value - Globals.GraphicsDeviceManager.GraphicsDevice.PresentationParameters.Bounds.Size.ToVector2() / 2 + Player.Texture.Bounds.Size.ToVector2() / 2,
-            0.3f
+        Globals.Active_Camera.Position = Vector2.SmoothStep(
+            Globals.Active_Camera.Position,
+            Player.Position - Globals.GraphicsDeviceManager.GraphicsDevice.PresentationParameters.Bounds.Size.ToVector2() / 2 + Player.Texture.Bounds.Size.ToVector2() / 2,
+            0.2f
         );
 
         base.Update(gameTime);

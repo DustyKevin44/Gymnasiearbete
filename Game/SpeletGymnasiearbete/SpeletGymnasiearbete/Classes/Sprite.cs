@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #nullable enable
 
@@ -9,23 +10,23 @@ public class Sprite : IGameObject
 {
     public bool Object_is_dying { get; private set; } = false;
     public Texture2D? Texture;
-    public IVector2 Position;
-    public Microsoft.Xna.Framework.Color Tint = Microsoft.Xna.Framework.Color.White;
+    public Vector2 Position;
+    public Color Tint = Color.White;
 
-    public Sprite(Texture2D? texture, IVector2 position) { Texture = texture; Position = position; }
-    public Sprite(Texture2D? texture, IVector2 position, Microsoft.Xna.Framework.Color tint) { Texture = texture; Position = position; Tint = tint; }
+    public Sprite(Texture2D? texture, Vector2 position) { Texture = texture; Position = position; }
+    public Sprite(Texture2D? texture, Vector2 position, Color tint) { Texture = texture; Position = position; Tint = tint; }
 
     public void Queue_kill() { Object_is_dying = true; }
 
-    public void Update(Microsoft.Xna.Framework.GameTime gameTime) {}
+    public void Update(GameTime gameTime) {}
 
     public void Draw()
     {
         if (Texture is not null)
         {
-            IVector2 camera_pos = (Globals.Active_Camera is Camera camera) ? camera.Position : new Vector2();
+            Vector2 camera_pos = (Globals.Active_Camera is Camera camera) ? camera.Position : new Vector2();
             Globals.SpriteBatch.Begin();
-            Globals.SpriteBatch.Draw(Texture, Position.Value - camera_pos.Value, Tint);
+            Globals.SpriteBatch.Draw(Texture, Position - camera_pos, Tint);
             Globals.SpriteBatch.End();
         }
     }
