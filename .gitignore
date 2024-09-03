@@ -1,0 +1,69 @@
+# Visual Studio specific files
+.vs/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+ipch/
+.vscode/
+
+# MonoGame specific files
+*.mgcb
+bin/
+obj/
+*.xnb
+
+# Build directories
+Build/
+[Bb]in/
+[Oo]bj/
+*.dll
+*.exe
+*.app
+
+# NuGet packages
+*.nupkg
+*.nuget/packages/
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# OS generated files
+Thumbs.db
+.DS_Store
+ehthumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.old
+*.log
+*.suo
+*.user
+*.rsuser
+*.swp
+
+# Logs
+*.log
+
+# Mac OS generated files
+*.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows generated files
+Thumbs.db
+Desktop.ini
+
+# Rider specific files
+.idea/
+*.sln.iml
