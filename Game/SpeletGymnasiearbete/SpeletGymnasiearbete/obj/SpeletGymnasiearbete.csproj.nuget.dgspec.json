@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Viggo\\OneDrive\\Skrivbord\\GymnasieArbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj": {}
+    "C:\\Users\\Viggo Nordström\\Desktop\\GymnasieArbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Viggo\\OneDrive\\Skrivbord\\GymnasieArbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj": {
+    "C:\\Users\\Viggo Nordström\\Desktop\\GymnasieArbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Viggo\\OneDrive\\Skrivbord\\GymnasieArbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
+        "projectUniqueName": "C:\\Users\\Viggo Nordström\\Desktop\\GymnasieArbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
         "projectName": "SpeletGymnasiearbete",
-        "projectPath": "C:\\Users\\Viggo\\OneDrive\\Skrivbord\\GymnasieArbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
-        "packagesPath": "C:\\Users\\Viggo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Viggo\\OneDrive\\Skrivbord\\GymnasieArbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\obj\\",
+        "projectPath": "C:\\Users\\Viggo Nordström\\Desktop\\GymnasieArbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\SpeletGymnasiearbete.csproj",
+        "packagesPath": "C:\\Users\\Viggo Nordström\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Viggo Nordström\\Desktop\\GymnasieArbete\\Gymnasiearbete\\Game\\SpeletGymnasiearbete\\SpeletGymnasiearbete\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Viggo\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Viggo Nordström\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -74,7 +68,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
