@@ -21,6 +21,8 @@ Build/
 *.dll
 *.exe
 *.app
+Content/obj
+Content/bin
 
 # NuGet packages
 *.nupkg
