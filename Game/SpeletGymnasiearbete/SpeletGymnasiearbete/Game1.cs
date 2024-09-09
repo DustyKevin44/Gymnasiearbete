@@ -7,7 +7,7 @@ using SpeletGymnasiearbete.Classes;
 
 using static SpeletGymnasiearbete.Utils;  // Globals and utilities
 namespace SpeletGymnasiearbete;
-
+/* muhahah */
 public class Game1 : Game
 {
     private readonly GraphicsDeviceManager _graphics;
