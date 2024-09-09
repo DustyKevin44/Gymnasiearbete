@@ -21,6 +21,7 @@ public class Game1 : Game
     private readonly Timer _bullet_cooldown = new(0.1f, false);
     // Isometric Grid
     private IsometricGrid _IsoGrid;
+    private readonly Sprite _testCube = new(null, Vector2.Zero);
 
     public Game1()
     {
@@ -39,7 +40,7 @@ public class Game1 : Game
         _IsoGrid = new(new Vector2(300, 200), null, 100, 5, 32*3, 32*3);
         // Create Camera
         Globals.Active_Camera = new(new Vector2());
-
+        
         base.Initialize();
     }
 
@@ -52,6 +53,8 @@ public class Game1 : Game
 
         // Load debug tile Texture
         _IsoGrid._missing_texture = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
+        // get test cube
+        _testCube.Texture = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
         // Load player Texture
         Player.Texture = Globals.ContentManager.Load<Texture2D>("Player-1");
         // Create new bullet Texture (OrangeRed circle with the radius 5)
@@ -64,12 +67,30 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboard.IsKeyDown(Keys.Escape))
             Exit();
 
-        // Handle directional input and move player, TODO: controller support
-        Vector2 direction = new(
-            x: (keyboard.IsKeyDown(Keys.D) ? 1f : 0f) - (keyboard.IsKeyDown(Keys.A) ? 1f : 0f),
-            y: (keyboard.IsKeyDown(Keys.S) ? 1f : 0f) - (keyboard.IsKeyDown(Keys.W) ? 1f : 0f));
-        // Makes diagonals as fast a axials TODO: make diagonals follow tile angle
-        if (direction.Length() != 0) direction.Normalize();
+        Vector2 direction = Vector2.Zero;
+        if (keyboard.IsKeyDown(Keys.W)) direction.Y += -1;
+        if (keyboard.IsKeyDown(Keys.S)) direction.Y += 1;
+        if (direction.Y != 0)
+        {
+            if (keyboard.IsKeyDown(Keys.A))
+            {
+                direction.Rotate(1.107149611f * direction.Y);
+            }
+            if (keyboard.IsKeyDown(Keys.D))
+            {
+                direction.Rotate(1.107149611f * -direction.Y);
+            }
+        } else {
+        if (keyboard.IsKeyDown(Keys.A))
+            {
+                direction.X += -1;
+            }
+            if (keyboard.IsKeyDown(Keys.D))
+            {
+                direction.X += 1;
+            }
+        }
+
         // Update the player position
         Player.Position += direction * _player_speed * GameTimeToDelta(gameTime);
 
@@ -123,6 +144,14 @@ public class Game1 : Game
 
         // Draw Isometric grid
         _IsoGrid.Draw();
+
+        // Draw test cube
+        Vector2 camera_pos = (Globals.Active_Camera is Camera camera) ? camera.Position : Vector2.Zero;
+        Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        Globals.SpriteBatch.Draw(_testCube.Texture, position: -camera_pos, null, Color.White, rotation: 0f, Vector2.UnitX * 50, Vector2.One*5, default, 0f);
+        Globals.SpriteBatch.Draw(_testCube.Texture, position: -camera_pos, null, Color.White, rotation: 1.463f, Vector2.Zero, Vector2.One*5, default, 0f);
+        Globals.SpriteBatch.End();
+
         // Draw player
         Player.Draw();
         // Draw bullets
