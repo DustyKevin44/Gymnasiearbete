@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tileset version="1.10" tiledversion="1.10.2" name="IsometricTileset" tilewidth="32" tileheight="32" tilecount="12" columns="12">
+ <image source="../../Downloads/gyarisotilemapgrasstest2.png" width="384" height="32"/>
+ <tile id="6">
+  <objectgroup draworder="index" id="3">
+   <object id="2" x="0.939688" y="8.24034">
+    <polygon points="0,0 -0.0722837,15.6856 14.9627,22.9139"/>
+   </object>
+  </objectgroup>
+ </tile>
+</tileset>
