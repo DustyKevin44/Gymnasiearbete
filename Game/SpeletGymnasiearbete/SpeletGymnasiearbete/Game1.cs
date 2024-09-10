@@ -8,9 +8,10 @@ using MonoGame.Extended.Content;
 
 using SpeletGymnasiearbete.Classes;
 
-using static SpeletGymnasiearbete.Utils;  // Globals and utilities
+using static SpeletGymnasiearbete.Utils;
+using System.Linq;  // Globals and utilities
 namespace SpeletGymnasiearbete;
-/* muhahah */
+
 public class Game1 : Game
 {
     private readonly GraphicsDeviceManager _graphics;
@@ -24,7 +25,7 @@ public class Game1 : Game
     private readonly Timer _bullet_cooldown = new(0.1f, false);
     // Isometric Grid
     private Texture2D tileset1;
-    private IsometricGrid _IsoGrid;
+    //private IsometricGrid _IsoGrid;
     
     // Isometric Tilemap
     private TilemapCode _tilemapCode;
@@ -44,8 +45,10 @@ public class Game1 : Game
         // Create the player at the center of the screen with the sprite to be loaded later
         Player = new Sprite(null, _graphics.GraphicsDevice.PresentationParameters.Bounds.Center.ToVector2());
         _bullet_cooldown.StartTimer();
+        
         // Create the isometric grid
-        _IsoGrid = new(new Vector2(300, 200), null, 100, 5, 32*3, 32*3);
+        //_IsoGrid = new(new Vector2(300, 200), null, 100, 5, 32*3, 32*3);
+        
         // Create Camera
         Globals.Active_Camera = new(new Vector2());
         
@@ -53,14 +56,8 @@ public class Game1 : Game
         _tilemapCode = new TilemapCode();
         //Load tilemap
         //Dictionary<Vector2, int> tilemap = TilemapCode.LoadMap("./playgroundtilemap.tmx");
-        _tileMap = _tilemapCode.LoadMap(TilemapCode.LayerData("../../../playgroundtilemap.tmx", "Tile Layer 1"));
-        // 1111111
-        // 1111111
-        // 1111111
-        // 1111111
-        
-        Console.WriteLine(_tileMap); // Pass the map file name without extension
-        
+        _tileMap = TilemapCode.LoadMap("../../../playgroundtilemap.tmx");
+
         base.Initialize();
     }
 
@@ -71,13 +68,18 @@ public class Game1 : Game
         Globals.SetContentManager(Content);
         Globals.SetGraphicsDeviceManager(_graphics);
 
-        tileset1 = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
+        tileset1 = Globals.ContentManager.Load<Texture2D>("tilesetImage");
+        //_tilemapCode.LoadContent(GraphicsDevice, Content, "playgroundtilemap");
+
         // Load debug tile Texture
-        _IsoGrid._missing_texture = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
+        //_IsoGrid._missing_texture = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
+        
         // get test cube
-        _testCube.Texture = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
+        //_testCube.Texture = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
+        
         // Load player Texture
         Player.Texture = Globals.ContentManager.Load<Texture2D>("Player-1");
+        
         // Create new bullet Texture (OrangeRed circle with the radius 5)
         bullet_sprite = Globals.CreateTexture(10, 10, Color.OrangeRed, Globals.CircleShader);
     }
@@ -167,14 +169,13 @@ public class Game1 : Game
         _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // Draw Isometric grid
-        _IsoGrid.Draw();
+        //_IsoGrid.Draw();
 
         // Draw test cube
-        Vector2 camera_pos = (Globals.Active_Camera is Camera camera) ? camera.Position : Vector2.Zero;
-        Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        Globals.SpriteBatch.Draw(_testCube.Texture, position: -camera_pos, null, Color.White, rotation: 0f, Vector2.UnitX * 50, Vector2.One*5, default, 0f);
-        Globals.SpriteBatch.Draw(_testCube.Texture, position: -camera_pos, null, Color.White, rotation: 1.463f, Vector2.Zero, Vector2.One*5, default, 0f);
-        Globals.SpriteBatch.End();
+        //Vector2 camera_pos = (Globals.Active_Camera is Camera camera) ? camera.Position : Vector2.Zero;
+        //Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        //Globals.SpriteBatch.Draw(_testCube.Texture, position: -camera_pos, null, Color.White, rotation: 0f, Vector2.UnitX * 50, Vector2.One*5, default, 0f);
+        //Globals.SpriteBatch.End();
 
         // Draw map
         _tilemapCode.Draw(gameTime);
