@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.Tiled;
+using MonoGame.Extended.Content;
+
 using SpeletGymnasiearbete.Classes;
 
 using static SpeletGymnasiearbete.Utils;  // Globals and utilities
@@ -20,12 +23,12 @@ public class Game1 : Game
     private readonly float _bullet_speed = 400f;
     private readonly Timer _bullet_cooldown = new(0.1f, false);
     // Isometric Grid
-    
+    private Texture2D tileset1;
     private IsometricGrid _IsoGrid;
     
     // Isometric Tilemap
     private TilemapCode _tilemapCode;
-    
+    private Dictionary<Vector2, int> _tileMap;
     private readonly Sprite _testCube = new(null, Vector2.Zero);
 
     public Game1()
@@ -48,8 +51,16 @@ public class Game1 : Game
         
         // Initialize tilemap
         _tilemapCode = new TilemapCode();
-        _tilemapCode.LoadContent(GraphicsDevice, Content, "tilesetImage"); // Pass the map file name without extension
-
+        //Load tilemap
+        //Dictionary<Vector2, int> tilemap = TilemapCode.LoadMap("./playgroundtilemap.tmx");
+        _tileMap = _tilemapCode.LoadMap(TilemapCode.LayerData("../../../playgroundtilemap.tmx", "Tile Layer 1"));
+        // 1111111
+        // 1111111
+        // 1111111
+        // 1111111
+        
+        Console.WriteLine(_tileMap); // Pass the map file name without extension
+        
         base.Initialize();
     }
 
@@ -60,6 +71,7 @@ public class Game1 : Game
         Globals.SetContentManager(Content);
         Globals.SetGraphicsDeviceManager(_graphics);
 
+        tileset1 = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
         // Load debug tile Texture
         _IsoGrid._missing_texture = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
         // get test cube
