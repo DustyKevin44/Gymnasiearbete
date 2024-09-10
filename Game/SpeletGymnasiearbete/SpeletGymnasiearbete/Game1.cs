@@ -20,7 +20,12 @@ public class Game1 : Game
     private readonly float _bullet_speed = 400f;
     private readonly Timer _bullet_cooldown = new(0.1f, false);
     // Isometric Grid
+    
     private IsometricGrid _IsoGrid;
+    
+    // Isometric Tilemap
+    private TilemapCode _tilemapCode;
+    
     private readonly Sprite _testCube = new(null, Vector2.Zero);
 
     public Game1()
@@ -41,6 +46,10 @@ public class Game1 : Game
         // Create Camera
         Globals.Active_Camera = new(new Vector2());
         
+        // Initialize tilemap
+        _tilemapCode = new TilemapCode();
+        _tilemapCode.LoadContent(GraphicsDevice, Content, "tilesetImage"); // Pass the map file name without extension
+
         base.Initialize();
     }
 
@@ -134,6 +143,9 @@ public class Game1 : Game
             0.2f
         );
 
+        // Update map
+        _tilemapCode.Update(gameTime);
+
         base.Update(gameTime);
     }
 
@@ -151,6 +163,9 @@ public class Game1 : Game
         Globals.SpriteBatch.Draw(_testCube.Texture, position: -camera_pos, null, Color.White, rotation: 0f, Vector2.UnitX * 50, Vector2.One*5, default, 0f);
         Globals.SpriteBatch.Draw(_testCube.Texture, position: -camera_pos, null, Color.White, rotation: 1.463f, Vector2.Zero, Vector2.One*5, default, 0f);
         Globals.SpriteBatch.End();
+
+        // Draw map
+        _tilemapCode.Draw(gameTime);
 
         // Draw player
         Player.Draw();
