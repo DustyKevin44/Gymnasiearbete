@@ -29,8 +29,12 @@ public class Game1 : Game
     
     // Isometric Tilemap
     private TilemapCode _tilemapCode;
-    private Dictionary<Vector2, int> _tileMap;
+    private Dictionary<Vector2, int> _mapLayer1;
+    private Dictionary<Vector2, int> _mapLayer2;
+    private Dictionary<Vector2, int> _mapLayer3;
+    private Dictionary<Vector2, int> _mapLayerCollision;
     private readonly Sprite _testCube = new(null, Vector2.Zero);
+    private Vector2 camera_pos;
 
     public Game1()
     {
@@ -56,7 +60,11 @@ public class Game1 : Game
         _tilemapCode = new TilemapCode();
         //Load tilemap
         //Dictionary<Vector2, int> tilemap = TilemapCode.LoadMap("./playgroundtilemap.tmx");
-        _tileMap = TilemapCode.LoadMap("../../../playgroundtilemap.tmx");
+        _mapLayer1 = TilemapCode.LoadMap("../../../playgroundtilemap_Tile Layer 1.csv");
+        _mapLayer2 = TilemapCode.LoadMap("../../../playgroundtilemap_Tile Layer 2.csv");
+        _mapLayer3 = TilemapCode.LoadMap("../../../playgroundtilemap_Tile Layer 3.csv");
+        _mapLayerCollision = TilemapCode.LoadMap("../../../playgroundtilemap_Collision.csv");
+
 
         base.Initialize();
     }
@@ -156,6 +164,7 @@ public class Game1 : Game
             Player.Position - Globals.GraphicsDeviceManager.GraphicsDevice.PresentationParameters.Bounds.Size.ToVector2() / 2 + Player.Texture.Bounds.Size.ToVector2() / 2,
             0.2f
         );
+        camera_pos = Globals.Active_Camera.Position;
 
         // Update map
         _tilemapCode.Update(gameTime);
@@ -167,9 +176,61 @@ public class Game1 : Game
     {
         // Clear previous draw calls and fill the background
         _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
-
+        
         // Draw Isometric grid
         //_IsoGrid.Draw();
+        
+        Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        int scale = 4;
+        int tile_size = 128;
+        int real_size = tile_size * scale;
+                
+        foreach (KeyValuePair<Vector2, int> item in _mapLayer1)
+            {
+                // item.Key is the position (Vector2) of the tile
+                // item.Value is the index or type of the tile
+               
+                Vector2 position = item.Key; // The position of the tile               
+                Vector2 worldpos =  new(
+                    (position.X - position.Y) * (tile_size / 2),
+                    (position.X + position.Y) * (tile_size / 4)
+                );
+                int tileIndex = item.Value;  // The index of the tile in the tileset
+                //Console.WriteLine(item.Key+ " and "+item.Value);
+                // Draw the tile at the given position
+                Globals.SpriteBatch.Draw(tileset1, worldpos-camera_pos, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, Vector2.One*4, SpriteEffects.None, 0f);
+            }
+             foreach (KeyValuePair<Vector2, int> item in _mapLayer2)
+            {
+                // item.Key is the position (Vector2) of the tile
+                // item.Value is the index or type of the tile
+               
+                Vector2 position = item.Key; // The position of the tile               
+                Vector2 worldpos =  new(
+                    (position.X - position.Y) * (tile_size / 2),
+                    (position.X + position.Y) * (tile_size / 4)
+                );
+                int tileIndex = item.Value;  // The index of the tile in the tileset
+                //Console.WriteLine(item.Key+ " and "+item.Value);
+                // Draw the tile at the given position
+                Globals.SpriteBatch.Draw(tileset1, worldpos-camera_pos, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, Vector2.One*4, SpriteEffects.None, 0f);
+            }
+             foreach (KeyValuePair<Vector2, int> item in _mapLayer3)
+            {
+                // item.Key is the position (Vector2) of the tile
+                // item.Value is the index or type of the tile
+               
+                Vector2 position = item.Key; // The position of the tile               
+                Vector2 worldpos =  new(
+                    (position.X - position.Y) * (tile_size / 2),
+                    (position.X + position.Y) * (tile_size / 4)
+                );
+                int tileIndex = item.Value;  // The index of the tile in the tileset
+                //Console.WriteLine(item.Key+ " and "+item.Value);
+                // Draw the tile at the given position
+                Globals.SpriteBatch.Draw(tileset1, worldpos-camera_pos, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, Vector2.One*4, SpriteEffects.None, 0f);
+            }
+        Globals.SpriteBatch.End();
 
         // Draw test cube
         //Vector2 camera_pos = (Globals.Active_Camera is Camera camera) ? camera.Position : Vector2.Zero;

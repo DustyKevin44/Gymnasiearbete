@@ -17,6 +17,8 @@ public class TilemapCode
 
     public static Dictionary<Vector2, int> LoadMap(string filepath)
     {
+        System.Console.WriteLine(filepath);
+
         Dictionary<Vector2, int> result = [];
         System.IO.StreamReader reader = new(filepath);
         int y = 0;
@@ -35,6 +37,7 @@ public class TilemapCode
             }
             y++;
         }
+        System.Console.WriteLine(result);
         return result;
     }
 
