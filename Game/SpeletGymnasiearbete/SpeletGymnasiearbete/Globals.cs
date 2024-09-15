@@ -2,9 +2,6 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.Tiled;
-using MonoGame.Extended.Tiled.Renderers;
-using MonoGame.Extended.Content;
 
 namespace SpeletGymnasiearbete;
 
@@ -18,7 +15,7 @@ public sealed class Utils
     public GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 
     public static Utils Globals { get { lock (_lock) { _global ??= new Utils(); return _global; } } }
-    public Classes.Camera Active_Camera;
+    public Classes.Camera Active_Camera = new(Vector2.Zero);
 
     public void SetContentManager(ContentManager contentManager) { ContentManager = contentManager; }
     public void SetSpriteBatch(SpriteBatch spriteBatch) { SpriteBatch = spriteBatch; }
