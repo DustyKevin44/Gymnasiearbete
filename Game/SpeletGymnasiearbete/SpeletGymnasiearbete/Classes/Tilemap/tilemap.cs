@@ -46,7 +46,7 @@ public class TileLayer(Point face_size, Point tile_size, Point group_size, Point
                 
                 if (_tiles[x,y] is ITileLayer tile) tile.Draw(position);
                 else
-                    Globals.SpriteBatch.Draw(tile_set, position - Globals.Active_Camera.Position, new Rectangle((_tiles[x,y].Position.ToVector2() * Tile_size).ToPoint(), Tile_size.ToPoint()), Color.White, rotation, tile_size.ToVector2() / 2f, scale, effects, depth);
+                    Globals.SpriteBatch.Draw(tile_set, position - Globals.Active_Camera.Position, new Rectangle((_tiles[x,y].Position.ToVector2() * Tile_size).ToPoint(), Tile_size.ToPoint()), Color.White, rotation, Tile_size / 2f, scale, effects, depth);
             }
         }
     }
