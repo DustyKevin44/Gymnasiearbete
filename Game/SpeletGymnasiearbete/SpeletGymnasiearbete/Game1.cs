@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended.Tiled;
-using MonoGame.Extended.Content;
 
 using SpeletGymnasiearbete.Classes;
+using SpeletGymnasiearbete.Classes.Tilemap;
+using static SpeletGymnasiearbete.Utils;  // Globals and utilities
 
-using static SpeletGymnasiearbete.Utils;
-using System.Linq;  // Globals and utilities
 namespace SpeletGymnasiearbete;
 
 public class Game1 : Game
@@ -35,24 +33,7 @@ public class Game1 : Game
     private readonly Sprite _testCube = new(null, Vector2.Zero);
     private bool pressed = false;
 
-    // Tilesize's face
-    private const float WIDTH = 128f;
-    private const float HEIGHT = 128f / 2f;
-    private const float WIDTH_over_2 = WIDTH / 2f;
-    private const float HEIGHT_over_2 = HEIGHT / 2f;
-
-    public Vector2 WorldToIso(Vector2 World) {
-        return new(
-            (float)Math.Round(World.X / WIDTH + World.Y / HEIGHT - 1),
-            (float)Math.Round(World.Y / HEIGHT - World.X / WIDTH)
-        );
-    }
-    public Vector2 IsoToWorld(Vector2 Iso) {
-        return new(
-            (Iso.X - Iso.Y) * WIDTH_over_2,
-            (Iso.X + Iso.Y) * HEIGHT_over_2
-        );
-    }
+    private readonly TileLayer _tilemap = new(new(32, 16), new(32, 32), new(100, 100), new(), null);
 
 
     public Game1()
@@ -135,7 +116,7 @@ public class Game1 : Game
         {
             if (!pressed)
             {
-                Vector2 index = WorldToIso(mouse.Position.ToVector2() + Globals.Active_Camera.Position);
+                Vector2 index = _tilemap.WorldToIso(mouse.Position.ToVector2() + Globals.Active_Camera.Position).ToVector2();
                 if (_mapLayer2.TryGetValue(index, out int value))
                 {
                     if (value < 11) _mapLayer2[index] = ++value;
@@ -193,26 +174,27 @@ public class Game1 : Game
         //_IsoGrid.Draw();
         
         Vector2 scale = new(4);
+        _tilemap.scale = scale;
 
         Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
         foreach (KeyValuePair<Vector2, int> item in _mapLayer1)
         {
             // Draw the tile at the given position
-            Globals.SpriteBatch.Draw(tileset1, IsoToWorld(item.Key) - Globals.Active_Camera.Position, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            Globals.SpriteBatch.Draw(tileset1, _tilemap.IsoToWorld(item.Key) - Globals.Active_Camera.Position, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
 
         foreach (KeyValuePair<Vector2, int> item in _mapLayer2)
         {
             // Draw the tile at the given position
-            Globals.SpriteBatch.Draw(tileset1, IsoToWorld(item.Key) - Globals.Active_Camera.Position, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            Globals.SpriteBatch.Draw(tileset1, _tilemap.IsoToWorld(item.Key) - Globals.Active_Camera.Position, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
 
         foreach (KeyValuePair<Vector2, int> item in _mapLayer3)
         {
             // Draw the tile at the given position
-            Globals.SpriteBatch.Draw(tileset1, IsoToWorld(item.Key) - Globals.Active_Camera.Position, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            Globals.SpriteBatch.Draw(tileset1, _tilemap.IsoToWorld(item.Key) - Globals.Active_Camera.Position, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
-        Globals.SpriteBatch.Draw(tileset1, IsoToWorld(WorldToIso(Mouse.GetState().Position.ToVector2() + Globals.Active_Camera.Position)) - Vector2.UnitY * HEIGHT - Globals.Active_Camera.Position, new Rectangle(0, 0, 32, 32), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        Globals.SpriteBatch.Draw(tileset1, _tilemap.IsoToWorld(_tilemap.WorldToIso(Mouse.GetState().Position.ToVector2() + Globals.Active_Camera.Position).ToVector2()) - Vector2.UnitY * _tilemap.Tile_size.Y - Globals.Active_Camera.Position, new Rectangle(0, 0, 32, 32), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         Globals.SpriteBatch.End();
 
         // Draw test cube
