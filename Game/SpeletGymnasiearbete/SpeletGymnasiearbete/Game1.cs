@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 using SpeletGymnasiearbete.Classes;
-using SpeletGymnasiearbete.Classes.Tilemap;
 using static SpeletGymnasiearbete.Utils;  // Globals and utilities
 
 namespace SpeletGymnasiearbete;
@@ -21,20 +20,9 @@ public class Game1 : Game
     private Texture2D bullet_sprite;
     private readonly float _bullet_speed = 400f;
     private readonly Timer _bullet_cooldown = new(0.1f, false);
-    // Isometric Grid
-    private Texture2D tileset1;
-    //private IsometricGrid _IsoGrid;
-    
+
     // Isometric Tilemap
-    private Dictionary<Vector2, int> _mapLayer1;
-    private Dictionary<Vector2, int> _mapLayer2;
-    private Dictionary<Vector2, int> _mapLayer3;
-    private Dictionary<Vector2, int> _mapLayerCollision;
-    private readonly Sprite _testCube = new(null, Vector2.Zero);
-    private bool pressed = false;
-
-    private readonly TileLayer _tilemap = new(new(32, 16), new(32, 32), new(100, 100), new(), null);
-
+    private readonly TileMap tileMap = new(4, new Vector2(4, 4), new Point(32, 16), new Point(32, 32));
 
     public Game1()
     {
@@ -51,17 +39,22 @@ public class Game1 : Game
         _bullet_cooldown.StartTimer();
         
         // Create the isometric grid
-        //_IsoGrid = new(new Vector2(300, 200), null, 100, 5, 32*3, 32*3);
-        
+        tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 1.csv", 0, new(32, 32));
+        tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 2.csv", 1, new(32, 32));
+        tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 3.csv", 2, new(32, 32));
+        tileMap.LoadLayer("../../../playgroundtilemap_Collision.csv", 3, new(32, 32));
+
         // Create Camera
         Globals.Active_Camera = new(new Vector2());
         
+        /*
         //Load tilemap
         //Dictionary<Vector2, int> tilemap = TilemapCode.LoadMap("./playgroundtilemap.tmx");
         _mapLayer1 = TilemapCode.LoadMap("../../../playgroundtilemap_Tile Layer 1.csv");
         _mapLayer2 = TilemapCode.LoadMap("../../../playgroundtilemap_Tile Layer 2.csv");
         _mapLayer3 = TilemapCode.LoadMap("../../../playgroundtilemap_Tile Layer 3.csv");
         _mapLayerCollision = TilemapCode.LoadMap("../../../playgroundtilemap_Collision.csv");
+        */
 
         base.Initialize();
     }
@@ -73,10 +66,8 @@ public class Game1 : Game
         Globals.SetContentManager(Content);
         Globals.SetGraphicsDeviceManager(_graphics);
 
-        tileset1 = Globals.ContentManager.Load<Texture2D>("tilesetImage");
-        
-        // get test cube
-        //_testCube.Texture = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
+        // Load tileset
+        tileMap.LoadTileset("tilesetImage");
         
         // Load player Texture
         Player.Texture = Globals.ContentManager.Load<Texture2D>("Player-1");
@@ -111,24 +102,7 @@ public class Game1 : Game
 
         // Shoot bullets, TODO: controller support
         MouseState mouse = Mouse.GetState();
-        
-        if (mouse.LeftButton == ButtonState.Pressed)
-        {
-            if (!pressed)
-            {
-                Vector2 index = _tilemap.WorldToIso(mouse.Position.ToVector2() + Globals.Active_Camera.Position).ToVector2();
-                if (_mapLayer2.TryGetValue(index, out int value))
-                {
-                    if (value < 11) _mapLayer2[index] = ++value;
-                    else _mapLayer2.Remove(index);
-                }
-                else _mapLayer2[index] = 5;
-            }
-            pressed = true;
-        }
-        else pressed = false;
-
-        if (false && _bullet_cooldown.Finished)
+        if (mouse.LeftButton == ButtonState.Pressed && _bullet_cooldown.Finished)
         {
             // Get the distance from the bullet to the mouse
             Vector2 bullet_dir = mouse.Position.ToVector2() + Globals.Active_Camera.Position - Player.Position - Player.Texture.Bounds.Size.ToVector2() / 2;
@@ -171,36 +145,11 @@ public class Game1 : Game
         _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
         
         // Draw Isometric grid
-        //_IsoGrid.Draw();
-        
-        Vector2 scale = new(4);
-        _tilemap.scale = scale;
-
         Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        foreach (KeyValuePair<Vector2, int> item in _mapLayer1)
-        {
-            // Draw the tile at the given position
-            Globals.SpriteBatch.Draw(tileset1, _tilemap.IsoToWorld(item.Key) - Globals.Active_Camera.Position, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-        }
-
-        foreach (KeyValuePair<Vector2, int> item in _mapLayer2)
-        {
-            // Draw the tile at the given position
-            Globals.SpriteBatch.Draw(tileset1, _tilemap.IsoToWorld(item.Key) - Globals.Active_Camera.Position, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-        }
-
-        foreach (KeyValuePair<Vector2, int> item in _mapLayer3)
-        {
-            // Draw the tile at the given position
-            Globals.SpriteBatch.Draw(tileset1, _tilemap.IsoToWorld(item.Key) - Globals.Active_Camera.Position, new Rectangle(item.Value*32, 0, 32, 32), Color.White, rotation: 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-        }
-        Globals.SpriteBatch.Draw(tileset1, _tilemap.IsoToWorld(_tilemap.WorldToIso(Mouse.GetState().Position.ToVector2() + Globals.Active_Camera.Position).ToVector2()) - Vector2.UnitY * _tilemap.Tile_size.Y - Globals.Active_Camera.Position, new Rectangle(0, 0, 32, 32), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        tileMap.Layers[0].Draw(Point.Zero, new Point(100, 100), Globals.SpriteBatch, tileMap, 0);
+        tileMap.Layers[1].Draw(Point.Zero, new Point(100, 100), Globals.SpriteBatch, tileMap, 1);
+        tileMap.Layers[2].Draw(Point.Zero, new Point(100, 100), Globals.SpriteBatch, tileMap, 2);
         Globals.SpriteBatch.End();
-
-        // Draw test cube
-        //Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        //Globals.SpriteBatch.Draw(_testCube.Texture, position: -camera_pos, null, Color.White, rotation: 0f, Vector2.UnitX * 50, Vector2.One*5, default, 0f);
-        //Globals.SpriteBatch.End();
 
         // Draw player
         Player.Draw();
