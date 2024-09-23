@@ -6,33 +6,6 @@ using Microsoft.Xna.Framework.Graphics;
 using static SpeletGymnasiearbete.Utils;
 namespace SpeletGymnasiearbete.Classes;
 
-/*
-
-public abstract class BaseTileLayer<T>(Vector2 offset, Point layer_size, Point face_size, Point tile_size, Vector2 scale)
-{
-    public Vector2 Offset = offset;
-    public Vector2 Scale = scale;
-    public Point Layer_size = layer_size;
-    protected Point _face_size = face_size;
-    public Point Tile_size = tile_size;
-    protected Vector2 _faceOver2 = face_size.ToVector2() / 2f;
-
-    public Point WorldToIso(Vector2 World) {
-        return new(
-            (int)Math.Round(World.X / _face_size.X * Scale.X + World.Y / _face_size.Y * Scale.Y - 1),
-            (int)Math.Round(World.Y / _face_size.Y * Scale.Y - World.X / _face_size.X * Scale.X)
-        );
-    }
-    
-    public Vector2 IsoToWorld(Vector2 Iso) {
-        return new(
-            (Iso.X - Iso.Y) * _faceOver2.X * Scale.X,
-            (Iso.X + Iso.Y) * _faceOver2.Y * Scale.Y
-        );
-    }
-}
-*/
-
 public class TileMap(int layers, Vector2 scale, Point face_size, Point tile_size)
 {
     public readonly TileLayer[] Layers = new TileLayer[layers];
@@ -68,12 +41,15 @@ public class TileLayer
 
     public void Draw(Point start, Point end, SpriteBatch spriteBatch, TileMap tileMap, int layer_id)
     {
+        start.X = (start.X < min.X) ? min.X : start.X;
+        start.Y = (start.Y < min.Y) ? min.Y : start.Y;
         for(;start.X<end.X;start.X++)
         {
             if (start.X >= _chunks.Count) continue;
             for(;start.Y<end.Y;start.Y++)
             {
-                if (start.Y >= _chunks[start.X].Count) continue;
+                if (start.Y >= _chunks[start.X].Count) break;
+                if (_chunks[start.X][start.Y] is null) continue;
                 _chunks[start.X][start.Y].Draw(spriteBatch, tileMap, new Vector2(0, layer_id * tileMap.Face_size.Y * tileMap.Scale.Y));
             }
         }
@@ -131,13 +107,12 @@ public class TileLayer
                         layer.SetChunk(new ChunkPlane(chunk_size), new(x / chunk_size.X, y / chunk_size.Y));
                     else if (y / chunk_size.Y >= layer._chunks[x / chunk_size.X].Count)
                         layer.SetChunk(new ChunkPlane(chunk_size), new(x / chunk_size.X, y / chunk_size.Y));
-
+                    if (layer._chunks[x/chunk_size.X][y/chunk_size.Y] is null) layer._chunks[x/chunk_size.X][y/chunk_size.Y] = new ChunkPlane(chunk_size);
                     layer._chunks[x/chunk_size.X][y/chunk_size.Y].SetTile(new(x % chunk_size.X, y % chunk_size.Y), value);
                 }
             }
             y++;
         }
-
         return layer;
     }
 }
@@ -149,24 +124,37 @@ public interface IChunk
     public void Draw(SpriteBatch spriteBatch, TileMap tileMap, Vector2 offset);
 }
 
-public class ChunkPlane(Point Size) : IChunk
+public class ChunkPlane : IChunk
 {
-    private readonly int[,] _tiles = new int[Size.X, Size.Y];
+    private readonly int[][] _tiles;
 
-    public void Draw(SpriteBatch spriteBatch, TileMap tileMap, Vector2 offset)
+    public ChunkPlane(Point Size)
     {
-        for(int x=0; x<_tiles.GetLength(0); x++)
+        _tiles = new int[Size.X][];
+        for(int x=0; x<Size.X; x++)
         {
-            for(int y=0; y<_tiles.GetLength(1); y++)
+            _tiles[x] = new int[Size.Y];
+            for(int y=0; y<Size.Y; y++)
             {
-                if (_tiles[x,y] == -1) continue;
-                spriteBatch.Draw(tileMap.Tileset, tileMap.IsoToWorld(new Point(x, y)) + offset - Globals.Active_Camera.Position, new Rectangle(_tiles[x,y] * tileMap.Tile_size.X, 0, tileMap.Tile_size.X, tileMap.Tile_size.Y), Color.White, 0f, Vector2.Zero, tileMap.Scale, SpriteEffects.None, 0f);
+                _tiles[x][y] = -1;
             }
         }
     }
 
-    public void SetTile(Point position, int tile) { _tiles[position.X, position.Y] = tile; }
-    public int GetTile(Point position) { return _tiles[position.X, position.Y]; }
+    public void Draw(SpriteBatch spriteBatch, TileMap tileMap, Vector2 offset)
+    {
+        for(int x=0; x<_tiles.Length; x++)
+        {
+            for(int y=0; y<_tiles[x].Length; y++)
+            {
+                if (_tiles[x][y] == -1) continue;
+                spriteBatch.Draw(tileMap.Tileset, tileMap.IsoToWorld(new Point(x, y)) + offset - Globals.Active_Camera.Position, new Rectangle(_tiles[x][y] * tileMap.Tile_size.X, 0, tileMap.Tile_size.X, tileMap.Tile_size.Y), Color.White, 0f, Vector2.Zero, tileMap.Scale, SpriteEffects.None, 0f);
+            }
+        }
+    }
+
+    public void SetTile(Point position, int tile) { _tiles[position.X][position.Y] = tile; }
+    public int GetTile(Point position) { return _tiles[position.X][position.Y]; }
 }
 
 public class ChunkMap : IChunk
@@ -177,7 +165,6 @@ public class ChunkMap : IChunk
     {
         foreach(KeyValuePair<Point, int> pair in _tiles)
         {
-            if (pair.Value == -1) continue;
             spriteBatch.Draw(tileMap.Tileset, tileMap.IsoToWorld(pair.Key) + offset - Globals.Active_Camera.Position, new Rectangle(pair.Value * tileMap.Tile_size.X, 0, tileMap.Tile_size.X, tileMap.Tile_size.Y), Color.White, 0f, Vector2.Zero, tileMap.Scale, SpriteEffects.None, 0f);
         }
     }
