@@ -37,7 +37,7 @@ public class TileMap(int layers, Vector2 scale, Point face_size, Point tile_size
 public class TileLayer
 {
     private Point min = Point.Zero;
-    private List<List<IChunk>> _chunks = [[]];
+    private readonly List<List<IChunk>> _chunks = [[]];
 
     public void Draw(Point start, Point end, SpriteBatch spriteBatch, TileMap tileMap, int layer_id)
     {
@@ -50,7 +50,7 @@ public class TileLayer
             {
                 if (start.Y >= _chunks[start.X].Count) break;
                 if (_chunks[start.X][start.Y] is null) continue;
-                _chunks[start.X][start.Y].Draw(spriteBatch, tileMap, new Vector2(0, layer_id * tileMap.Face_size.Y * tileMap.Scale.Y));
+                _chunks[start.X][start.Y].Draw(spriteBatch, tileMap, new Vector2(0, 0));//-1 * layer_id * tileMap.Face_size.Y * tileMap.Scale.Y));
             }
         }
     }
@@ -66,32 +66,26 @@ public class TileLayer
         return null;
     }
 
-    public IChunk SetChunk(IChunk chunk, Point position)
+    public void SetChunk(IChunk chunk, Point position)
     {
-        // Append Lists and Chunks until _chunks[position.X][position.Y] = null
-        if (position.X < min.X)
-        {
-            _chunks.InsertRange(0, Enumerable.Repeat<List<IChunk>>([], min.X - position.X + 1));
-            min.X = position.X;
+        if (position.X < 0) {
+            for (int x=position.X; x<=0; x++) _chunks.Add([]);
+            position.X = 0;
+        } else {
+            for (int x=0; x <= position.X - _chunks.Count; x++) _chunks.Add([]);
         }
-        else if (position.X >= _chunks.Count)
-            _chunks.AddRange(Enumerable.Repeat<List<IChunk>>([], position.X - min.X + 1));
-        
-        if (position.Y < min.Y)
-        {
-            _chunks[position.X].InsertRange(0, Enumerable.Repeat<IChunk>(null, min.Y - position.Y + 1));
-            min.Y = position.Y;
+        if (position.Y < 0) {
+            for (int y=position.Y; y<=0; y++) _chunks.Add(null);
+            position.Y = 0;
+        } else {
+            for (int y=0; y <= position.Y - _chunks[position.X].Count; y++) _chunks[position.X].Add(null);
         }
-        else if (position.Y >= _chunks[position.X].Count)
-            _chunks[position.X].AddRange(Enumerable.Repeat<IChunk>(null, position.Y - min.Y + 1));
-        // Set Chunk and return the replaced chunk, null if no chunk replaced
-        IChunk replaced = _chunks[position.X][position.Y];
         _chunks[position.X][position.Y] = chunk;
-        return replaced;
     }
 
     public static TileLayer FromSVC(string filepath, Point chunk_size)
     {
+        if (chunk_size.X == 0 | chunk_size.Y == 0) throw new System.Exception("Can not initialize TileLayer with a chunk size of 0.");
         TileLayer layer = new();
 
         System.IO.StreamReader reader = new(filepath);
@@ -101,15 +95,13 @@ public class TileLayer
             string[] items = line.Split(",");
             for (int x = 0; x < items.Length; x++)
             {
-                if (int.TryParse(items[x], out int value))
-                {
-                    if (x / chunk_size.X >= layer._chunks.Count)
-                        layer.SetChunk(new ChunkPlane(chunk_size), new(x / chunk_size.X, y / chunk_size.Y));
-                    else if (y / chunk_size.Y >= layer._chunks[x / chunk_size.X].Count)
-                        layer.SetChunk(new ChunkPlane(chunk_size), new(x / chunk_size.X, y / chunk_size.Y));
-                    if (layer._chunks[x/chunk_size.X][y/chunk_size.Y] is null) layer._chunks[x/chunk_size.X][y/chunk_size.Y] = new ChunkPlane(chunk_size);
-                    layer._chunks[x/chunk_size.X][y/chunk_size.Y].SetTile(new(x % chunk_size.X, y % chunk_size.Y), value);
-                }
+                if (x / chunk_size.X >= layer._chunks.Count)
+                    layer.SetChunk(new ChunkPlane(chunk_size), new(x / chunk_size.X, y / chunk_size.Y));
+                else if (y / chunk_size.Y >= layer._chunks[x / chunk_size.X].Count)
+                    layer.SetChunk(new ChunkPlane(chunk_size), new(x / chunk_size.X, y / chunk_size.Y));
+                if (layer._chunks[x/chunk_size.X][y/chunk_size.Y] is null) layer._chunks[x/chunk_size.X][y/chunk_size.Y] = new ChunkPlane(chunk_size);
+
+                layer._chunks[x/chunk_size.X][y/chunk_size.Y].SetTile(new(x % chunk_size.X, y % chunk_size.Y), int.TryParse(items[x], out int value) ? value : 1);
             }
             y++;
         }
@@ -172,20 +164,3 @@ public class ChunkMap : IChunk
     public void SetTile(Point position, int tile) { _tiles[position] = tile; }
     public int GetTile(Point position) { return _tiles[position]; }
 }
-
-
-/*
-TileMap
-    * TileLayers
-    * Tileset
-    * Tile Logic
-
-TileLayer
-    * TileChunks
-
-TileChunk (Fixed size)
-    * Tiles
-        - Map: Vector -> T
-        or Array: [T, T, ...], [...], ...
-
-*/
