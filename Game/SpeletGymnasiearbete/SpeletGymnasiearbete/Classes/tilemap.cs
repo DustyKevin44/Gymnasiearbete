@@ -36,28 +36,25 @@ public class TileMap(int layers, Vector2 scale, Point face_size, Point tile_size
 
 public class TileLayer
 {
-    private Point min = Point.Zero;
     private readonly List<List<IChunk>> _chunks = [[]];
 
-    public void Draw(Point start, Point end, SpriteBatch spriteBatch, TileMap tileMap, int layer_id)
+    public void Draw(Point start, Point end, SpriteBatch spriteBatch, TileMap tileMap)
     {
-        start.X = (start.X < min.X) ? min.X : start.X;
-        start.Y = (start.Y < min.Y) ? min.Y : start.Y;
-        for(;start.X<end.X;start.X++)
+        for (int x=start.X; x <= end.X; x++)
         {
-            if (start.X >= _chunks.Count) continue;
-            for(;start.Y<end.Y;start.Y++)
+            if (x >= _chunks.Count) continue;
+            for (int y=start.Y; y <= end.Y; y++)
             {
-                if (start.Y >= _chunks[start.X].Count) break;
-                if (_chunks[start.X][start.Y] is null) continue;
-                _chunks[start.X][start.Y].Draw(spriteBatch, tileMap, new Vector2(0, 0));//-1 * layer_id * tileMap.Face_size.Y * tileMap.Scale.Y));
+                if (y >= _chunks[x].Count) continue;
+                if (_chunks[x][y] is null) continue;
+                Vector2 position = tileMap.IsoToWorld(new(x*2, y*2));
+                _chunks[x][y].Draw(spriteBatch, tileMap, new Vector2(position.X, position.Y));
             }
         }
     }
 
     public IChunk GetChunk(Point position)
     {
-        position -= min;
         if (_chunks.Count > position.X && position.X >= 0 &&
             _chunks[position.X].Count > position.Y && position.Y >= 0)
         {
@@ -75,7 +72,7 @@ public class TileLayer
             for (int x=0; x <= position.X - _chunks.Count; x++) _chunks.Add([]);
         }
         if (position.Y < 0) {
-            for (int y=position.Y; y<=0; y++) _chunks.Add(null);
+            for (int y=position.Y; y<=0; y++) _chunks[position.X].Add(null);
             position.Y = 0;
         } else {
             for (int y=0; y <= position.Y - _chunks[position.X].Count; y++) _chunks[position.X].Add(null);
@@ -85,7 +82,7 @@ public class TileLayer
 
     public static TileLayer FromSVC(string filepath, Point chunk_size)
     {
-        if (chunk_size.X == 0 | chunk_size.Y == 0) throw new System.Exception("Can not initialize TileLayer with a chunk size of 0.");
+        if (chunk_size.X < 1 || chunk_size.Y < 1) throw new System.Exception("Can not initialize TileLayer with a chunk size less than (1, 1).");
         TileLayer layer = new();
 
         System.IO.StreamReader reader = new(filepath);
@@ -95,16 +92,25 @@ public class TileLayer
             string[] items = line.Split(",");
             for (int x = 0; x < items.Length; x++)
             {
-                if (x / chunk_size.X >= layer._chunks.Count)
-                    layer.SetChunk(new ChunkPlane(chunk_size), new(x / chunk_size.X, y / chunk_size.Y));
-                else if (y / chunk_size.Y >= layer._chunks[x / chunk_size.X].Count)
-                    layer.SetChunk(new ChunkPlane(chunk_size), new(x / chunk_size.X, y / chunk_size.Y));
-                if (layer._chunks[x/chunk_size.X][y/chunk_size.Y] is null) layer._chunks[x/chunk_size.X][y/chunk_size.Y] = new ChunkPlane(chunk_size);
+                Point chunk_pos = new(x / chunk_size.X, y / chunk_size.Y);
+                Point tile_pos = new(x % chunk_size.X, y % chunk_size.Y);
 
-                layer._chunks[x/chunk_size.X][y/chunk_size.Y].SetTile(new(x % chunk_size.X, y % chunk_size.Y), int.TryParse(items[x], out int value) ? value : 1);
+                if (chunk_pos.X >= layer._chunks.Count)
+                    layer._chunks.Add([]);
+                if (chunk_pos.Y >= layer._chunks[chunk_pos.X].Count)
+                    layer._chunks[chunk_pos.X].Add(new ChunkPlane(chunk_size));
+/*
+                System.Console.Write(new Point(x, y));
+                System.Console.Write(" | ");
+                System.Console.Write(chunk_pos);
+                System.Console.Write(" | ");
+                System.Console.WriteLine(tile_pos);
+*/
+                layer._chunks[chunk_pos.X][chunk_pos.Y].SetTile(tile_pos, int.TryParse(items[x], out int value) ? value : 1);
             }
             y++;
         }
+        reader.Close();
         return layer;
     }
 }
