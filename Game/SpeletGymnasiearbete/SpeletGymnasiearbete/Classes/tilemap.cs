@@ -21,8 +21,8 @@ public class TileMap(int layers, Vector2 scale, Point face_size, Point tile_size
 
     public Point WorldToIso(Vector2 World) {
         return new(
-            (int)System.Math.Round(World.X / Face_size.X * Scale.X + World.Y / Face_size.Y * Scale.Y - 1),
-            (int)System.Math.Round(World.Y / Face_size.Y * Scale.Y - World.X / Face_size.X * Scale.X)
+            (int)System.Math.Round(World.X / (Face_size.X * Scale.X) + World.Y / (Face_size.Y * Scale.Y - 1)),
+            (int)System.Math.Round(World.Y / (Face_size.Y * Scale.Y) - World.X / (Face_size.X * Scale.X))
         );
     }
     
@@ -42,10 +42,10 @@ public class TileLayer
     {
         for (int x=start.X; x <= end.X; x++)
         {
-            if (x >= _chunks.Count) continue;
+            if (x < 0 || x >= _chunks.Count) continue;
             for (int y=start.Y; y <= end.Y; y++)
             {
-                if (y >= _chunks[x].Count) continue;
+                if (y < 0 || y >= _chunks[x].Count) continue;
                 if (_chunks[x][y] is null) continue;
                 Vector2 position = tileMap.IsoToWorld(new(x*2, y*2));
                 _chunks[x][y].Draw(spriteBatch, tileMap, new Vector2(position.X, position.Y));
@@ -99,13 +99,7 @@ public class TileLayer
                     layer._chunks.Add([]);
                 if (chunk_pos.Y >= layer._chunks[chunk_pos.X].Count)
                     layer._chunks[chunk_pos.X].Add(new ChunkPlane(chunk_size));
-/*
-                System.Console.Write(new Point(x, y));
-                System.Console.Write(" | ");
-                System.Console.Write(chunk_pos);
-                System.Console.Write(" | ");
-                System.Console.WriteLine(tile_pos);
-*/
+                    
                 layer._chunks[chunk_pos.X][chunk_pos.Y].SetTile(tile_pos, int.TryParse(items[x], out int value) ? value : 1);
             }
             y++;

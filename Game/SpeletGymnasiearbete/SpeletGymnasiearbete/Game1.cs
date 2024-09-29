@@ -23,6 +23,7 @@ public class Game1 : Game
 
     // Isometric Tilemap
     private readonly TileMap tileMap = new(4, new Vector2(4, 4), new Point(32, 16), new Point(32, 32));
+    private readonly Point chunk_size = new(2, 2);
 
     public Game1()
     {
@@ -39,14 +40,13 @@ public class Game1 : Game
         _bullet_cooldown.StartTimer();
         
         // test csv tileMap files
-        tileMap.LoadLayer("../../../test.csv", 0, new(2, 2)); // TODO: fix chunk loading
-
+        //tileMap.LoadLayer("../../../test.csv", 0, new(2, 2)); // TODO: fix chunk loading
         //tileMap.LoadLayer("../../../test2.csv", 1, new(32, 32));
 
         // Create the isometric grid
-        //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 1.csv", 0, new(32, 32));
-        //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 2.csv", 1, new(32, 32));
-        //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 3.csv", 2, new(32, 32));
+        tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 1.csv", 0, chunk_size);
+        tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 2.csv", 1, chunk_size);
+        tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 3.csv", 2, chunk_size);
         //tileMap.LoadLayer("../../../playgroundtilemap_Collision.csv", 3, new(32, 32));
 
         // Create Camera
@@ -149,11 +149,16 @@ public class Game1 : Game
         // Clear previous draw calls and fill the background
         _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
         
+        Point Player_Tile_pos = tileMap.WorldToIso(Player.Position);
+        Point Player_chunk = new(Player_Tile_pos.X / chunk_size.X, Player_Tile_pos.Y / chunk_size.Y);
+        Point Player_inner_pos = new(Player_Tile_pos.X % chunk_size.X, Player_Tile_pos.Y % chunk_size.Y);
+        Point offset = new(1, 1);
+
         // Draw Isometric grid
         Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        tileMap.Layers[0].Draw(Point.Zero, new Point(3, 3), Globals.SpriteBatch, tileMap);
-        //tileMap.Layers[1].Draw(Point.Zero, new Point(100, 100), Globals.SpriteBatch, tileMap);
-        //tileMap.Layers[2].Draw(Point.Zero, new Point(100, 100), Globals.SpriteBatch, tileMap);
+        tileMap.Layers[0].Draw(Player_chunk - offset, Player_chunk + offset, Globals.SpriteBatch, tileMap);
+        tileMap.Layers[1].Draw(Player_chunk - offset, Player_chunk + offset, Globals.SpriteBatch, tileMap);
+        tileMap.Layers[2].Draw(Player_chunk - offset, Player_chunk + offset, Globals.SpriteBatch, tileMap);
         Globals.SpriteBatch.End();
 
         // Draw player
