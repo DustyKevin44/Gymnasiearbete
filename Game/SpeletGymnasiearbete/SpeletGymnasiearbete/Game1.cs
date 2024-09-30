@@ -14,7 +14,7 @@ public class Game1 : Game
     private readonly GraphicsDeviceManager _graphics;
     // Player
     private Sprite Player;
-    private float _player_speed = 400f;
+    private float _player_speed = 100;
     // Bullet
     private readonly List<Bullet> _bullets = [];
     private Texture2D bullet_sprite;
@@ -40,12 +40,12 @@ public class Game1 : Game
         _bullet_cooldown.StartTimer();
         
         // test csv tileMap files
-        //tileMap.LoadLayer("../../../test.csv", 0, new(2, 2)); // TODO: fix chunk loading
-        //tileMap.LoadLayer("../../../test2.csv", 1, new(32, 32));
+        tileMap.LoadLayer("../../../test.csv", 0, chunk_size);
+        tileMap.LoadLayer("../../../test2.csv", 1, chunk_size);
 
         // Create the isometric grid
-        tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 1.csv", 0, chunk_size);
-        tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 2.csv", 1, chunk_size);
+        //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 1.csv", 0, chunk_size);
+        //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 2.csv", 1, chunk_size);
         tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 3.csv", 2, chunk_size);
         //tileMap.LoadLayer("../../../playgroundtilemap_Collision.csv", 3, new(32, 32));
 
@@ -99,8 +99,49 @@ public class Game1 : Game
             if (keyboard.IsKeyDown(Keys.D)) direction.Rotate(1.107149611f * -direction.Y);
         }
 
-        // Update the player position
-        Player.Position += direction * _player_speed * GameTimeToDelta(gameTime);
+        // Update the player position. TODO: make player able to stand on other layers
+        Vector2 step = direction * _player_speed * GameTimeToDelta(gameTime);
+        Player.Position += step;
+
+        Vector2 centered_player_pos = Player.Position + new Vector2(Player.Texture.Width/2, Player.Texture.Height);
+        Vector2 Centered_Player_global_tile_pos = tileMap.WorldToIsoVec(centered_player_pos);
+        Vector2 pl_gl_t_pos = tileMap.WorldToIsoVec(Player.Position) + new Vector2(0.25f, -0.25f);
+        Point Player_chunk_pos = new((int)Centered_Player_global_tile_pos.X / chunk_size.X, (int)Centered_Player_global_tile_pos.Y / chunk_size.Y);
+        Point Player_tile_pos = new((int)Centered_Player_global_tile_pos.X % chunk_size.X, (int)Centered_Player_global_tile_pos.Y % chunk_size.Y);
+
+        if (tileMap.Layers[0].GetChunk(Player_chunk_pos) is not IChunk chunk0 || chunk0.GetTile(Player_tile_pos) is not int type0 || type0 == -1) {
+            Player.Position -= step;
+        }
+
+        float z = 0f;
+        if (tileMap.Layers[1].GetChunk(Player_chunk_pos) is not null)
+        {
+            switch (tileMap.Layers[1].GetChunk(Player_chunk_pos).GetTile(Player_tile_pos))
+            {
+                case 5:
+                    z = tileMap.Face_size.Y * tileMap.Scale.Y;
+                    break;
+                case 8:
+                    z = tileMap.Face_size.Y * tileMap.Scale.Y / 2;
+                    break;
+                case 9:
+                    z = tileMap.Face_size.Y * tileMap.Scale.Y / 4;
+                    break;
+                case 6:
+                case 11:
+                    z = 2 - pl_gl_t_pos.X + Player_tile_pos.X;
+                    Console.WriteLine(pl_gl_t_pos.X);
+                    z *= tileMap.Face_size.Y * tileMap.Scale.X;
+                    break;
+                case 7:
+                case 12:
+                    z = 2 - pl_gl_t_pos.Y + Player_tile_pos.Y;
+                    Console.WriteLine(pl_gl_t_pos.Y);
+                    z *= tileMap.Face_size.Y * tileMap.Scale.Y;
+                    break;
+            }
+        }
+        Player.Z_offset = z;
 
         // Update timer
         _bullet_cooldown.Update(gameTime);
@@ -151,20 +192,23 @@ public class Game1 : Game
         
         Point Player_Tile_pos = tileMap.WorldToIso(Player.Position);
         Point Player_chunk = new(Player_Tile_pos.X / chunk_size.X, Player_Tile_pos.Y / chunk_size.Y);
-        Point Player_inner_pos = new(Player_Tile_pos.X % chunk_size.X, Player_Tile_pos.Y % chunk_size.Y);
-        Point offset = new(1, 1);
+        //Point Player_inner_pos = new(Player_Tile_pos.X % chunk_size.X, Player_Tile_pos.Y % chunk_size.Y);
+        Point render_dist = new(2, 2);
 
         // Draw Isometric grid
         Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        tileMap.Layers[0].Draw(Player_chunk - offset, Player_chunk + offset, Globals.SpriteBatch, tileMap);
-        tileMap.Layers[1].Draw(Player_chunk - offset, Player_chunk + offset, Globals.SpriteBatch, tileMap);
-        tileMap.Layers[2].Draw(Player_chunk - offset, Player_chunk + offset, Globals.SpriteBatch, tileMap);
+        tileMap.Layers[0].Draw(Player_chunk - render_dist, Player_chunk + render_dist, Globals.SpriteBatch, tileMap);
+        tileMap.Layers[1].Draw(Player_chunk - render_dist, Player_chunk + render_dist, Globals.SpriteBatch, tileMap);
+        tileMap.Layers[2].Draw(Player_chunk - render_dist, Player_chunk + render_dist, Globals.SpriteBatch, tileMap);
         Globals.SpriteBatch.End();
 
         // Draw player
         Player.Draw();
         // Draw bullets
-        foreach(Sprite bullet in _bullets) { bullet.Draw(); }
+        //foreach(Sprite bullet in _bullets) { bullet.Draw(); }
+        Globals.SpriteBatch.Begin();
+        Globals.SpriteBatch.Draw(bullet_sprite, Player.Position + new Vector2(Player.Texture.Width/2, Player.Texture.Height) - Globals.Active_Camera.Position, Color.White);
+        Globals.SpriteBatch.End();
 
         base.Draw(gameTime);
     }

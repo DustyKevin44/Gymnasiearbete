@@ -21,12 +21,28 @@ public class TileMap(int layers, Vector2 scale, Point face_size, Point tile_size
 
     public Point WorldToIso(Vector2 World) {
         return new(
-            (int)System.Math.Round(World.X / (Face_size.X * Scale.X) + World.Y / (Face_size.Y * Scale.Y - 1)),
+            (int)System.Math.Round(World.X / (Face_size.X * Scale.X) + World.Y / (Face_size.Y * Scale.Y) - 1),
             (int)System.Math.Round(World.Y / (Face_size.Y * Scale.Y) - World.X / (Face_size.X * Scale.X))
         );
     }
-    
+
     public Vector2 IsoToWorld(Point Iso) {
+        return new(
+            (Iso.X - Iso.Y) * _faceOver2.X * Scale.X,
+            (Iso.X + Iso.Y) * _faceOver2.Y * Scale.Y
+        );
+    }
+
+    public Vector2 WorldToIsoVec(Vector2 World)
+    {
+        return new(
+            World.X / (Face_size.X * Scale.X) + World.Y / (Face_size.Y * Scale.Y) - 1,
+            World.Y / (Face_size.Y * Scale.Y) - World.X / (Face_size.X * Scale.X)
+        );
+    }
+
+    public Vector2 IsoToWorldVec(Vector2 Iso)
+    {
         return new(
             (Iso.X - Iso.Y) * _faceOver2.X * Scale.X,
             (Iso.X + Iso.Y) * _faceOver2.Y * Scale.Y
@@ -111,8 +127,8 @@ public class TileLayer
 
 public interface IChunk
 {
-    public void SetTile(Point position, int tile);
-    public int GetTile(Point position);
+    public bool SetTile(Point position, int tile);
+    public int? GetTile(Point position);
     public void Draw(SpriteBatch spriteBatch, TileMap tileMap, Vector2 offset);
 }
 
@@ -145,8 +161,22 @@ public class ChunkPlane : IChunk
         }
     }
 
-    public void SetTile(Point position, int tile) { _tiles[position.X][position.Y] = tile; }
-    public int GetTile(Point position) { return _tiles[position.X][position.Y]; }
+    public bool SetTile(Point position, int tile)
+    {
+        if (position.X >= 0 && position.X < _tiles.Length && position.Y >= 0 && position.Y < _tiles[position.X].Length)
+        {
+            _tiles[position.X][position.Y] = tile;
+            return true;
+        }
+        return false;
+    }
+    
+    public int? GetTile(Point position)
+    {
+        if (position.X >= 0 && position.X < _tiles.Length && position.Y >= 0 && position.Y < _tiles[position.X].Length)
+            return _tiles[position.X][position.Y];
+        return null;
+    }
 }
 
 public class ChunkMap : IChunk
@@ -161,6 +191,12 @@ public class ChunkMap : IChunk
         }
     }
 
-    public void SetTile(Point position, int tile) { _tiles[position] = tile; }
-    public int GetTile(Point position) { return _tiles[position]; }
+    public bool SetTile(Point position, int tile) { _tiles[position] = tile; return true; }
+    
+    public int? GetTile(Point position)
+    {
+        if (_tiles.TryGetValue(position, out int value))
+            return value;
+        return null;
+    }
 }
