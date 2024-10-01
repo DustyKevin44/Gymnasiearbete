@@ -14,7 +14,7 @@ public class Game1 : Game
     private readonly GraphicsDeviceManager _graphics;
     // Player
     private Sprite Player;
-    private float _player_speed = 100;
+    private float _player_speed = 200f;
     // Bullet
     private readonly List<Bullet> _bullets = [];
     private Texture2D bullet_sprite;
@@ -46,7 +46,7 @@ public class Game1 : Game
         // Create the isometric grid
         //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 1.csv", 0, chunk_size);
         //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 2.csv", 1, chunk_size);
-        tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 3.csv", 2, chunk_size);
+        //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 3.csv", 2, chunk_size);
         //tileMap.LoadLayer("../../../playgroundtilemap_Collision.csv", 3, new(32, 32));
 
         // Create Camera
@@ -113,16 +113,28 @@ public class Game1 : Game
             Player.Position -= step;
         }
 
+        // Add logic to change which layer to check depending on z_offset
+
         float z = 0f;
         if (tileMap.Layers[1].GetChunk(Player_chunk_pos) is not null)
         {
             switch (tileMap.Layers[1].GetChunk(Player_chunk_pos).GetTile(Player_tile_pos))
             {
                 case 5:
-                    z = tileMap.Face_size.Y * tileMap.Scale.Y;
+                    if (Player.Z_offset > tileMap.Face_size.Y * tileMap.Scale.Y / 2) {
+                        z = tileMap.Face_size.Y * tileMap.Scale.Y;
+                        break;
+                    }
+                    Player.Position -= step;
+                    z = Player.Z_offset;
                     break;
                 case 8:
-                    z = tileMap.Face_size.Y * tileMap.Scale.Y / 2;
+                    if (Player.Z_offset >= tileMap.Face_size.Y * tileMap.Scale.Y / 4) {
+                        z = tileMap.Face_size.Y * tileMap.Scale.Y / 2;
+                        break;
+                    }
+                    Player.Position -= step;
+                    z = Player.Z_offset;
                     break;
                 case 9:
                     z = tileMap.Face_size.Y * tileMap.Scale.Y / 4;
@@ -130,13 +142,21 @@ public class Game1 : Game
                 case 6:
                 case 11:
                     z = 2 - pl_gl_t_pos.X + Player_tile_pos.X;
-                    Console.WriteLine(pl_gl_t_pos.X);
+                    if (z - Player.Z_offset > 0.2) {
+                        Player.Position -= step;
+                        z = Player.Z_offset;
+                        break;
+                    }
                     z *= tileMap.Face_size.Y * tileMap.Scale.X;
                     break;
                 case 7:
-                case 12:
+                case 10:
                     z = 2 - pl_gl_t_pos.Y + Player_tile_pos.Y;
-                    Console.WriteLine(pl_gl_t_pos.Y);
+                    if (z - Player.Z_offset > 0.2) {
+                        Player.Position -= step;
+                        z = Player.Z_offset;
+                        break;
+                    }
                     z *= tileMap.Face_size.Y * tileMap.Scale.Y;
                     break;
             }
@@ -199,7 +219,7 @@ public class Game1 : Game
         Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
         tileMap.Layers[0].Draw(Player_chunk - render_dist, Player_chunk + render_dist, Globals.SpriteBatch, tileMap);
         tileMap.Layers[1].Draw(Player_chunk - render_dist, Player_chunk + render_dist, Globals.SpriteBatch, tileMap);
-        tileMap.Layers[2].Draw(Player_chunk - render_dist, Player_chunk + render_dist, Globals.SpriteBatch, tileMap);
+        //tileMap.Layers[2].Draw(Player_chunk - render_dist, Player_chunk + render_dist, Globals.SpriteBatch, tileMap);
         Globals.SpriteBatch.End();
 
         // Draw player
@@ -207,7 +227,7 @@ public class Game1 : Game
         // Draw bullets
         //foreach(Sprite bullet in _bullets) { bullet.Draw(); }
         Globals.SpriteBatch.Begin();
-        Globals.SpriteBatch.Draw(bullet_sprite, Player.Position + new Vector2(Player.Texture.Width/2, Player.Texture.Height) - Globals.Active_Camera.Position, Color.White);
+        Globals.SpriteBatch.Draw(bullet_sprite, Player.Position + new Vector2(Player.Texture.Width/2, Player.Texture.Height) - Vector2.UnitY * Player.Z_offset - Globals.Active_Camera.Position, Color.White);
         Globals.SpriteBatch.End();
 
         base.Draw(gameTime);
