@@ -1,10 +1,8 @@
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 
 #nullable enable
-
 
 using static SpeletGymnasiearbete.Utils;
 namespace SpeletGymnasiearbete.Classes;
@@ -16,7 +14,7 @@ public class Sprite : IGameObject
     public Vector2 Position;
     public Color Tint = Color.White;
     public float Z_offset = 0f;
-
+    
     public Sprite(Texture2D? texture, Vector2 position) { Texture = texture; Position = position; }
     public Sprite(Texture2D? texture, Vector2 position, Color tint) { Texture = texture; Position = position; Tint = tint; }
 
@@ -39,12 +37,13 @@ public class AnimatedSprite : Sprite{
     public Timer newTimer;
     public int AnimationLength; // Hur många bilder animationen är
     public int currentFrame = 0; // Hehe 8===D
-    public float frameTick; // Ifall lika med 1000 så byter den bild efter en sekund / Tid per bild i millisekunder
-    public AnimatedSprite(Texture2D? texture, Vector2 position, int TheLengthOfAnimationAmount, float FrameTick ) : base(texture, position) 
+    
+        public float frameTick; // Ifall lika med 1000 så byter den bild efter en sekund / Tid per bild i millisekunder
+    public AnimatedSprite(Texture2D? texture, Vector2 position, int TheLengthOfAnimationAmount, float FrameTick, bool repeat) : base(texture, position) 
     {
         AnimationLength = TheLengthOfAnimationAmount;
         frameTick = FrameTick;
-        newTimer = new Timer(frameTick*AnimationLength, true);
+        newTimer = new Timer(frameTick*AnimationLength, repeat);
     }   
     public new void Update(GameTime gametime){
         newTimer.Update(gametime);

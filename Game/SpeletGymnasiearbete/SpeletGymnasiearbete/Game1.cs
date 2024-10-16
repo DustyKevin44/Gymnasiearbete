@@ -36,7 +36,7 @@ public class Game1 : Game
     protected override void Initialize()
     {
         // Create the player
-        Player = new AnimatedSprite(null, Vector2.Zero, 4, 1f);
+        Player = new AnimatedSprite(null, Vector2.Zero, 4, 1f, true);
         _bullet_cooldown.StartTimer();
         
         // test csv tileMap files
