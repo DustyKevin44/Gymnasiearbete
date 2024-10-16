@@ -1,5 +1,8 @@
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+
 #nullable enable
 
 
@@ -31,4 +34,31 @@ public class Sprite : IGameObject
             Globals.SpriteBatch.End();
         }
     }
+}    
+public class AnimatedSprite : Sprite{
+    public Timer newTimer;
+    public int AnimationLength; // Hur många bilder animationen är
+    public int currentFrame = 0; // Hehe 8===D
+    public float frameTick; // Ifall lika med 1000 så byter den bild efter en sekund / Tid per bild i millisekunder
+    public AnimatedSprite(Texture2D? texture, Vector2 position, int TheLengthOfAnimationAmount, float FrameTick ) : base(texture, position) 
+    {
+        AnimationLength = TheLengthOfAnimationAmount;
+        frameTick = FrameTick;
+        newTimer = new Timer(frameTick*AnimationLength, true);
+    }   
+    public new void Update(GameTime gametime){
+        newTimer.Update(gametime);
+        if (newTimer.Finished){
+            currentFrame++;
+            if( currentFrame == AnimationLength){
+                currentFrame = 0;
+            }
+        }
+    }
+    public void Draw(GameTime gametime)
+    {
+        Globals.SpriteBatch.Draw(Texture, Position- Globals.Active_Camera.Position, new Rectangle(currentFrame * Texture.Bounds.X / AnimationLength, 0, Texture.Bounds.X / AnimationLength, Texture.Bounds.Y), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+
+    }
 }
+

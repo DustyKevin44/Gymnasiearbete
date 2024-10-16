@@ -13,7 +13,7 @@ public class Game1 : Game
 {
     private readonly GraphicsDeviceManager _graphics;
     // Player
-    private Sprite Player;
+    private AnimatedSprite Player;
     private float _player_speed = 200f;
     // Bullet
     private readonly List<Bullet> _bullets = [];
@@ -36,7 +36,7 @@ public class Game1 : Game
     protected override void Initialize()
     {
         // Create the player
-        Player = new Sprite(null, Vector2.Zero);
+        Player = new AnimatedSprite(null, Vector2.Zero, 4, 1f);
         _bullet_cooldown.StartTimer();
         
         // test csv tileMap files
@@ -75,7 +75,7 @@ public class Game1 : Game
         tileMap.LoadTileset("tilesetImage");
         
         // Load player Texture
-        Player.Texture = Globals.ContentManager.Load<Texture2D>("Player-1");
+        Player.Texture = Globals.ContentManager.Load<Texture2D>("playerTest");
         
         // Create new bullet Texture (OrangeRed circle with the radius 5)
         bullet_sprite = Globals.CreateTexture(10, 10, Color.OrangeRed, Globals.CircleShader);
@@ -224,6 +224,7 @@ public class Game1 : Game
 
         // Draw player
         Player.Draw();
+                
         // Draw bullets
         //foreach(Sprite bullet in _bullets) { bullet.Draw(); }
         Globals.SpriteBatch.Begin();
