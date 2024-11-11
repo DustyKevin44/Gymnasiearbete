@@ -14,7 +14,7 @@ public class Sprite : IGameObject
     public Vector2 Position;
     public Color Tint = Color.White;
     public float Z_offset = 0f;
-    
+
     public Sprite(Texture2D? texture, Vector2 position) { Texture = texture; Position = position; }
     public Sprite(Texture2D? texture, Vector2 position, Color tint) { Texture = texture; Position = position; Tint = tint; }
 

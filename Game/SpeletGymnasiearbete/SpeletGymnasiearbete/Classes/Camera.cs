@@ -4,7 +4,7 @@ namespace SpeletGymnasiearbete.Classes;
 
 public class Camera(Vector2 position) : IGameObject
 {
-    public bool Object_is_dying { get; private set; } = false;
+    public bool Object_is_dying { get; private set; } = false; // A bool that deletes the object if true.
     public Vector2 Position = position;
 
     public void Draw() {}

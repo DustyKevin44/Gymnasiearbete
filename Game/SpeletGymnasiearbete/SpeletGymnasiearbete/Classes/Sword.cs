@@ -26,7 +26,7 @@ class Sword : AnimatedSprite{
         cooldown = CD;  
         offset = OF;     
         damage = dmg;
-        newTimer = new Timer(cooldown, false);
+        cdTimer = new Timer(cooldown, false);
         activateKey = aK47;
         keyboard = keybeard;
     } 
