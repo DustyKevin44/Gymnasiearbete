@@ -12,9 +12,15 @@ namespace SpeletGymnasiearbete;
 public class Game1 : Game
 {
     private readonly GraphicsDeviceManager _graphics;
+
     // Player
     private AnimatedSprite Player;
     private float _player_speed = 200f;
+    // Slime 
+    private AnimatedSprite SlimeSprite;
+    private Slime slime;
+
+
     // Bullet
     private readonly List<Bullet> _bullets = [];
     private Texture2D bullet_sprite;
@@ -38,6 +44,8 @@ public class Game1 : Game
         // Create the player
         Player = new AnimatedSprite(null, Vector2.Zero, 4, 1f, true);
         _bullet_cooldown.StartTimer();
+         slime= new Slime(null, new Vector2(20,20));
+       
         
         // test csv tileMap files
         tileMap.LoadLayer("../../../test.csv", 0, chunk_size);
@@ -76,9 +84,12 @@ public class Game1 : Game
         
         // Load player Texture
         Player.Texture = Globals.ContentManager.Load<Texture2D>("playerTest");
-        
+        // Load slime texture
+        slime.sprite.Texture = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
         // Create new bullet Texture (OrangeRed circle with the radius 5)
         bullet_sprite = Globals.CreateTexture(10, 10, Color.OrangeRed, Globals.CircleShader);
+        
+
     }
 
     protected override void Update(GameTime gameTime)
@@ -166,6 +177,9 @@ public class Game1 : Game
         // Update timer
         _bullet_cooldown.Update(gameTime);
 
+        // Slime behavior (sus)
+        slime.Update(gameTime);
+
         // Shoot bullets, TODO: controller support
         MouseState mouse = Mouse.GetState();
         if (mouse.LeftButton == ButtonState.Pressed && _bullet_cooldown.Finished)
@@ -224,6 +238,8 @@ public class Game1 : Game
 
         // Draw player
         Player.Draw();
+        // Draw slime
+        slime.Draw();
                 
         // Draw bullets
         //foreach(Sprite bullet in _bullets) { bullet.Draw(); }

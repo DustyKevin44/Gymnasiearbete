@@ -36,7 +36,7 @@ public class Sprite : IGameObject
 public class AnimatedSprite : Sprite{
     public Timer newTimer;
     public int AnimationLength; // Hur många bilder animationen är
-    public int currentFrame = 0; // Hehe 8===D
+    public int currentFrame = 0; // Hehe -- 8=======D  O:
     
         public float frameTick; // Ifall lika med 1000 så byter den bild efter en sekund / Tid per bild i millisekunder
     public AnimatedSprite(Texture2D? texture, Vector2 position, int TheLengthOfAnimationAmount, float FrameTick, bool repeat) : base(texture, position) 
