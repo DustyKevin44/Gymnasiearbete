@@ -17,7 +17,7 @@ public class Game1 : Game
     private AnimatedSprite Player;
     private float _player_speed = 200f;
     // Slime 
-    private AnimatedSprite SlimeSprite;
+    //private AnimatedSprite SlimeSprite;
     private Slime slime;
 
 
@@ -28,7 +28,7 @@ public class Game1 : Game
     private readonly Timer _bullet_cooldown = new(0.1f, false);
 
     // Isometric Tilemap
-    private readonly TileMap tileMap = new(4, new Vector2(4, 4), new Point(32, 16), new Point(32, 32));
+    private readonly TileMap tileMap = new(1, new Vector2(1, 1), new Point(64, 64), new Point(64, 64));
     private readonly Point chunk_size = new(2, 2);
 
     public Game1()
@@ -48,8 +48,9 @@ public class Game1 : Game
        
         
         // test csv tileMap files
-        tileMap.LoadLayer("../../../test.csv", 0, chunk_size);
-        tileMap.LoadLayer("../../../test2.csv", 1, chunk_size);
+        //tileMap.LoadLayer("../../../test.csv", 0, chunk_size);
+        //tileMap.LoadLayer("../../../test2.csv", 1, chunk_size);
+        tileMap.LoadLayer("../../../tileLayer1.csv", 0, chunk_size);
 
         // Create the isometric grid
         //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 1.csv", 0, chunk_size);
@@ -80,7 +81,7 @@ public class Game1 : Game
         Globals.SetGraphicsDeviceManager(_graphics);
 
         // Load tileset
-        tileMap.LoadTileset("tilesetImage");
+        tileMap.LoadTileset("grassSet");
         
         // Load player Texture
         Player.Texture = Globals.ContentManager.Load<Texture2D>("playerTest");
@@ -93,160 +94,103 @@ public class Game1 : Game
     }
 
     protected override void Update(GameTime gameTime)
+    {{
+    KeyboardState keyboard = Keyboard.GetState();
+    if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboard.IsKeyDown(Keys.Escape))
+        Exit();
+
+    // Player movement
+    Vector2 direction = Vector2.Zero;
+    if (keyboard.IsKeyDown(Keys.W)) direction.Y -= 1;
+    if (keyboard.IsKeyDown(Keys.S)) direction.Y += 1;
+    if (keyboard.IsKeyDown(Keys.A)) direction.X -= 1;
+    if (keyboard.IsKeyDown(Keys.D)) direction.X += 1;
+    if (direction != Vector2.Zero) direction.Normalize();
+
+    // Update player position
+    Vector2 step = direction * _player_speed * GameTimeToDelta(gameTime);
+    Player.Position += step;
+
+    // Ensure the player stays within valid tiles
+    Point playerTilePos = tileMap.WorldToTile(Player.Position);
+    Point playerChunkPos = new(playerTilePos.X / chunk_size.X, playerTilePos.Y / chunk_size.Y);
+    Point playerLocalTilePos = new(playerTilePos.X % chunk_size.X, playerTilePos.Y % chunk_size.Y);
+
+    //if (tileMap.Layers[0].GetChunk(playerChunkPos) is not IChunk chunk ||
+    //    chunk.GetTile(playerLocalTilePos) is not int tileType || tileType == -1)
+    //{
+        // Revert movement if tile is invalid
+    //    Player.Position -= step;
+    //}
+
+    // Update bullets
+    _bullet_cooldown.Update(gameTime);
+    MouseState mouse = Mouse.GetState();
+    if (mouse.LeftButton == ButtonState.Pressed && _bullet_cooldown.Finished)
     {
-        KeyboardState keyboard = Keyboard.GetState();
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboard.IsKeyDown(Keys.Escape))
-            Exit();
+        Vector2 mouseWorldPos = mouse.Position.ToVector2() + Globals.Active_Camera.Position;
+        Vector2 bulletDir = mouseWorldPos - (Player.Position + Player.Texture.Bounds.Size.ToVector2() / 2);
 
-        Vector2 direction = Vector2.Zero;
-        if (keyboard.IsKeyDown(Keys.W)) direction.Y += -1;
-        if (keyboard.IsKeyDown(Keys.S)) direction.Y += 1;
-        if (direction.Y == 0)
-        {
-            if (keyboard.IsKeyDown(Keys.A)) direction.X += -1;
-            if (keyboard.IsKeyDown(Keys.D)) direction.X += 1;
-        } else if (keyboard.IsKeyDown(Keys.A) ^ keyboard.IsKeyDown(Keys.D)) {
-            if (keyboard.IsKeyDown(Keys.A)) direction.Rotate(1.107149611f * direction.Y);
-            if (keyboard.IsKeyDown(Keys.D)) direction.Rotate(1.107149611f * -direction.Y);
-        }
+        if (bulletDir != Vector2.Zero) bulletDir.Normalize();
 
-        // Update the player position. TODO: make player able to stand on other layers
-        Vector2 step = direction * _player_speed * GameTimeToDelta(gameTime);
-        Player.Position += step;
-
-        Vector2 centered_player_pos = Player.Position + new Vector2(Player.Texture.Width/2, Player.Texture.Height);
-        Vector2 Centered_Player_global_tile_pos = tileMap.WorldToIsoVec(centered_player_pos);
-        Vector2 pl_gl_t_pos = tileMap.WorldToIsoVec(Player.Position) + new Vector2(0.25f, -0.25f);
-        Point Player_chunk_pos = new((int)Centered_Player_global_tile_pos.X / chunk_size.X, (int)Centered_Player_global_tile_pos.Y / chunk_size.Y);
-        Point Player_tile_pos = new((int)Centered_Player_global_tile_pos.X % chunk_size.X, (int)Centered_Player_global_tile_pos.Y % chunk_size.Y);
-
-        if (tileMap.Layers[0].GetChunk(Player_chunk_pos) is not IChunk chunk0 || chunk0.GetTile(Player_tile_pos) is not int type0 || type0 == -1) {
-            Player.Position -= step;
-        }
-
-        // Add logic to change which layer to check depending on z_offset
-
-        float z = 0f;
-        if (tileMap.Layers[1].GetChunk(Player_chunk_pos) is not null)
-        {
-            switch (tileMap.Layers[1].GetChunk(Player_chunk_pos).GetTile(Player_tile_pos))
-            {
-                case 5:
-                    if (Player.Z_offset > tileMap.Face_size.Y * tileMap.Scale.Y / 2) {
-                        z = tileMap.Face_size.Y * tileMap.Scale.Y;
-                        break;
-                    }
-                    Player.Position -= step;
-                    z = Player.Z_offset;
-                    break;
-                case 8:
-                    if (Player.Z_offset >= tileMap.Face_size.Y * tileMap.Scale.Y / 4) {
-                        z = tileMap.Face_size.Y * tileMap.Scale.Y / 2;
-                        break;
-                    }
-                    Player.Position -= step;
-                    z = Player.Z_offset;
-                    break;
-                case 9:
-                    z = tileMap.Face_size.Y * tileMap.Scale.Y / 4;
-                    break;
-                case 6:
-                case 11:
-                    z = 2 - pl_gl_t_pos.X + Player_tile_pos.X;
-                    if (z - Player.Z_offset > 0.2) {
-                        Player.Position -= step;
-                        z = Player.Z_offset;
-                        break;
-                    }
-                    z *= tileMap.Face_size.Y * tileMap.Scale.X;
-                    break;
-                case 7:
-                case 10:
-                    z = 2 - pl_gl_t_pos.Y + Player_tile_pos.Y;
-                    if (z - Player.Z_offset > 0.2) {
-                        Player.Position -= step;
-                        z = Player.Z_offset;
-                        break;
-                    }
-                    z *= tileMap.Face_size.Y * tileMap.Scale.Y;
-                    break;
-            }
-        }
-        Player.Z_offset = z;
-
-        // Update timer
-        _bullet_cooldown.Update(gameTime);
-
-        // Slime behavior (sus)
-        slime.Update(gameTime);
-
-        // Shoot bullets, TODO: controller support
-        MouseState mouse = Mouse.GetState();
-        if (mouse.LeftButton == ButtonState.Pressed && _bullet_cooldown.Finished)
-        {
-            // Get the distance from the bullet to the mouse
-            Vector2 bullet_dir = mouse.Position.ToVector2() + Globals.Active_Camera.Position - Player.Position - Player.Texture.Bounds.Size.ToVector2() / 2;
-            // Get the direction of the distance Vector
-            if (bullet_dir != Vector2.Zero) bullet_dir.Normalize();
-            // if the direction is to nowhere (0, 0) then Random direction
-            else { bullet_dir = Vector2.One; bullet_dir.Rotate(new Random().NextSingle() * MathHelper.TwoPi); }  // TODO: use generated seed instead of default
-
-            // Create a Vector representing the direction to the mouse with the amplitude '_bullet_speed'
-            Vector2 bullet_velo = bullet_dir * _bullet_speed;
-            // Add some of the The relative velocity from the player to the bullet
-            bullet_velo += direction * _player_speed / 2f;
-
-            // Spawn a bullet at the Player position with a velocity of 'bullet_velo'
-            _bullets.Add(new Bullet(bullet_sprite, Player.Position + Player.Texture.Bounds.Size.ToVector2() / 2, bullet_velo));
-            // Start the cooldown so that it doesn't create a Bullet every frame the left mouse button is held
-            _bullet_cooldown.StartTimer();
-        }
-
-        // Update every bullet
-        _bullets.RemoveAll((bullet) => {
-            bullet.Update(gameTime);
-            // If Bullet is marked for deletion remove it from the list so that it can be collected by the garbage collector
-            return bullet.Object_is_dying;
-        });
-
-        // Move camera
-        Globals.Active_Camera.Position = Vector2.SmoothStep(
-            Globals.Active_Camera.Position,
-            Player.Position + (Player.Texture.Bounds.Size.ToVector2() - Globals.GraphicsDeviceManager.GraphicsDevice.PresentationParameters.Bounds.Size.ToVector2()) / 2,
-            0.2f
-        );
-
-        base.Update(gameTime);
+        Vector2 bulletVelocity = bulletDir * _bullet_speed + direction * _player_speed / 2f;
+        _bullets.Add(new Bullet(bullet_sprite, Player.Position + Player.Texture.Bounds.Size.ToVector2() / 2, bulletVelocity));
+        _bullet_cooldown.StartTimer();
     }
 
-    protected override void Draw(GameTime gameTime)
+    // Update each bullet
+    _bullets.RemoveAll(bullet =>
     {
-        // Clear previous draw calls and fill the background
-        _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
-        
-        Point Player_Tile_pos = tileMap.WorldToIso(Player.Position);
-        Point Player_chunk = new(Player_Tile_pos.X / chunk_size.X, Player_Tile_pos.Y / chunk_size.Y);
-        //Point Player_inner_pos = new(Player_Tile_pos.X % chunk_size.X, Player_Tile_pos.Y % chunk_size.Y);
-        Point render_dist = new(2, 2);
+        bullet.Update(gameTime);
+        return bullet.Object_is_dying; // Remove bullets marked for deletion
+    });
 
-        // Draw Isometric grid
-        Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        tileMap.Layers[0].Draw(Player_chunk - render_dist, Player_chunk + render_dist, Globals.SpriteBatch, tileMap);
-        tileMap.Layers[1].Draw(Player_chunk - render_dist, Player_chunk + render_dist, Globals.SpriteBatch, tileMap);
-        //tileMap.Layers[2].Draw(Player_chunk - render_dist, Player_chunk + render_dist, Globals.SpriteBatch, tileMap);
-        Globals.SpriteBatch.End();
+    // Update slime behavior
+    slime.Update(gameTime);
 
-        // Draw player
-        Player.Draw();
-        // Draw slime
-        slime.Draw();
-                
-        // Draw bullets
-        //foreach(Sprite bullet in _bullets) { bullet.Draw(); }
-        Globals.SpriteBatch.Begin();
-        Globals.SpriteBatch.Draw(bullet_sprite, Player.Position + new Vector2(Player.Texture.Width/2, Player.Texture.Height) - Vector2.UnitY * Player.Z_offset - Globals.Active_Camera.Position, Color.White);
-        Globals.SpriteBatch.End();
+    // Move camera to follow the player
+    Globals.Active_Camera.Position = Vector2.SmoothStep(
+        Globals.Active_Camera.Position,
+        Player.Position + (Player.Texture.Bounds.Size.ToVector2() - Globals.GraphicsDeviceManager.GraphicsDevice.PresentationParameters.Bounds.Size.ToVector2()) / 2,
+        0.2f
+    );
 
-        base.Draw(gameTime);
-    }
+    base.Update(gameTime);
 }
+    }
+protected override void Draw(GameTime gameTime)
+{
+    // Clear the screen
+    _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
+
+    // Determine player tile and chunk positions
+    Point playerTilePos = tileMap.WorldToTile(Player.Position);
+    Point playerChunkPos = new(playerTilePos.X / chunk_size.X, playerTilePos.Y / chunk_size.Y);
+    Point renderDistance = new(2, 2);
+
+    // Draw tile layers
+    Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+    tileMap.Layers[0].Draw(playerChunkPos - renderDistance, playerChunkPos + renderDistance, Globals.SpriteBatch, tileMap);
+    //.Layers[1].Draw(playerChunkPos - renderDistance, playerChunkPos + renderDistance, Globals.SpriteBatch, tileMap);
+    Globals.SpriteBatch.End();
+
+    // Draw the player
+    Globals.SpriteBatch.Begin();
+    Player.Draw();
+    Globals.SpriteBatch.End();
+
+    // Draw slime
+    Globals.SpriteBatch.Begin();
+    slime.Draw();
+    Globals.SpriteBatch.End();
+
+    // Draw bullets
+    Globals.SpriteBatch.Begin();
+    foreach (Bullet bullet in _bullets)
+    {
+        bullet.Draw();
+    }
+    Globals.SpriteBatch.End();
+
+    base.Draw(gameTime);
+}}

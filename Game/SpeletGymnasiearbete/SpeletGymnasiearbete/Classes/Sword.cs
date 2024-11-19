@@ -30,7 +30,7 @@ class Sword : AnimatedSprite{
         activateKey = aK47;
         keyboard = keybeard;
     } 
-    public void Update(GameTime gay){
+    public new void Update(GameTime gay){
         base.Update(gay); //Gaytime ;)
         cdTimer.Update(gay);
         if (!cdTimer.Finished){

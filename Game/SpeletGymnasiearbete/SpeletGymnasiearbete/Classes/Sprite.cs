@@ -27,9 +27,7 @@ public class Sprite : IGameObject
         if (Texture is not null)
         {
             Vector2 camera_pos = (Globals.Active_Camera is Camera camera) ? camera.Position : new Vector2();
-            Globals.SpriteBatch.Begin();
             Globals.SpriteBatch.Draw(Texture, Position - Vector2.UnitY * Z_offset - camera_pos, Tint);
-            Globals.SpriteBatch.End();
         }
     }
 }    
@@ -56,7 +54,10 @@ public class AnimatedSprite : Sprite{
     }
     public void Draw(GameTime gametime)
     {
-        Globals.SpriteBatch.Draw(Texture, Position- Globals.Active_Camera.Position, new Rectangle(currentFrame * Texture.Bounds.X / AnimationLength, 0, Texture.Bounds.X / AnimationLength, Texture.Bounds.Y), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        if (Texture is not null)
+        {
+            Globals.SpriteBatch.Draw(Texture, Position- Globals.Active_Camera.Position, new Rectangle(currentFrame * Texture.Bounds.X / AnimationLength, 0, Texture.Bounds.X / AnimationLength, Texture.Bounds.Y), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        }
 
     }
 }

@@ -19,17 +19,19 @@ public class TileMap(int layers, Vector2 scale, Point face_size, Point tile_size
     public void LoadTileset(string path) { Tileset = Globals.ContentManager.Load<Texture2D>(path); }
     public void LoadLayer(string csv_filepath, int layer, Point chunk_size) { Layers[layer] = TileLayer.FromSVC(csv_filepath, chunk_size); }
 
-    public Point WorldToIso(Vector2 World) {
-        return new(
-            (int)System.Math.Round(World.X / (Face_size.X * Scale.X) + World.Y / (Face_size.Y * Scale.Y) - 1),
-            (int)System.Math.Round(World.Y / (Face_size.Y * Scale.Y) - World.X / (Face_size.X * Scale.X))
+    public Point WorldToTile(Vector2 worldPosition)
+    {
+        return new Point(
+            (int)(worldPosition.X / (Tile_size.X * Scale.X)),
+            (int)(worldPosition.Y / (Tile_size.Y * Scale.Y))
         );
     }
 
-    public Vector2 IsoToWorld(Point Iso) {
-        return new(
-            (Iso.X - Iso.Y) * _faceOver2.X * Scale.X,
-            (Iso.X + Iso.Y) * _faceOver2.Y * Scale.Y
+    public Vector2 TileToWorld(Point tilePosition)
+    {
+        return new Vector2(
+            tilePosition.X * Tile_size.X * Scale.X,
+            tilePosition.Y * Tile_size.Y * Scale.Y
         );
     }
 
@@ -63,7 +65,7 @@ public class TileLayer
             {
                 if (y < 0 || y >= _chunks[x].Count) continue;
                 if (_chunks[x][y] is null) continue;
-                Vector2 position = tileMap.IsoToWorld(new(x*2, y*2));
+                Vector2 position = tileMap.TileToWorld(new(x*2, y*2));
                 _chunks[x][y].Draw(spriteBatch, tileMap, new Vector2(position.X, position.Y));
             }
         }
@@ -156,7 +158,7 @@ public class ChunkPlane : IChunk
             for(int y=0; y<_tiles[x].Length; y++)
             {
                 if (_tiles[x][y] == -1) continue;
-                spriteBatch.Draw(tileMap.Tileset, tileMap.IsoToWorld(new Point(x, y)) + offset - Globals.Active_Camera.Position, new Rectangle(_tiles[x][y] * tileMap.Tile_size.X, 0, tileMap.Tile_size.X, tileMap.Tile_size.Y), Color.White, 0f, Vector2.Zero, tileMap.Scale, SpriteEffects.None, 0f);
+                spriteBatch.Draw(tileMap.Tileset, tileMap.TileToWorld(new Point(x, y)) + offset - Globals.Active_Camera.Position, new Rectangle(_tiles[x][y] * tileMap.Tile_size.X, 0, tileMap.Tile_size.X, tileMap.Tile_size.Y), Color.White, 0f, Vector2.Zero, tileMap.Scale, SpriteEffects.None, 0f);
             }
         }
     }
@@ -187,7 +189,7 @@ public class ChunkMap : IChunk
     {
         foreach(KeyValuePair<Point, int> pair in _tiles)
         {
-            spriteBatch.Draw(tileMap.Tileset, tileMap.IsoToWorld(pair.Key) + offset - Globals.Active_Camera.Position, new Rectangle(pair.Value * tileMap.Tile_size.X, 0, tileMap.Tile_size.X, tileMap.Tile_size.Y), Color.White, 0f, Vector2.Zero, tileMap.Scale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(tileMap.Tileset, tileMap.TileToWorld(pair.Key) + offset - Globals.Active_Camera.Position, new Rectangle(pair.Value * tileMap.Tile_size.X, 0, tileMap.Tile_size.X, tileMap.Tile_size.Y), Color.White, 0f, Vector2.Zero, tileMap.Scale, SpriteEffects.None, 0f);
         }
     }
 
