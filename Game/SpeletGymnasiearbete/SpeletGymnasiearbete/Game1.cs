@@ -42,9 +42,9 @@ public class Game1 : Game
     protected override void Initialize()
     {
         // Create the player
-        Player = new AnimatedSprite(null, Vector2.Zero, 4, 1f, true);
+        Player = new AnimatedSprite(null, Vector2.Zero, 4, 200f, true);
         _bullet_cooldown.StartTimer();
-         slime= new Slime(null, new Vector2(20,20));
+        slime= new Slime(null, new Vector2(20,20));
        
         
         // test csv tileMap files
@@ -110,6 +110,7 @@ public class Game1 : Game
     // Update player position
     Vector2 step = direction * _player_speed * GameTimeToDelta(gameTime);
     Player.Position += step;
+    Player.Update(gameTime);
 
     // Ensure the player stays within valid tiles
     Point playerTilePos = tileMap.WorldToTile(Player.Position);
@@ -176,7 +177,7 @@ protected override void Draw(GameTime gameTime)
 
     // Draw the player
     Globals.SpriteBatch.Begin();
-    Player.Draw();
+    Player.Draw(gameTime);
     Globals.SpriteBatch.End();
 
     // Draw slime

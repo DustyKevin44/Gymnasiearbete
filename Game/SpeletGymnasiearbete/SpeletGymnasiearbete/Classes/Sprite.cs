@@ -30,35 +30,70 @@ public class Sprite : IGameObject
             Globals.SpriteBatch.Draw(Texture, Position - Vector2.UnitY * Z_offset - camera_pos, Tint);
         }
     }
-}    
-public class AnimatedSprite : Sprite{
-    public Timer newTimer;
-    public int AnimationLength; // Hur många bilder animationen är
-    public int currentFrame = 0; // Hehe -- 8=======D  O:
-    
-        public float frameTick; // Ifall lika med 1000 så byter den bild efter en sekund / Tid per bild i millisekunder
-    public AnimatedSprite(Texture2D? texture, Vector2 position, int TheLengthOfAnimationAmount, float FrameTick, bool repeat) : base(texture, position) 
+}    public class AnimatedSprite : Sprite
+{
+    public Timer newTimer;         // Timer for animation frames
+    public int AnimationLength;    // Total number of animation frames
+    public int currentFrame = 0;   // Current frame index
+
+    public float frameTick;        // Time per frame in milliseconds
+
+    public AnimatedSprite(Texture2D? texture, Vector2 position, int animationLength, float frameTick, bool repeat)
+        : base(texture, position)
     {
-        AnimationLength = TheLengthOfAnimationAmount;
-        frameTick = FrameTick;
-        newTimer = new Timer(frameTick*AnimationLength, repeat);
-    }   
-    public new void Update(GameTime gametime){
-        newTimer.Update(gametime);
-        if (newTimer.Finished){
+        AnimationLength = animationLength;
+        this.frameTick = frameTick;
+        
+        // Timer is set to the time for a single frame
+        newTimer = new Timer(frameTick, repeat);
+    }
+
+    public new void Update(GameTime gameTime)
+    {
+        // Update the frame timer
+        newTimer.Update(gameTime);
+
+        // Check if it's time to advance to the next frame
+        if (newTimer.Finished)
+        {
             currentFrame++;
-            if( currentFrame == AnimationLength){
+
+            // Loop back to the first frame if we've reached the end
+            if (currentFrame >= AnimationLength)
+            {
                 currentFrame = 0;
             }
+
+            // Restart the timer for the next frame
+            newTimer.StartTimer();
         }
     }
-    public void Draw(GameTime gametime)
+
+    public void Draw(GameTime gameTime)
     {
         if (Texture is not null)
         {
-            Globals.SpriteBatch.Draw(Texture, Position- Globals.Active_Camera.Position, new Rectangle(currentFrame * Texture.Bounds.X / AnimationLength, 0, Texture.Bounds.X / AnimationLength, Texture.Bounds.Y), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-        }
+            // Calculate the width of a single frame
+            int frameWidth = Texture.Width / AnimationLength;
 
+            // Define the source rectangle for the current frame
+            Rectangle sourceRectangle = new Rectangle(currentFrame * frameWidth, 0, frameWidth, Texture.Height);
+
+            // Draw the current frame
+            Globals.SpriteBatch.Draw(
+                Texture,
+                Position - Globals.Active_Camera.Position,
+                sourceRectangle,       // Source rectangle
+                Color.White,           // Color tint
+                0f,                    // Rotation
+                Vector2.Zero,          // Origin
+                1f,                    // Scale
+                SpriteEffects.None,    // Sprite effect
+                0f                     // Layer depth
+            );
+        }
     }
 }
+
+
 
