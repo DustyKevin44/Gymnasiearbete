@@ -30,12 +30,13 @@ public class Sprite : IGameObject
             Globals.SpriteBatch.Draw(Texture, Position - Vector2.UnitY * Z_offset - camera_pos, Tint);
         }
     }
+
 }    public class AnimatedSprite : Sprite
 {
     public Timer newTimer;         // Timer for animation frames
     public int AnimationLength;    // Total number of animation frames
     public int currentFrame = 0;   // Current frame index
-
+    public float rotation; // Texture rotation
     public float frameTick;        // Time per frame in milliseconds
 
     public AnimatedSprite(Texture2D? texture, Vector2 position, int animationLength, float frameTick, bool repeat)
@@ -78,6 +79,7 @@ public class Sprite : IGameObject
 
             // Define the source rectangle for the current frame
             Rectangle sourceRectangle = new Rectangle(currentFrame * frameWidth, 0, frameWidth, Texture.Height);
+            System.Console.WriteLine($"Sprite Rotation: {rotation} radians");
 
             // Draw the current frame
             Globals.SpriteBatch.Draw(
@@ -85,8 +87,8 @@ public class Sprite : IGameObject
                 Position - Globals.Active_Camera.Position,
                 sourceRectangle,       // Source rectangle
                 Color.White,           // Color tint
-                0f,                    // Rotation
-                Vector2.Zero,          // Origin
+                rotation,              // Rotation
+                new Vector2(Texture.Width / 2, Texture.Height / 2),          // Origin
                 1f,                    // Scale
                 SpriteEffects.None,    // Sprite effect
                 0f                     // Layer depth

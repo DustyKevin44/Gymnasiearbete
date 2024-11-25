@@ -20,6 +20,8 @@ public class Game1 : Game
     //private AnimatedSprite SlimeSprite;
     private Slime slime;
 
+    private SpriteFont _font;
+
 
     // Bullet
     private readonly List<Bullet> _bullets = [];
@@ -28,8 +30,9 @@ public class Game1 : Game
     private readonly Timer _bullet_cooldown = new(0.1f, false);
 
     // Isometric Tilemap
-    private readonly TileMap tileMap = new(1, new Vector2(1, 1), new Point(64, 64), new Point(64, 64));
-    private readonly Point chunk_size = new(2, 2);
+    private readonly TileMap tileMap = new(1, new Vector2(2, 2), new Point(32, 32), new Point(32, 32));
+    private readonly TileMap tileMapFoilage = new(1, new Vector2(2, 2), new Point(32, 32), new Point(32, 32));
+    private readonly Point chunk_size = new(16, 16);
 
     public Game1()
     {
@@ -51,6 +54,7 @@ public class Game1 : Game
         //tileMap.LoadLayer("../../../test.csv", 0, chunk_size);
         //tileMap.LoadLayer("../../../test2.csv", 1, chunk_size);
         tileMap.LoadLayer("../../../tileLayer1.csv", 0, chunk_size);
+        tileMapFoilage.LoadLayer("../../../tileLayer2.csv", 0, chunk_size);
 
         // Create the isometric grid
         //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 1.csv", 0, chunk_size);
@@ -82,13 +86,17 @@ public class Game1 : Game
 
         // Load tileset
         tileMap.LoadTileset("grassSet");
-        
+        tileMapFoilage.LoadTileset("Stone_Medium_1_And_2");
+
         // Load player Texture
         Player.Texture = Globals.ContentManager.Load<Texture2D>("playerTest");
         // Load slime texture
-        slime.sprite.Texture = Globals.ContentManager.Load<Texture2D>("IsoDebugTile");
+        slime.sprite.Texture = Globals.ContentManager.Load<Texture2D>("panther");
         // Create new bullet Texture (OrangeRed circle with the radius 5)
         bullet_sprite = Globals.CreateTexture(10, 10, Color.OrangeRed, Globals.CircleShader);
+
+        _font = Content.Load<SpriteFont>("font"); // Match the name from the Content Pipeline
+
         
 
     }
@@ -172,6 +180,8 @@ protected override void Draw(GameTime gameTime)
     // Draw tile layers
     Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
     tileMap.Layers[0].Draw(playerChunkPos - renderDistance, playerChunkPos + renderDistance, Globals.SpriteBatch, tileMap);
+    tileMapFoilage.Layers[0].Draw(playerChunkPos - renderDistance, playerChunkPos + renderDistance, Globals.SpriteBatch, tileMapFoilage);
+
     //.Layers[1].Draw(playerChunkPos - renderDistance, playerChunkPos + renderDistance, Globals.SpriteBatch, tileMap);
     Globals.SpriteBatch.End();
 
@@ -182,6 +192,9 @@ protected override void Draw(GameTime gameTime)
 
     // Draw slime
     Globals.SpriteBatch.Begin();
+    slime.sprite.rotation = 1.5f;
+    Console.WriteLine($"Angle: {slime.angle}, Direction: {slime.direction}");
+
     slime.Draw();
     Globals.SpriteBatch.End();
 
@@ -191,6 +204,10 @@ protected override void Draw(GameTime gameTime)
     {
         bullet.Draw();
     }
+    Globals.SpriteBatch.End();
+
+    Globals.SpriteBatch.Begin();
+    Globals.SpriteBatch.DrawString(_font, "Animationframe" + Player.Position , new Vector2(100, 100), Color.White);
     Globals.SpriteBatch.End();
 
     base.Draw(gameTime);

@@ -16,6 +16,7 @@ namespace SpeletGymnasiearbete.Classes
         public Vector2 direction;
         public AnimatedSprite sprite;     // AnimatedSprite for the entity
         public float timeInterval;
+        public float angle;
 
         public randomMovingEntity(Texture2D texture, Vector2 initialPosition)
         {
@@ -39,6 +40,7 @@ namespace SpeletGymnasiearbete.Classes
                 ChooseRandomDirection();
                 timer = 0f;
                 moveInterval = GetRandomInterval(timeInterval);
+                sprite.rotation = angle;
             }
 
             // Update the position based on the direction and speed
@@ -52,7 +54,7 @@ namespace SpeletGymnasiearbete.Classes
         protected void ChooseRandomDirection()
         {
             // Pick a random angle and convert it to a direction vector
-            float angle = (float)(random.NextDouble() * MathHelper.TwoPi);
+            angle = (float)(random.NextDouble() * MathHelper.TwoPi); 
             direction = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
         }
 
@@ -71,8 +73,8 @@ public class Slime : randomMovingEntity
 {
     public Slime(Texture2D texture, Vector2 initialPosition) : base(texture, initialPosition)
     {
-        speed = 1f;  // Set the slime's speed (slower than default)
-        timeInterval = 0.5f;
+        speed = 2f;  // Set the slime's speed (slower than default)
+        timeInterval = 1.5f;
         // You can also add any specific behavior for the slime if needed
     }
 
@@ -80,6 +82,7 @@ public class Slime : randomMovingEntity
     public new void Update(GameTime gameTime)
     {
         base.Update(gameTime);  // Call base class Update (handles movement, random direction, etc.)
+        
         // Slime-specific behavior can be added here (e.g., reaction to nearby entities)
     }
 
