@@ -32,6 +32,7 @@ public class Game1 : Game
     // Isometric Tilemap
     private readonly TileMap tileMap = new(1, new Vector2(2, 2), new Point(32, 32), new Point(32, 32));
     private readonly TileMap tileMapFoilage = new(1, new Vector2(2, 2), new Point(32, 32), new Point(32, 32));
+    private readonly TileMap tileMapFoilage_grass = new(1, new Vector2(2, 2), new Point(32, 32), new Point(32, 32));
     private readonly Point chunk_size = new(16, 16);
 
     public Game1()
@@ -53,9 +54,7 @@ public class Game1 : Game
         // test csv tileMap files
         //tileMap.LoadLayer("../../../test.csv", 0, chunk_size);
         //tileMap.LoadLayer("../../../test2.csv", 1, chunk_size);
-        tileMap.LoadLayer("../../../tileLayer1.csv", 0, chunk_size);
-        tileMapFoilage.LoadLayer("../../../tileLayer2.csv", 0, chunk_size);
-
+    
         // Create the isometric grid
         //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 1.csv", 0, chunk_size);
         //tileMap.LoadLayer("../../../playgroundtilemap_Tile Layer 2.csv", 1, chunk_size);
@@ -85,8 +84,13 @@ public class Game1 : Game
         Globals.SetGraphicsDeviceManager(_graphics);
 
         // Load tileset
+        tileMap.LoadLayer("../../../tileLayer1.csv", 0, chunk_size);
+        tileMapFoilage.LoadLayer("../../../tileLayer2.csv", 0, chunk_size);
+        tileMapFoilage_grass.LoadLayer("../../../tileLayer1.csv", 0, chunk_size);
+
         tileMap.LoadTileset("grassSet");
         tileMapFoilage.LoadTileset("Stone_Medium_1_And_2");
+        tileMapFoilage_grass.LoadTileset("grass_foilage");
 
         // Load player Texture
         Player.Texture = Globals.ContentManager.Load<Texture2D>("playerTest");
@@ -180,7 +184,9 @@ protected override void Draw(GameTime gameTime)
     // Draw tile layers
     Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
     tileMap.Layers[0].Draw(playerChunkPos - renderDistance, playerChunkPos + renderDistance, Globals.SpriteBatch, tileMap);
+        tileMapFoilage_grass.Layers[0].Draw(playerChunkPos - renderDistance, playerChunkPos + renderDistance, Globals.SpriteBatch, tileMapFoilage_grass);
     tileMapFoilage.Layers[0].Draw(playerChunkPos - renderDistance, playerChunkPos + renderDistance, Globals.SpriteBatch, tileMapFoilage);
+
 
     //.Layers[1].Draw(playerChunkPos - renderDistance, playerChunkPos + renderDistance, Globals.SpriteBatch, tileMap);
     Globals.SpriteBatch.End();
