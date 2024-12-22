@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using MonoGame.Extended.Graphics;
 using SpeletGymnasiearbete.Classes;
-using static SpeletGymnasiearbete.Utils;  // Globals and utilities
+using AnimatedSprite = SpeletGymnasiearbete.Classes.AnimatedSprite;
 
+
+// Globals and utilities
+using static SpeletGymnasiearbete.Utils;
 namespace SpeletGymnasiearbete;
 
 public class Game1 : Game
@@ -31,6 +34,10 @@ public class Game1 : Game
     private readonly TileMap tileMap = new(4, new Vector2(4, 4), new Point(32, 16), new Point(32, 32));
     private readonly Point chunk_size = new(2, 2);
 
+
+    // Sword
+    MonoGame.Extended.Graphics.AnimatedSprite sword;
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -44,8 +51,7 @@ public class Game1 : Game
         // Create the player
         Player = new AnimatedSprite(null, Vector2.Zero, 4, 1f, true);
         _bullet_cooldown.StartTimer();
-         slime= new Slime(null, new Vector2(20,20));
-       
+        slime= new Slime(null, new Vector2(20,20));
         
         // test csv tileMap files
         tileMap.LoadLayer("../../../test.csv", 0, chunk_size);
@@ -89,11 +95,31 @@ public class Game1 : Game
         // Create new bullet Texture (OrangeRed circle with the radius 5)
         bullet_sprite = Globals.CreateTexture(10, 10, Color.OrangeRed, Globals.CircleShader);
         
+        // Load sword animation
+        Texture2D swordTxt = Globals.ContentManager.Load<Texture2D>("swordNAnimation");
+        Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/sword", swordTxt, 32, 32);
+        SpriteSheet spriteSheet = new("SpriteSheet/sword", atlas);
 
+        spriteSheet.DefineAnimation("attack", builder => 
+        {
+            builder.IsLooping(true)
+                   .AddFrame(0, TimeSpan.FromSeconds(0.1))
+                   .AddFrame(1, TimeSpan.FromSeconds(0.1))
+                   .AddFrame(2, TimeSpan.FromSeconds(0.1))
+                   .AddFrame(3, TimeSpan.FromSeconds(0.1))
+                   .AddFrame(4, TimeSpan.FromSeconds(0.1))
+                   .AddFrame(5, TimeSpan.FromSeconds(0.1))
+                   .AddFrame(6, TimeSpan.FromSeconds(0.1))
+                   .AddFrame(7, TimeSpan.FromSeconds(0.1));
+        });
+
+        sword = new(spriteSheet, "attack");
     }
 
     protected override void Update(GameTime gameTime)
     {
+        sword.Update(gameTime);
+
         KeyboardState keyboard = Keyboard.GetState();
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboard.IsKeyDown(Keys.Escape))
             Exit();
@@ -245,6 +271,10 @@ public class Game1 : Game
         //foreach(Sprite bullet in _bullets) { bullet.Draw(); }
         Globals.SpriteBatch.Begin();
         Globals.SpriteBatch.Draw(bullet_sprite, Player.Position + new Vector2(Player.Texture.Width/2, Player.Texture.Height) - Vector2.UnitY * Player.Z_offset - Globals.Active_Camera.Position, Color.White);
+        Globals.SpriteBatch.End();
+
+        Globals.SpriteBatch.Begin();
+        Globals.SpriteBatch.Draw(sword, sword.Origin * 3, 0, new Vector2(3));
         Globals.SpriteBatch.End();
 
         base.Draw(gameTime);
