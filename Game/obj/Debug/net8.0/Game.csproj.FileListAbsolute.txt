@@ -24,3 +24,12 @@ C:\Users\Viggo\OneDrive\Skrivbord\GYAR\Gymnasiearbete\Game\obj\Debug\net8.0\refi
 C:\Users\Viggo\OneDrive\Skrivbord\GYAR\Gymnasiearbete\Game\obj\Debug\net8.0\Game.pdb
 C:\Users\Viggo\OneDrive\Skrivbord\GYAR\Gymnasiearbete\Game\obj\Debug\net8.0\Game.genruntimeconfig.cache
 C:\Users\Viggo\OneDrive\Skrivbord\GYAR\Gymnasiearbete\Game\obj\Debug\net8.0\ref\Game.dll
+C:\Users\Dusty\Desktop\gyarrepo\Gymnasiearbete\Game\obj\Debug\net8.0\Game.csproj.AssemblyReference.cache
+C:\Users\Dusty\Desktop\gyarrepo\Gymnasiearbete\Game\obj\Debug\net8.0\Game.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Dusty\Desktop\gyarrepo\Gymnasiearbete\Game\obj\Debug\net8.0\Game.AssemblyInfoInputs.cache
+C:\Users\Dusty\Desktop\gyarrepo\Gymnasiearbete\Game\obj\Debug\net8.0\Game.AssemblyInfo.cs
+C:\Users\Dusty\Desktop\gyarrepo\Gymnasiearbete\Game\obj\Debug\net8.0\Game.csproj.CoreCompileInputs.cache
+C:\Users\Dusty\Desktop\gyarrepo\Gymnasiearbete\Game\obj\Debug\net8.0\Game.sourcelink.json
+C:\Users\Dusty\Desktop\gyarrepo\Gymnasiearbete\Game\obj\Debug\net8.0\Game.dll
+C:\Users\Dusty\Desktop\gyarrepo\Gymnasiearbete\Game\obj\Debug\net8.0\refint\Game.dll
+C:\Users\Dusty\Desktop\gyarrepo\Gymnasiearbete\Game\obj\Debug\net8.0\Game.pdb

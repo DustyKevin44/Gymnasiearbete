@@ -346,11 +346,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Dusty\\Desktop\\Gyarrepo 2\\Gymnasiearbete\\Game\\Game.csproj",
+      "projectUniqueName": "C:\\Users\\Dusty\\Desktop\\gyarrepo\\Gymnasiearbete\\Game\\Game.csproj",
       "projectName": "Game",
-      "projectPath": "C:\\Users\\Dusty\\Desktop\\Gyarrepo 2\\Gymnasiearbete\\Game\\Game.csproj",
+      "projectPath": "C:\\Users\\Dusty\\Desktop\\gyarrepo\\Gymnasiearbete\\Game\\Game.csproj",
       "packagesPath": "C:\\Users\\Dusty\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Dusty\\Desktop\\Gyarrepo 2\\Gymnasiearbete\\Game\\obj\\",
+      "outputPath": "C:\\Users\\Dusty\\Desktop\\gyarrepo\\Gymnasiearbete\\Game\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Dusty\\AppData\\Roaming\\NuGet\\NuGet.Config"
