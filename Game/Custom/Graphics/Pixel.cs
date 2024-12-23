@@ -5,6 +5,13 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Game.Custom.Graphics;
 
 static class Pixel {
+    public static Vector2 SnapToPixelGrid(Vector2 position, int pixelSize) {
+        float snappedX = (float)Math.Floor(position.X / pixelSize) * pixelSize;
+        float snappedY = (float)Math.Floor(position.Y / pixelSize) * pixelSize;
+
+        return new Vector2(snappedX, snappedY);
+    }
+
     public static void DrawPerfectLine(SpriteBatch spriteBatch, Vector2 start, Vector2 end, Texture2D texture, int size, Color color)
     {
         start /= size;

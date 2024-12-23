@@ -26,13 +26,16 @@ public class Game : Microsoft.Xna.Framework.Game
     private SpriteBatch _spriteBatch;
     private OrthographicCamera _camera;
 
+    private const int _pixelSize = 8;
     private Texture2D _pixel;
     private Vector2 _line;
     private Vector2 _line2;
     // Properties
     private float _lineSpeed = 200f;
-    public const float radie = 50;
-    public const float radieSQR = radie*radie;
+    private const float _minRadius = 2f;
+    private const float _minRadiusSquared = _minRadius*_minRadius;
+    private const float _radie = 50;
+    private const float _radieSquared = _radie*_radie;
 
     public Game()
     {
@@ -45,10 +48,11 @@ public class Game : Microsoft.Xna.Framework.Game
     {
         _line = GraphicsDevice.PresentationParameters.Bounds.Size.ToVector2() / 2f;
         _line2 = _line;
-        base.Initialize();
 
         var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 800, 480);
         _camera = new OrthographicCamera(viewportAdapter);
+
+        base.Initialize();
     }
 
     protected override void LoadContent()
@@ -77,16 +81,19 @@ public class Game : Microsoft.Xna.Framework.Game
         // Line Update
         var mouse_pos = Mouse.GetState().Position.ToVector2();
         var mouse_world_pos = _camera.ScreenToWorld(mouse_pos);
-        
-        var delta = mouse_world_pos - _line;
-        delta.Normalize();
-        _line += delta * _lineSpeed * gameTime.GetElapsedSeconds();
 
-        if (Vector2.DistanceSquared(_line, _line2) >= radieSQR)
+        var delta = mouse_world_pos - _line;
+        if (delta.LengthSquared() > _minRadiusSquared)
+        {
+            delta.Normalize();
+            _line += delta * _lineSpeed * gameTime.GetElapsedSeconds();
+        }
+
+        if (Vector2.DistanceSquared(_line, _line2) >= _radieSquared)
         {
             var delta2 = _line2 - _line;
             delta2.Normalize();
-            _line2 = _line + delta2 * radie;
+            _line2 = _line + delta2 * _radie;
         }
 
         base.Update(gameTime);
@@ -101,7 +108,7 @@ public class Game : Microsoft.Xna.Framework.Game
         _spriteBatch.Begin(transformMatrix: transformMatrix);
 
         // Line drawing
-        Pixel.DrawPerfectLine(_spriteBatch, _line, _line2, _pixel, 8, Color.Red);
+        Pixel.DrawPerfectLine(_spriteBatch, _line, _line2, _pixel, _pixelSize, Color.Red);
 
         // Test rectangle
         _spriteBatch.DrawRectangle(new RectangleF(250,250,50,50), Color.Black, 1f);
