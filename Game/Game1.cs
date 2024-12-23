@@ -7,6 +7,7 @@ using MonoGame.Extended.ViewportAdapters;
 
 using Game.Custom.Input;
 using Game.Custom.Graphics;
+using System;
 namespace Game;
 
 
@@ -28,7 +29,8 @@ public class Game : Microsoft.Xna.Framework.Game
     private Texture2D _pixel;
     private Vector2 _line;
     private Vector2 _line2;
-
+    // Properties
+    private float _lineSpeed = 200f;
     public const float radie = 50;
     public const float radieSQR = radie*radie;
 
@@ -62,18 +64,30 @@ public class Game : Microsoft.Xna.Framework.Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
+        // Camera Update
+        const float movementSpeed = 200;
+        _camera.Move(GetMovementDirection() * movementSpeed * gameTime.GetElapsedSeconds());
+        
+        var keyboard = Keyboard.GetState();
+        var zoom = Utils.getInputDirection(keyboard.IsKeyDown(Keys.Z), keyboard.IsKeyDown(Keys.X));
+
+        // For natural feeling zoom
+        _camera.ZoomIn(zoom * _camera.Zoom / 10f);
+
+        // Line Update
         var mouse_pos = Mouse.GetState().Position.ToVector2();
-        _line = Vector2.Lerp(_line, mouse_pos, 0.1f);
+        var mouse_world_pos = _camera.ScreenToWorld(mouse_pos);
+        
+        var delta = mouse_world_pos - _line;
+        delta.Normalize();
+        _line += delta * _lineSpeed * gameTime.GetElapsedSeconds();
+
         if (Vector2.DistanceSquared(_line, _line2) >= radieSQR)
         {
-            var delta = _line2 - _line;
-            delta.Normalize();
-            _line2 = _line + delta * radie;
+            var delta2 = _line2 - _line;
+            delta2.Normalize();
+            _line2 = _line + delta2 * radie;
         }
-
-        // Camera Update
-        const float movementSpeed = -200;
-        _camera.Move(GetMovementDirection() * movementSpeed * gameTime.GetElapsedSeconds());
 
         base.Update(gameTime);
     }
@@ -82,14 +96,16 @@ public class Game : Microsoft.Xna.Framework.Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        _spriteBatch.Begin();
-        Pixel.DrawPerfectLine(_spriteBatch, _line, _line2, _pixel, 8, Color.Red);
-        _spriteBatch.End();
-
         // Camera logic
          var transformMatrix = _camera.GetViewMatrix();
         _spriteBatch.Begin(transformMatrix: transformMatrix);
+
+        // Line drawing
+        Pixel.DrawPerfectLine(_spriteBatch, _line, _line2, _pixel, 8, Color.Red);
+
+        // Test rectangle
         _spriteBatch.DrawRectangle(new RectangleF(250,250,50,50), Color.Black, 1f);
+
         _spriteBatch.End();
 
         base.Draw(gameTime);
