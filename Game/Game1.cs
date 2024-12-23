@@ -2,12 +2,20 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+using Game.Custom.Graphics;
 namespace Game;
 
 public class Game : Microsoft.Xna.Framework.Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
+
+    private Texture2D _pixel;
+    private Vector2 _line;
+    private Vector2 _line2;
+
+    public const float radie = 50;
+    public const float radieSQR = radie*radie;
 
     public Game()
     {
@@ -18,8 +26,8 @@ public class Game : Microsoft.Xna.Framework.Game
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
-
+        _line = GraphicsDevice.PresentationParameters.Bounds.Size.ToVector2() / 2f;
+        _line2 = _line;
         base.Initialize();
     }
 
@@ -27,15 +35,14 @@ public class Game : Microsoft.Xna.Framework.Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        // TODO: use this.Content to load your game content here
+        _pixel = new(GraphicsDevice, 1, 1);
+        _pixel.SetData([Color.White]);
     }
 
     protected override void Update(GameTime gameTime)
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
-
-        // TODO: Add your update logic here
 
         base.Update(gameTime);
     }
@@ -44,7 +51,11 @@ public class Game : Microsoft.Xna.Framework.Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        // TODO: Add your drawing code here
+        _spriteBatch.Begin();
+
+        Utils.DrawPixelPerfectLine(_spriteBatch, _line, _line2, _pixel, 16, Color.Red);
+
+        _spriteBatch.End();
 
         base.Draw(gameTime);
     }
