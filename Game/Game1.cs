@@ -3,11 +3,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.ViewportAdapters;
-
-
 using Game.Custom.Input;
 using Game.Custom.Graphics;
-using System;
+using MonoGame.Extended.ECS;
+
 namespace Game;
 
 
@@ -26,6 +25,9 @@ public class Game : Microsoft.Xna.Framework.Game
     private SpriteBatch _spriteBatch;
     private OrthographicCamera _camera;
 
+    private World _world;
+
+    // Red worm drawing
     private const int _pixelSize = 8;
     private Texture2D _pixel;
     private Vector2 _line;
@@ -36,6 +38,9 @@ public class Game : Microsoft.Xna.Framework.Game
     private const float _minRadiusSquared = _minRadius*_minRadius;
     private const float _radie = 50;
     private const float _radieSquared = _radie*_radie;
+
+    // Circle
+    private Effect _circleEffect;
 
     public Game()
     {
@@ -48,6 +53,8 @@ public class Game : Microsoft.Xna.Framework.Game
     {
         _line = GraphicsDevice.PresentationParameters.Bounds.Size.ToVector2() / 2f;
         _line2 = _line;
+
+        _circleEffect = Content.Load<Effect>("CircleShader");
 
         var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 800, 480);
         _camera = new OrthographicCamera(viewportAdapter);
@@ -71,7 +78,7 @@ public class Game : Microsoft.Xna.Framework.Game
         // Camera Update
         const float movementSpeed = 200;
         _camera.Move(GetMovementDirection() * movementSpeed * gameTime.GetElapsedSeconds());
-        
+
         var keyboard = Keyboard.GetState();
         var zoom = Utils.getInputDirection(keyboard.IsKeyDown(Keys.Z), keyboard.IsKeyDown(Keys.X));
 
@@ -105,14 +112,22 @@ public class Game : Microsoft.Xna.Framework.Game
 
         // Camera logic
          var transformMatrix = _camera.GetViewMatrix();
-        _spriteBatch.Begin(transformMatrix: transformMatrix);
+        _spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: SpriteSortMode.Immediate, blendState: BlendState.AlphaBlend);
 
         // Line drawing
         Pixel.DrawPerfectLine(_spriteBatch, _line, _line2, _pixel, _pixelSize, Color.Red);
 
         // Test rectangle
         _spriteBatch.DrawRectangle(new RectangleF(250,250,50,50), Color.Black, 1f);
+        _spriteBatch.End();
 
+        // Test circle
+        _circleEffect.Parameters["radius"].SetValue(0.5f);
+        _circleEffect.Parameters["pixelSize"].SetValue(_pixelSize);
+        _circleEffect.Parameters["textureSize"].SetValue(new Vector2(200f, 200f));
+
+        _spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: SpriteSortMode.Immediate, blendState: BlendState.AlphaBlend, effect: _circleEffect);
+        _spriteBatch.FillRectangle(new RectangleF(8*8*8, 8*8f, 200f, 200f), Color.White);
         _spriteBatch.End();
 
         base.Draw(gameTime);
