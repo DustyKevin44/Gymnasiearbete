@@ -21,11 +21,9 @@ public class Game : Microsoft.Xna.Framework.Game
             Utils.getInputDirection(state.IsKeyDown(Keys.Up), state.IsKeyDown(Keys.Down))
         );
     }
-    private GraphicsDeviceManager _graphics;
+    private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private OrthographicCamera _camera;
-
-    private World _world;
 
     // Red worm drawing
     private const int _pixelSize = 8;
