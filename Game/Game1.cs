@@ -34,7 +34,7 @@ public class Game : Microsoft.Xna.Framework.Game
     private Vector2 _line2;
 
     // Long White worm
-    private Chain _worm;
+    private Skeleton _worm;
 
     // Properties
     private float _lineSpeed = 200f;
@@ -63,13 +63,18 @@ public class Game : Microsoft.Xna.Framework.Game
         var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 800, 480);
         _camera = new OrthographicCamera(viewportAdapter);
 
-        _worm = new([
-            new Joint(Vector2.Zero, 30f),
-            new Joint(Vector2.Zero, 30f),
-            new Joint(Vector2.Zero, 30f),
-            new Joint(Vector2.Zero, 30f),
-            new Joint(Vector2.Zero, 30f),
-            new Joint(Vector2.Zero, 30f)
+        _worm = new(new(), [
+            new Bone(new(), [new DistanceConstraint(30f)], [
+                new Bone(new(), [new DistanceConstraint(30f)], [
+                    new Bone(new(), [new DistanceConstraint(30f)], [
+                        new Bone(new(), [new DistanceConstraint(30f)], [
+                            new Bone(new(), [new DistanceConstraint(30f)], [
+                                new Bone(new(), [new DistanceConstraint(30f)], null)
+                            ])
+                        ])
+                    ])
+                ])
+            ])
         ]);
 
         base.Initialize();
@@ -116,8 +121,8 @@ public class Game : Microsoft.Xna.Framework.Game
             _line2 = _line + delta2 * _radie;
         }
 
-        _worm.Position = mouse_world_pos;
-        _worm.Update(gameTime);
+        _worm.LocalTransform.Position = mouse_world_pos;
+        _worm.Update();
 
         base.Update(gameTime);
     }
@@ -131,13 +136,13 @@ public class Game : Microsoft.Xna.Framework.Game
         _spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: SpriteSortMode.Immediate, blendState: BlendState.AlphaBlend);
 
         // Line drawing
-        Pixel.DrawPerfectLine(_spriteBatch, _line, _line2, _pixel, _pixelSize, Color.Red);
+        //Pixel.DrawPerfectLine(_spriteBatch, _line, _line2, _pixel, _pixelSize, Color.Red);
 
         // Test rectangle
         _spriteBatch.DrawRectangle(new RectangleF(250,250,50,50), Color.Black, 1f);
 
         // Worm
-        _worm.Draw(gameTime, _spriteBatch);
+        _worm.Draw(_spriteBatch);
 
         _spriteBatch.End();
 
