@@ -6,6 +6,8 @@ using MonoGame.Extended.ViewportAdapters;
 using Game.Custom.Input;
 using Game.Custom.Graphics;
 using MonoGame.Extended.ECS;
+using Game.Custom.Graphics.Procedural;
+using System;
 
 namespace Game;
 
@@ -30,6 +32,10 @@ public class Game : Microsoft.Xna.Framework.Game
     private Texture2D _pixel;
     private Vector2 _line;
     private Vector2 _line2;
+
+    // Long White worm
+    private Chain _worm;
+
     // Properties
     private float _lineSpeed = 200f;
     private const float _minRadius = 2f;
@@ -56,6 +62,15 @@ public class Game : Microsoft.Xna.Framework.Game
 
         var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 800, 480);
         _camera = new OrthographicCamera(viewportAdapter);
+
+        _worm = new([
+            new Joint(Vector2.Zero, 30f),
+            new Joint(Vector2.Zero, 30f),
+            new Joint(Vector2.Zero, 30f),
+            new Joint(Vector2.Zero, 30f),
+            new Joint(Vector2.Zero, 30f),
+            new Joint(Vector2.Zero, 30f)
+        ]);
 
         base.Initialize();
     }
@@ -101,6 +116,9 @@ public class Game : Microsoft.Xna.Framework.Game
             _line2 = _line + delta2 * _radie;
         }
 
+        _worm.Position = mouse_world_pos;
+        _worm.Update(gameTime);
+
         base.Update(gameTime);
     }
 
@@ -117,6 +135,10 @@ public class Game : Microsoft.Xna.Framework.Game
 
         // Test rectangle
         _spriteBatch.DrawRectangle(new RectangleF(250,250,50,50), Color.Black, 1f);
+
+        // Worm
+        _worm.Draw(gameTime, _spriteBatch);
+
         _spriteBatch.End();
 
         // Test circle
