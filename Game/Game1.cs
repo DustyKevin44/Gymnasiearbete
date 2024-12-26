@@ -8,6 +8,8 @@ using Game.Custom.Graphics;
 using MonoGame.Extended.ECS;
 using Game.Custom.Graphics.Procedural;
 using System;
+using MonoGame.Extended.Input;
+using System.Linq;
 
 namespace Game;
 
@@ -63,20 +65,6 @@ public class Game : Microsoft.Xna.Framework.Game
         var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 800, 480);
         _camera = new OrthographicCamera(viewportAdapter);
 
-        _worm = new(new(), [
-            new Bone(new(), [new DistanceConstraint(30f)], [
-                new Bone(new(), [new DistanceConstraint(30f)], [
-                    new Bone(new(), [new DistanceConstraint(30f)], [
-                        new Bone(new(), [new DistanceConstraint(30f)], [
-                            new Bone(new(), [new DistanceConstraint(30f)], [
-                                new Bone(new(), [new DistanceConstraint(30f)], null)
-                            ])
-                        ])
-                    ])
-                ])
-            ])
-        ]);
-
         base.Initialize();
     }
 
@@ -86,6 +74,12 @@ public class Game : Microsoft.Xna.Framework.Game
 
         _pixel = new(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
+
+        _worm = new Skeleton(new Vector2(200f, 100f))
+            .AttachBone(new Bone(Vector2.Zero, 30f, 0f, 3.14f)
+                .AttachBone(new Bone(Vector2.Zero, 30f, 0f, 3.14f)
+                    .AttachBone(new Bone(Vector2.Zero, 30f, 0f, 3.14f)
+                        .AttachBone(new Bone(Vector2.Zero, 30f, 0f, 3.14f)))));
     }
 
     protected override void Update(GameTime gameTime)
@@ -121,8 +115,14 @@ public class Game : Microsoft.Xna.Framework.Game
             _line2 = _line + delta2 * _radie;
         }
 
-        _worm.LocalTransform.Position = mouse_world_pos;
-        _worm.Update();
+        
+        // const float WORM_SPEED = 200f;
+        // if (Vector2.DistanceSquared(_worm.GlobalPosition, mouse_world_pos) > 30) {
+        //     _worm.GlobalPosition += (mouse_world_pos - _worm.GlobalPosition).NormalizedCopy() * WORM_SPEED * gameTime.GetElapsedSeconds();
+        //     _worm.GlobalRotation = (mouse_world_pos - _worm.GlobalPosition).ToAngle();
+        // }
+        _worm.Update(gameTime);
+        _worm.SolveIK(mouse_world_pos, _worm.Bones.Last());
 
         base.Update(gameTime);
     }
@@ -143,6 +143,9 @@ public class Game : Microsoft.Xna.Framework.Game
 
         // Worm
         _worm.Draw(_spriteBatch);
+
+        var rot = MathHelper.PiOver2 * (float)gameTime.TotalGameTime.TotalSeconds;
+        Debug.DrawArc(_spriteBatch, new Vector2(200, 200), 30f, 20, rot + 2, rot, Color.Red);
 
         _spriteBatch.End();
 

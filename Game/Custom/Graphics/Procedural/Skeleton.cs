@@ -1,25 +1,27 @@
 using MonoGame.Extended;
+using MonoGame.Extended.Shapes;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System;
+using System.Linq;
 
 namespace Game.Custom.Graphics.Procedural;
 
 
-public abstract class ABone
+public abstract class ABone(Vector2 position)
 {
-    public List<Bone> Bones { get; private set; }
-    public Transform2 LocalTransform { get; set; }
+    public readonly List<Bone> Bones = [];
 
-    public ABone(Transform2 transform, List<Bone> bones = null) {
-        LocalTransform = transform;
-        Bones = bones ?? [];
-        foreach (var bone in Bones) { bone.Parent = this; }
-    }
+    public Vector2 LocalPosition = position;
+    public float LocalRotation = 0f; // -PI -> PI
 
-    public void Update() {
+    public Vector2 GlobalPosition { get => LocalPosition; set => LocalPosition = value; }
+    public float GlobalRotation { get => LocalRotation; set => LocalRotation = value; }
+
+    public void Update(GameTime gameTime) {
         foreach (var bone in Bones) {
-            bone.Update();
+            bone.Update(gameTime);
         }
     }
 
@@ -28,78 +30,88 @@ public abstract class ABone
             bone.Draw(spriteBatch);
         }
     }
+
+    public void SolveIK(Vector2 target, Bone endEffector) {
+        IKForward(target, endEffector);
+        IKBackward();
+    }
+    
+    public void IKBackward() {
+        foreach (var bone in Bones) {
+            var angle = (GlobalPosition - bone.GlobalPosition).ToAngle();
+            bone.GlobalRotation = angle;
+            bone.GlobalPosition = (this is Bone thisBone) ? thisBone.GlobalPosition : GlobalPosition;
+            bone.IKBackward(); // Propegate
+        }
+    }
+
+    public void IKForward(Vector2 target, Bone endEffector) {
+        int limit = 1000;
+        int i = 0;
+        while (Vector2.DistanceSquared(target, endEffector.GlobalPosition) > 1 && ++i < limit) {
+            ABone cur = endEffector;
+            Vector2 t = target;
+            while (cur is Bone bone) {
+                if (bone.TipGlobalPosition == t) {
+                    t = bone.GlobalPosition;
+                    cur = bone.Parent;
+                    continue;
+                }
+                var angle = (t - bone.GlobalPosition).ToAngle();
+                bone.GlobalRotation = angle; // TODO: Apply constraints
+                bone.TipGlobalPosition = t;
+                t = bone.GlobalPosition;
+                cur = bone.Parent;
+            }
+        }
+    }
 }
 
 // Works as the root bone that all other bones in the "skeleton" are attached to, should be thought as the main body and the bones make up the limbs and appendages of the skeleton
-public class Skeleton(Transform2 transform, List<Bone> bones = null) : ABone(transform, bones);
-
-
-public class Bone : ABone
+public class Skeleton(Vector2 position) : ABone(position)
 {
-    public List<IConstraint> Constraints { get; private set; }
-    public ABone Parent { get; set; }
+    private Polygon _polygon = new([Vector2.Zero, new Vector2(10, 10), Vector2.UnitY * -10, new Vector2(-10, 10), Vector2.Zero]);
 
-    public Bone(Transform2 transform, List<IConstraint> constraints = null, List<Bone> bones = null) : base(transform, bones) {
-        Constraints = constraints ?? [];
-        foreach (var constraint in Constraints) {
-            constraint.Owner = this;
-        }
-    }
-
-    public new void Update() {
-        foreach (var constraint in Constraints) {
-            constraint.Update(Parent);
-        }
-        base.Update();
+    public Skeleton AttachBone(Bone bone) {
+        Bones.Add(bone);
+        bone.Parent = this;
+        return this;
     }
 
     public new void Draw(SpriteBatch spriteBatch) {
-        foreach (var constraint in Constraints) {
-            constraint.Draw(Parent, spriteBatch);
-        }
+        spriteBatch.DrawPolygon(GlobalPosition, _polygon.TransformedCopy(Vector2.Zero, GlobalRotation, Vector2.One), Color.White, 2f);
         base.Draw(spriteBatch);
     }
 }
 
 
-public interface IConstraint {
-    public Bone Owner { get; set; }
-    public void Update(ABone target);
-    public void Draw(ABone target, SpriteBatch spriteBatch);
-}
-
-
-public abstract class BaseConstraint {
-    public Bone Owner { get; set; }
-}
-
-
-public class DistanceConstraint(float length) : BaseConstraint, IConstraint
+public class Bone(Vector2 position, float length, double minimumAngle, double maximumAngle) : ABone(position)
 {
+    public ABone Parent { get; set; }
+    // Properties
+    public new Vector2 GlobalPosition { get => LocalPosition + Parent.GlobalPosition; set => LocalPosition = value - Parent.GlobalPosition; }
+    public new float GlobalRotation { get => LocalRotation + Parent.GlobalRotation; set => LocalRotation = value - Parent.GlobalRotation; }
+
+    public Vector2 TipLocalPosition { get => LocalPosition + Length * new Vector2(MathF.Cos(GlobalRotation), MathF.Sin(GlobalRotation)); set => LocalPosition = value + LocalPosition - TipLocalPosition; }
+    public Vector2 TipGlobalPosition { get => GlobalPosition + Length * new Vector2(MathF.Cos(GlobalRotation), MathF.Sin(GlobalRotation)); set => GlobalPosition = value + GlobalPosition - TipGlobalPosition; }
+
     public float Length { get; set; } = length;
+    public float MinAngle { get; set; } = MathHelper.WrapAngle((float)minimumAngle) + MathF.PI;
+    public float MaxAngle { get; set; } = MathHelper.WrapAngle((float)maximumAngle) + MathF.PI;
 
-    public void Draw(ABone target, SpriteBatch spriteBatch) {
-        spriteBatch.DrawLine(Owner.LocalTransform.Position, target.LocalTransform.Position, Color.Red, 2f);
+    public Bone AttachBone(Bone bone) {
+        Bones.Add(bone);
+        bone.Parent = this;
+        return this;
     }
 
-    public void Update(ABone target) {
-        var dir = Owner.LocalTransform.Position - target.LocalTransform.Position;
-        dir.Normalize();
+    public new void Update(GameTime gameTime) {
+        LocalRotation = MathHelper.Clamp(MathHelper.WrapAngle(LocalRotation) + MathF.PI, MinAngle + 0.01f, MaxAngle - 0.01f);
+    }
 
-        Owner.LocalTransform.Position = target.LocalTransform.Position + dir * Length;
+    public new void Draw(SpriteBatch spriteBatch) {
+        spriteBatch.DrawLine(GlobalPosition, TipGlobalPosition, Color.White, 2f);
+        Debug.DrawArc(spriteBatch, GlobalPosition, 20f, 10, MinAngle, MaxAngle, Color.Red);
+        base.Draw(spriteBatch);
     }
 }
-
-
-public class AngleConstraint(double minAngle, double maxAngle) : BaseConstraint, IConstraint
-{
-    public float MinAngle { get; set; } = (float)minAngle;
-    public float MaxAngle { get; set; } = (float)maxAngle;
-
-    public void Draw(ABone target, SpriteBatch spriteBatch) {
-        Drawing.Arc(spriteBatch, Owner.LocalTransform.Position, 20f, MinAngle, MaxAngle, 32, Color.Red);
-    }
-
-    public void Update(ABone target) {}
-}
-
