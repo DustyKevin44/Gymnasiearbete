@@ -19,7 +19,7 @@
 /processorParam:DebugMode=Auto
 /build:CircleShader.fx
 
-#begin Controls/menu-button-icon.png
+#begin Controls/menyknapp2.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -29,7 +29,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Controls/menu-button-icon.png
+/build:Controls/menyknapp2.png
 
 #begin Fonts/Font.spritefont
 /importer:FontDescriptionImporter

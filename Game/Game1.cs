@@ -10,6 +10,7 @@ using Game.Custom.Graphics.Procedural;
 using System;
 using MonoGame.Extended.Input;
 using System.Linq;
+using Game.States;
 
 namespace Game;
 
@@ -48,6 +49,13 @@ public class Game : Microsoft.Xna.Framework.Game
     // Circle
     private Effect _circleEffect;
 
+    // Game states
+    private State _currentState;
+    private State _nextState;
+    public void ChangeState(State state)
+    {
+        _nextState = state;
+    }
     public Game()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -59,7 +67,7 @@ public class Game : Microsoft.Xna.Framework.Game
     {
         _line = GraphicsDevice.PresentationParameters.Bounds.Size.ToVector2() / 2f;
         _line2 = _line;
-
+        IsMouseVisible = true;
         _circleEffect = Content.Load<Effect>("CircleShader");
 
         var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 800, 480);
@@ -71,6 +79,8 @@ public class Game : Microsoft.Xna.Framework.Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+        _currentState = new MenuState(this, GraphicsDevice, Content);
 
         _pixel = new(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
@@ -87,6 +97,16 @@ public class Game : Microsoft.Xna.Framework.Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
+
+        // State logic
+        if (_nextState != null)
+        {
+            _currentState = _nextState;
+
+            _nextState = null;
+        }
+        _currentState.Update(gameTime);
+        _currentState.PostUpdate(gameTime);
         // Camera Update
         const float movementSpeed = 200;
         _camera.Move(GetMovementDirection() * movementSpeed * gameTime.GetElapsedSeconds());
@@ -130,6 +150,9 @@ public class Game : Microsoft.Xna.Framework.Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
+        
+        // Draw state
+        _currentState.Draw(gameTime, _spriteBatch);
 
         // Camera logic
          var transformMatrix = _camera.GetViewMatrix();
