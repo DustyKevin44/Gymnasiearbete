@@ -30,25 +30,6 @@ public class Game : Microsoft.Xna.Framework.Game
     private SpriteBatch _spriteBatch;
     private OrthographicCamera _camera;
 
-    // Red worm drawing
-    private const int _pixelSize = 8;
-    private Texture2D _pixel;
-    private Vector2 _line;
-    private Vector2 _line2;
-
-    // Long White worm
-    private Skeleton _worm;
-
-    // Properties
-    private float _lineSpeed = 200f;
-    private const float _minRadius = 2f;
-    private const float _minRadiusSquared = _minRadius*_minRadius;
-    private const float _radie = 50;
-    private const float _radieSquared = _radie*_radie;
-
-    // Circle
-    private Effect _circleEffect;
-
     // Game states
     private State _currentState;
     private State _nextState;
@@ -62,41 +43,18 @@ public class Game : Microsoft.Xna.Framework.Game
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
-
     protected override void Initialize()
-    {
-        _line = GraphicsDevice.PresentationParameters.Bounds.Size.ToVector2() / 2f;
-        _line2 = _line;
-        IsMouseVisible = true;
-        _circleEffect = Content.Load<Effect>("CircleShader");
-
-        var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 800, 480);
-        _camera = new OrthographicCamera(viewportAdapter);
-
-        base.Initialize();
-    }
-
-    protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        _currentState = new MenuState(this, GraphicsDevice, Content);
-
-        _pixel = new(GraphicsDevice, 1, 1);
-        _pixel.SetData([Color.White]);
-
-        _worm = new Skeleton(new Vector2(200f, 100f))
-            .AttachBone(new Bone(Vector2.Zero, 30f, 0f, 3.14f)
-                .AttachBone(new Bone(Vector2.Zero, 30f, 0f, 3.14f)
-                    .AttachBone(new Bone(Vector2.Zero, 30f, 0f, 3.14f)
-                        .AttachBone(new Bone(Vector2.Zero, 30f, 0f, 3.14f)))));
+    _camera = new OrthographicCamera(GraphicsDevice);  // Initialize the camera
+    _currentState = new MenuState(this, GraphicsDevice, Content);
+    base.Initialize();
     }
-
     protected override void Update(GameTime gameTime)
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
-
 
         // State logic
         if (_nextState != null)
@@ -107,79 +65,15 @@ public class Game : Microsoft.Xna.Framework.Game
         }
         _currentState.Update(gameTime);
         _currentState.PostUpdate(gameTime);
-        // Camera Update
-        const float movementSpeed = 200;
-        _camera.Move(GetMovementDirection() * movementSpeed * gameTime.GetElapsedSeconds());
-
-        var keyboard = Keyboard.GetState();
-        var zoom = Utils.getInputDirection(keyboard.IsKeyDown(Keys.Z), keyboard.IsKeyDown(Keys.X));
-
-        // For natural feeling zoom
-        _camera.ZoomIn(zoom * _camera.Zoom / 10f);
-
-        // Line Update
-        var mouse_pos = Mouse.GetState().Position.ToVector2();
-        var mouse_world_pos = _camera.ScreenToWorld(mouse_pos);
-
-        var delta = mouse_world_pos - _line;
-        if (delta.LengthSquared() > _minRadiusSquared)
-        {
-            delta.Normalize();
-            _line += delta * _lineSpeed * gameTime.GetElapsedSeconds();
-        }
-
-        if (Vector2.DistanceSquared(_line, _line2) >= _radieSquared)
-        {
-            var delta2 = _line2 - _line;
-            delta2.Normalize();
-            _line2 = _line + delta2 * _radie;
-        }
-
-        
-        // const float WORM_SPEED = 200f;
-        // if (Vector2.DistanceSquared(_worm.GlobalPosition, mouse_world_pos) > 30) {
-        //     _worm.GlobalPosition += (mouse_world_pos - _worm.GlobalPosition).NormalizedCopy() * WORM_SPEED * gameTime.GetElapsedSeconds();
-        //     _worm.GlobalRotation = (mouse_world_pos - _worm.GlobalPosition).ToAngle();
-        // }
-        _worm.Update(gameTime);
-        _worm.SolveIK(mouse_world_pos, _worm.Bones.Last());
-
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
-        
         // Draw state
         _currentState.Draw(gameTime, _spriteBatch);
-
-        // Camera logic
-         var transformMatrix = _camera.GetViewMatrix();
-        _spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: SpriteSortMode.Immediate, blendState: BlendState.AlphaBlend);
-
-        // Line drawing
-        //Pixel.DrawPerfectLine(_spriteBatch, _line, _line2, _pixel, _pixelSize, Color.Red);
-
-        // Test rectangle
-        _spriteBatch.DrawRectangle(new RectangleF(250,250,50,50), Color.Black, 1f);
-
-        // Worm
-        _worm.Draw(_spriteBatch);
-
-        var rot = MathHelper.PiOver2 * (float)gameTime.TotalGameTime.TotalSeconds;
-        Debug.DrawArc(_spriteBatch, new Vector2(200, 200), 30f, 20, rot + 2, rot, Color.Red);
-
-        _spriteBatch.End();
-
-        // Test circle
-        _circleEffect.Parameters["radius"].SetValue(0.5f);
-        _circleEffect.Parameters["pixelSize"].SetValue(_pixelSize);
-        _circleEffect.Parameters["textureSize"].SetValue(new Vector2(200f, 200f));
-
-        _spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: SpriteSortMode.Immediate, blendState: BlendState.AlphaBlend, effect: _circleEffect);
-        _spriteBatch.FillRectangle(new RectangleF(8*8*8, 8*8f, 200f, 200f), Color.White);
-        _spriteBatch.End();
+      
 
         base.Draw(gameTime);
     }
