@@ -1,40 +1,24 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Game.States
+namespace Game.Custom.States;
+
+public abstract class State(Game game, GraphicsDevice graphicsDevice, ContentManager content)
 {
-    public abstract class State{
-        #region Fields
+    #region Fields
 
-        protected ContentManager _content; 
+    protected ContentManager _content = content;
+    protected GraphicsDevice _graphicsDevice = graphicsDevice;
+    protected Game _game = game;
 
-        protected GraphicsDevice _graphicsDevice;
-        protected Game _game;
+    #endregion
 
-        #endregion
+    #region Methods
 
-        #region Methods
+    public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
+    public abstract void PostUpdate(GameTime gameTime);
+    public abstract void Update(GameTime gameTime);
 
-        public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
-
-        public abstract void PostUpdate(GameTime gameTime);
-
-        public abstract void Update(GameTime gameTime);
-
-        public State(Game game, GraphicsDevice graphicsDevice, ContentManager content){
-            _game = game;
-             
-            _graphicsDevice = graphicsDevice;
-
-            _content = content;
-        }
-        
-        #endregion
-    }
+    #endregion
 }

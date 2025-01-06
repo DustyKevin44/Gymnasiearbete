@@ -4,15 +4,17 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Game.Custom.Graphics;
 
-static class Pixel {
-    public static Vector2 SnapToPixelGrid(Vector2 position, int pixelSize) {
+static class Pixel
+{
+    public static Vector2 SnapToPixelGrid(Vector2 position, int pixelSize)
+    {
         float snappedX = (float)Math.Floor(position.X / pixelSize) * pixelSize;
         float snappedY = (float)Math.Floor(position.Y / pixelSize) * pixelSize;
 
         return new Vector2(snappedX, snappedY);
     }
 
-    public static void DrawPerfectLine(SpriteBatch spriteBatch, Vector2 start, Vector2 end, Texture2D texture, int size, Color color)
+    public static void DrawPixelPerfectLine(SpriteBatch spriteBatch, Vector2 start, Vector2 end, Texture2D texture, int size, Color color)
     {
         start /= size;
         end /= size;
@@ -30,6 +32,7 @@ static class Pixel {
 
         int maxSteps = dx + dy + 1000; // Safety limit
         int steps = 0;
+
         while (true)
         {
             spriteBatch.Draw(texture, new Rectangle(x0 * size, y0 * size, size, size), color);
@@ -41,7 +44,7 @@ static class Pixel {
             if (e2 > -dy) { err -= dy; x0 += sx; }
             if (e2 < dx) { err += dx; y0 += sy; }
 
-            if (++steps > maxSteps) 
+            if (++steps > maxSteps)
             {
                 throw new InvalidOperationException("Exceeded maximum steps in DrawPixelPerfectLine.");
             }
