@@ -10,15 +10,7 @@ namespace Game;
 
 public class Game : Microsoft.Xna.Framework.Game
 {
-    // Move camera function
-    private static Vector2 GetMovementDirection()
-    {
-        var state = Keyboard.GetState();
-        return new Vector2(
-            Utils.GetInputDirection(state.IsKeyDown(Keys.Left), state.IsKeyDown(Keys.Right)),
-            Utils.GetInputDirection(state.IsKeyDown(Keys.Up), state.IsKeyDown(Keys.Down))
-        );
-    }
+ 
 
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;

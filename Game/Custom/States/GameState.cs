@@ -6,6 +6,8 @@ using MonoGame.Extended;
 using MonoGame.Extended.ViewportAdapters;
 using Game.Custom.Graphics;
 using Game.Custom.Graphics.Procedural;
+using Game.Custom.Input;
+
 using System.Linq;
 
 
@@ -25,6 +27,15 @@ public class GameState : State
     private const float _radie = 50f;
     private const float _radieSquared = _radie * _radie;
     private const float _minRadiusSquared = _minRadius * _minRadius;
+       // Move camera function
+    private static Vector2 GetMovementDirection()
+    {
+        var state = Keyboard.GetState();
+        return new Vector2(
+            Utils.GetInputDirection(state.IsKeyDown(Keys.Left), state.IsKeyDown(Keys.Right)),
+            Utils.GetInputDirection(state.IsKeyDown(Keys.Up), state.IsKeyDown(Keys.Down))
+        );
+    }
 
     public GameState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
         : base(game, graphicsDevice, content)
