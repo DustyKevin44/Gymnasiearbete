@@ -11,12 +11,14 @@ public class Player : Object
 {
     private readonly VelictyComponent _input;
     private readonly Physics _physics;
+    private readonly Texture2D _texture;
 
 
     public Player(Texture2D texture, Vector2 startPosition) : base(texture, startPosition)
     {
         _input = new VelictyComponent();
         _physics = new Physics(startPosition);
+        _texture = texture;
   
     }
 
@@ -29,6 +31,6 @@ public class Player : Object
     public void Draw(SpriteBatch spriteBatch)
     {
         
-        spriteBatch.Draw(_texture, _Position);
+        spriteBatch.Draw(_texture, _Position, Color.White);
     }
 }

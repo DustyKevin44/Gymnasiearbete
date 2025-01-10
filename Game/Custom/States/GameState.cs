@@ -7,7 +7,7 @@ using MonoGame.Extended.ViewportAdapters;
 using Game.Custom.Graphics;
 using Game.Custom.Graphics.Procedural;
 using Game.Custom.Input;
-
+using Game.Custom.Objects;
 using System.Linq;
 
 
@@ -27,6 +27,8 @@ public class GameState : State
     private const float _radie = 50f;
     private const float _radieSquared = _radie * _radie;
     private const float _minRadiusSquared = _minRadius * _minRadius;
+    private Player _player;
+
        // Move camera function
     private static Vector2 GetMovementDirection()
     {
@@ -67,6 +69,10 @@ public class GameState : State
         _pixel.SetData([Color.White]);
 
         _circleEffect = _content.Load<Effect>("CircleShader");
+
+        var playerTexture = _content.Load<Texture2D>("player");
+
+       
     }
 
     public override void Update(GameTime gameTime)
