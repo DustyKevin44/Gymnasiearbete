@@ -9,6 +9,7 @@ using Game.Custom.Graphics.Procedural;
 using Game.Custom.Input;
 using Game.Custom.Objects;
 using System.Linq;
+using Game.Custom.Tilemap;
 
 
 namespace Game.Custom.States;
@@ -27,7 +28,10 @@ public class GameState : State
     private const float _radie = 50f;
     private const float _radieSquared = _radie * _radie;
     private const float _minRadiusSquared = _minRadius * _minRadius;
-    private Player _player;
+    //private Player _player;
+    private Hero _hero;
+    private Map _map;
+    private readonly GraphicsDeviceManager _graphics;
 
        // Move camera function
     private static Vector2 GetMovementDirection()
@@ -51,8 +55,11 @@ public class GameState : State
         // Initialize your variables
         _line = new Vector2(300, 300); // Example starting position
         _line2 = _line;
+        _map = new(_content);
+        _hero = new(_content.Load<Texture2D>("cursorButton"), Vector2.Zero);
+        Pathfinder.Init(_map, _hero);
 
-        var viewportAdapter = new BoxingViewportAdapter(_game.Window, _graphicsDevice, 800, 480);
+        var viewportAdapter = new BoxingViewportAdapter(_game.Window, _graphicsDevice, 500, 500);
         _camera = new OrthographicCamera(viewportAdapter);
 
         _worm = new Skeleton(new Vector2(200f, 100f))
@@ -70,7 +77,7 @@ public class GameState : State
 
         _circleEffect = _content.Load<Effect>("CircleShader");
 
-        var playerTexture = _content.Load<Texture2D>("player");
+        //var playerTexture = _content.Load<Texture2D>("player");
 
        
     }
@@ -97,6 +104,12 @@ public class GameState : State
 
         _worm.Update(gameTime);
         _worm.SolveIK(mousePosition, _worm.Bones.Last());
+        
+
+        InputManager.Update();
+        _map.Update();
+        _hero.Update(gameTime);
+    
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -107,6 +120,12 @@ public class GameState : State
 
         // Line drawing (example commented out)
         // Pixel.DrawPerfectLine(spriteBatch, _line, _line2, _pixel, _pixelSize, Color.Red);
+
+
+        // Draw hero and map
+        _map.Draw(spriteBatch);
+        _hero.Draw(spriteBatch);
+
 
         // Test rectangle
         spriteBatch.DrawRectangle(new RectangleF(250, 250, 50, 50), Color.Black, 1f);
