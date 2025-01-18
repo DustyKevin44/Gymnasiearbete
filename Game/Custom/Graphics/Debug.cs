@@ -5,7 +5,6 @@ using System;
 
 namespace Game.Custom.Graphics;
 
-
 public static class Debug
 {
     public static void DrawArc(SpriteBatch spriteBatch, Vector2 center, float radius, int segments, float start, float end, Color color, float thickness = 2f)

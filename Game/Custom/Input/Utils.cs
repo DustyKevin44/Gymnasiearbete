@@ -1,3 +1,4 @@
+
 namespace Game.Custom.Input;
 
 public static class Utils {

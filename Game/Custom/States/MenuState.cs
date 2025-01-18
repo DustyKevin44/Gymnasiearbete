@@ -5,12 +5,10 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System;
 
-
 namespace Game.Custom.States;
 
 public class MenuState : State
 {
-
     private readonly List<Component> _components;
 
     public MenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
@@ -47,7 +45,6 @@ public class MenuState : State
             loadGameButton,
             quitGameButton,
         ];
-
     }
 
     private void NewGameButton_Click(object sender, EventArgs e)
@@ -81,12 +78,10 @@ public class MenuState : State
     public override void PostUpdate(GameTime gameTime)
     {
         // Ta bort sprite när de inte används
-
     }
 
     public override void Update(GameTime gameTime)
     {
-
         foreach (Component component in _components)
         {
             component.Update(gameTime);

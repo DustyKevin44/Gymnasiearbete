@@ -1,16 +1,12 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using MonoGame.Extended.Particles.Modifiers;
-using System;
 
-namespace Game.Custom.ObjectComponent;
+namespace Game.Custom.ObjectComponents;
 
-public class VelictyComponent()
+public class VelocityComponent()
 {
     //public int _change = change; // The amount of movement
-    public Vector2 GetMovementInput()
+    public static Vector2 GetMovementInput()
     {
         Vector2 movement = Vector2.Zero;
         if (Keyboard.GetState().IsKeyDown(Keys.W)) movement.Y -= 1;
