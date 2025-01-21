@@ -9,9 +9,8 @@
 /compress:False
 
 #-------------------------------- References --------------------------------#
-/reference:..\..\Game\MonoGame.Extended.Content.Pipeline.dll
-/reference:..\..\Game\MonoGame.Extended.dll
-/reference:..\..\Game\MonoGame.Extended.Tiled.dll
+
+/reference:..\..\..\..\..\.nuget\packages\monogame.extended.content.pipeline\4.0.4\tools\MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -52,6 +51,23 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Font.spritefont
 
+#begin grassTileset.tsx
+/importer:TiledMapTilesetImporter
+/processor:TiledMapTilesetProcessor
+/build:grassTileset.tsx
+
+#begin grassTilesetImages.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:grassTilesetImages.png
+
 #begin tile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -63,4 +79,9 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:tile.png
+
+#begin tilemap.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:tilemap.tmx
 
