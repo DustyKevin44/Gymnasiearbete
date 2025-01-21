@@ -1,3 +1,7 @@
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+using MonoGame.Extended.ECS;
 namespace Game.Custom.ObjectComponents;
 
 public class TransformComponent

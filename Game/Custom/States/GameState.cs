@@ -46,8 +46,8 @@ public class GameState : State
     {
 
     // Load the map and pathfinding system
-    var map = new Map(_content, _graphicsDevice);
-    Pathfinder.Init(map.CollisionLayer);
+    //var map = new Map(_content, _graphicsDevice);
+    //Pathfinder.Init(map.CollisionLayer);
     }   
 
     public override void Update(GameTime gameTime)
@@ -67,30 +67,9 @@ public class GameState : State
     var mouseState = Mouse.GetState();
     var mousePosition = _camera.ScreenToWorld(mouseState.Position.ToVector2());
 
-    InputManager.Update();
-    // BAD CODE REMOVE LATER
-    var mouseState = Mouse.GetState();
-    if (mouseState.LeftButton == ButtonState.Pressed)
-    {
-        var mapPosition = map.ScreenToMap(new Vector2(mouseState.X, mouseState.Y));
-        var heroPosition = map.ScreenToMap(hero.Position);
+    //InputManager.Update();
 
-        var path = Pathfinder.BFSearch(heroPosition, mapPosition);
-
-        if (path != null)
-        {
-            hero.SetPath(path.Select(p => map.MapToScreen(new Point((int)p.X, (int)p.Y))).ToList());
-        }
     }
-
-    map.Update(gameTime);
-    hero.Update(gameTime);
-
-    base.Update(gameTime);
-    // END OF BBBAAD CODE
-    _map.Update();
-    _hero.Update(gameTime);
-}
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
@@ -99,8 +78,8 @@ public class GameState : State
         spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: SpriteSortMode.Immediate, blendState: BlendState.AlphaBlend);
 
         // Draw hero and map
-        _map.Draw(spriteBatch);
-        _hero.Draw(spriteBatch);
+        //_map.Draw(spriteBatch);
+        //_/hero.Draw(spriteBatch);
 
         spriteBatch.End();
     }

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Game.Custom.ObjectComponents;
 
 namespace Game.Custom.Objects;
-
+/* 
 public class Player(Texture2D texture, Vector2 startPosition) : Object(texture, startPosition)
 {
     private readonly VelocityComponent _input = new();
@@ -20,4 +20,4 @@ public class Player(Texture2D texture, Vector2 startPosition) : Object(texture, 
     {
         spriteBatch.Draw(_texture, _Position, Color.White);
     }
-}
+} */
