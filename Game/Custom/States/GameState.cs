@@ -3,11 +3,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using MonoGame.Extended;
+using MonoGame.Extended.ECS;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended.ViewportAdapters;
 using Game.Custom.Input;
 using Game.Custom.Tilemap;
+using Game.Custom.ObjectComponents;
 
 namespace Game.Custom.States
 {
@@ -16,7 +18,15 @@ namespace Game.Custom.States
         private OrthographicCamera _camera;
         private TiledMap _map;
         private TiledMapRenderer _mapRenderer;
+        private Entity _player;
+        private World _world;
+  
 
+        private Vector2 _position;
+        private Vector2 playerVelocity;
+        private EntityManager _entityManager;
+        private Texture2D playerTexture;
+        private static SpriteBatch spriteBatch;
 
         // Utility function to get movement direction
         private static Vector2 GetMovementDirection()
@@ -31,17 +41,33 @@ namespace Game.Custom.States
         public GameState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
             : base(game, graphicsDevice, content)
         {
+
             Initialize();
             LoadContent();
         }
 
         private void Initialize()
         {
+                // Initialize the world
+            _world = new WorldBuilder()
+                .AddSystem(new MovementSystem())
+                .AddSystem(new RenderSystem(spriteBatch))
+                .Build();
+
+
+            _player = _world.CreateEntity();
+
+            // Add the components
+            _player.Attach(new TransformComponent(_position));
+            _player.Attach(new VelocityComponent(playerVelocity = new Vector2(0, 0))); // Moving right
+            _player.Attach(new SpriteComponent(playerTexture));
+
+
             // Load the Tiled map
             _map = _content.Load<TiledMap>("tilemap"); // Use the name of your Tiled map file
 
             // Initialize the TiledMapRenderer
-            _mapRenderer = new TiledMapRenderer(_graphicsDevice);
+            _mapRenderer = new TiledMapRenderer(_graphicsDevice, _map);
 
             var viewportAdapter = new BoxingViewportAdapter(_game.Window, _graphicsDevice, 500, 500);
             _camera = new OrthographicCamera(viewportAdapter);
@@ -50,6 +76,8 @@ namespace Game.Custom.States
         public void LoadContent()
         {
             // No content loading needed here for now
+            playerTexture = _content.Load<Texture2D>("cursorButton"); // Ensure you have a "player" texture
+
         }
 
         public override void Update(GameTime gameTime)
@@ -62,9 +90,9 @@ namespace Game.Custom.States
 
             // Define camera speed
             float cameraSpeed = 300f; // Adjust speed as necessary
-
+            TransformComponent playerTransform = _player.Get<TransformComponent>();
             // Update the camera's position with scaled movement direction
-            _camera.Move(movementDirection * cameraSpeed * deltaTime);
+            _camera.LookAt(movementDirection * cameraSpeed * deltaTime);
 
             // Update other game elements
             var mouseState = Mouse.GetState();
@@ -79,9 +107,11 @@ namespace Game.Custom.States
             spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: SpriteSortMode.Immediate, blendState: BlendState.AlphaBlend);
             System.Console.WriteLine(transformMatrix);
 
-            // Draw the Tiled map
-            _mapRenderer.Draw(transformMatrix); // Draw the map with camera transformation
+            // Render the tilemap
+            _mapRenderer.Draw(transformMatrix);
 
+            // Render all entities (handled by RenderSystem)
+            _world.Draw(gameTime);
             spriteBatch.End();
         }
 
