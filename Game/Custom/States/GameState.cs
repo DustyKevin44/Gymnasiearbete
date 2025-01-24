@@ -26,7 +26,7 @@ namespace Game.Custom.States
         private Vector2 playerVelocity;
         private EntityManager _entityManager;
         private Texture2D playerTexture;
-        private static SpriteBatch spriteBatch;
+        private SpriteBatch _spriteBatch;
 
         // Utility function to get movement direction
         private static Vector2 GetMovementDirection()
@@ -38,20 +38,21 @@ namespace Game.Custom.States
             );
         }
 
-        public GameState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
+        public GameState(Game game, GraphicsDevice graphicsDevice, ContentManager content, SpriteBatch spriteBatch)
             : base(game, graphicsDevice, content)
         {
-
+            _spriteBatch = spriteBatch;
             Initialize();
             LoadContent();
         }
+
 
         private void Initialize()
         {
                 // Initialize the world
             _world = new WorldBuilder()
                 .AddSystem(new MovementSystem())
-                .AddSystem(new RenderSystem(spriteBatch))
+                .AddSystem(new RenderSystem(_spriteBatch))
                 .Build();
 
 
@@ -100,11 +101,11 @@ namespace Game.Custom.States
             // Do something with mousePosition if necessary
         }
 
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, SpriteBatch _spriteBatch)
         {
             // Camera logic
             var transformMatrix = _camera.GetViewMatrix();
-            spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: SpriteSortMode.Immediate, blendState: BlendState.AlphaBlend);
+            _spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: SpriteSortMode.Immediate, blendState: BlendState.AlphaBlend);
             System.Console.WriteLine(transformMatrix);
 
             // Render the tilemap
@@ -112,7 +113,7 @@ namespace Game.Custom.States
 
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);
-            spriteBatch.End();
+            _spriteBatch.End();
         }
 
         public override void PostUpdate(GameTime gameTime)

@@ -10,12 +10,13 @@ namespace Game.Custom.States;
 public class MenuState : State
 {
     private readonly List<Component> _components;
+    private SpriteBatch _spriteBatch;
 
-    public MenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
+    public MenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content, SpriteBatch spriteBatch) : base(game, graphicsDevice, content)
     {
         Texture2D buttonTexture = _content.Load<Texture2D>("Controls/menyknapp2");
         SpriteFont buttonFont = _content.Load<SpriteFont>("Fonts/Font");
-
+        SpriteBatch _spriteBatch = spriteBatch;
         var newGameButton = new Button(buttonTexture, buttonFont)
         {
             Position = new Vector2(300, 200),
@@ -49,7 +50,7 @@ public class MenuState : State
 
     private void NewGameButton_Click(object sender, EventArgs e)
     {
-        _game.ChangeState(new GameState(_game, _graphicsDevice, _content));
+        _game.ChangeState(new GameState(_game, _graphicsDevice, _content, _spriteBatch));
     }
 
     private void LoadGameButton_Click(object sender, EventArgs e)
