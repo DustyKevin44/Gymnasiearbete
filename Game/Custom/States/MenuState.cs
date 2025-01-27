@@ -50,7 +50,7 @@ public class MenuState : State
 
     private void NewGameButton_Click(object sender, EventArgs e)
     {
-        _game.ChangeState(new GameState(_game, _graphicsDevice, _content, _spriteBatch));
+        _game.ChangeState(new GameState(_game, _graphicsDevice, _content));
     }
 
     private void LoadGameButton_Click(object sender, EventArgs e)

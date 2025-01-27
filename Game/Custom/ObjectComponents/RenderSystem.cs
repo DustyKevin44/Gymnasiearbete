@@ -1,47 +1,57 @@
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Game.Custom.ObjectComponents;
-
-public class RenderSystem : EntityDrawSystem
+namespace Game.Custom.ObjectComponents
 {
-    private SpriteBatch _spriteBatch;
-    private ComponentMapper<TransformComponent> _transformMapper;
-    private ComponentMapper<SpriteComponent> _spriteMapper;
-
-    public RenderSystem(SpriteBatch spriteBatch)
-        : base(Aspect.All(typeof(TransformComponent), typeof(SpriteComponent)))
+    public class RenderSystem : EntityDrawSystem
     {
-        _spriteBatch = spriteBatch;
-    }
+        private readonly GraphicsDevice _graphicsDevice;
+        private readonly SpriteBatch _spriteBatch;
 
-    public override void Initialize(IComponentMapperService mapperService)
-    {
-        _transformMapper = mapperService.GetMapper<TransformComponent>();
-        _spriteMapper = mapperService.GetMapper<SpriteComponent>();
-    }
+        private ComponentMapper<TransformComponent> _transformMapper;
+        private ComponentMapper<SpriteComponent> _spriteMapper;
 
-    public override void Draw(GameTime gameTime)
-    {
-        _spriteBatch.Begin();
-
-        foreach (var entity in ActiveEntities)
+        public RenderSystem(GraphicsDevice graphicsDevice)
+            : base(Aspect.All(typeof(TransformComponent), typeof(SpriteComponent))) // Entities must have both Transform2 and Sprite components
         {
-            var transform = _transformMapper.Get(entity);
-            var sprite = _spriteMapper.Get(entity);
-
-            _spriteBatch.Draw(sprite.Texture, transform.Position, Color.White);
+            _graphicsDevice = graphicsDevice;
+            _spriteBatch = new SpriteBatch(graphicsDevice);
         }
 
-        _spriteBatch.End();
+        public override void Initialize(IComponentMapperService mapperService)
+        {
+            _transformMapper = mapperService.GetMapper<TransformComponent>();
+            _spriteMapper = mapperService.GetMapper<SpriteComponent>(); // Mapper for Sprite component
+        }
+
+        public override void Draw(GameTime gameTime)
+        {
+            _graphicsDevice.Clear(Color.CornflowerBlue); // Set the background color
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+
+            foreach (var entity in ActiveEntities)
+            {
+                var transform = _transformMapper.Get(entity);
+                var sprite = _spriteMapper.Get(entity);
+
+                // Draw each entity using its sprite and transform
+                _spriteBatch.Draw(
+                    sprite.Texture,               // The sprite's texture
+                    transform.Position,           // Position to draw the sprite at
+                    null,                         // Source rectangle (null uses the whole texture)
+                    Color.White,                  // Tint color
+                    0f,                           // Rotation (if any)
+                    new Vector2(sprite.Texture.Width / 2f, sprite.Texture.Height / 2f), // Origin (center of the texture)
+                    transform.Scale,              // Scale factor
+                    SpriteEffects.None,           // Effects (e.g., flipping)
+                    0f                            // Layer depth
+                );
+            }
+
+            _spriteBatch.End();
+        }
     }
 }

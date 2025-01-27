@@ -38,30 +38,34 @@ namespace Game.Custom.States
             );
         }
 
-        public GameState(Game game, GraphicsDevice graphicsDevice, ContentManager content, SpriteBatch spriteBatch)
+        public GameState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
             : base(game, graphicsDevice, content)
         {
-            _spriteBatch = spriteBatch;
-            Initialize();
+            Initialize(graphicsDevice);
             LoadContent();
         }
 
 
-        private void Initialize()
+        private void Initialize(GraphicsDevice _graphicsDevice)
         {
+            
                 // Initialize the world
             _world = new WorldBuilder()
                 .AddSystem(new MovementSystem())
-                .AddSystem(new RenderSystem(_spriteBatch))
+                //.AddSystem(new RenderSystem(_graphicsDevice))
                 .Build();
 
 
             _player = _world.CreateEntity();
-
-            // Add the components
-            _player.Attach(new TransformComponent(_position));
-            _player.Attach(new VelocityComponent(playerVelocity = new Vector2(0, 0))); // Moving right
+           
+            _player.Attach(new Transform2(_position));
+            _player.Attach(new VelocityComponent(playerVelocity)); // Moving right
             _player.Attach(new SpriteComponent(playerTexture));
+
+            var entity = _world.CreateEntity()
+                .Attach(new Transform2 { Position = new Vector2(0, 0) })
+                .Attach(new VelocityComponent{ Velocity = new Vector2(0,0)}) // Moves 100 units/second
+                .Build();
 
 
             // Load the Tiled map
@@ -92,8 +96,13 @@ namespace Game.Custom.States
             // Define camera speed
             float cameraSpeed = 300f; // Adjust speed as necessary
             TransformComponent playerTransform = _player.Get<TransformComponent>();
+            VelocityComponent playerVelocity = _player.Get<VelocityComponent>();
+            playerVelocity.Velocity = movementDirection;
             // Update the camera's position with scaled movement direction
-            _camera.LookAt(movementDirection * cameraSpeed * deltaTime);
+            _camera.LookAt(playerTransform.Position * cameraSpeed * deltaTime);
+            System.Console.WriteLine(playerTransform.Position+ "" + playerVelocity.Velocity + " " + movementDirection
+            );
+
 
             // Update other game elements
             var mouseState = Mouse.GetState();
@@ -106,7 +115,6 @@ namespace Game.Custom.States
             // Camera logic
             var transformMatrix = _camera.GetViewMatrix();
             _spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: SpriteSortMode.Immediate, blendState: BlendState.AlphaBlend);
-            System.Console.WriteLine(transformMatrix);
 
             // Render the tilemap
             _mapRenderer.Draw(transformMatrix);

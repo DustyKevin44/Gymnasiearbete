@@ -13,17 +13,17 @@ namespace Game.Custom.ObjectComponents
 {
     public class MovementSystem : EntityUpdateSystem
     {
-        private ComponentMapper<TransformComponent> _transformMapper;
+        private ComponentMapper<Transform2> _transformMapper;
         private ComponentMapper<VelocityComponent> _velocityMapper;
 
         public MovementSystem() 
-            : base(Aspect.All(typeof(TransformComponent), typeof(VelocityComponent)))
+            : base(Aspect.All(typeof(Transform2), typeof(VelocityComponent)))
         {
         }
 
         public override void Initialize(IComponentMapperService mapperService)
         {
-            _transformMapper = mapperService.GetMapper<TransformComponent>();
+            _transformMapper = mapperService.GetMapper<Transform2>();
             _velocityMapper = mapperService.GetMapper<VelocityComponent>();
         }
 
@@ -33,8 +33,10 @@ namespace Game.Custom.ObjectComponents
             {
                 var transform = _transformMapper.Get(entity);
                 var velocity = _velocityMapper.Get(entity);
-
+                System.Console.WriteLine(velocity.Velocity + transform.Position);
                 transform.Position += velocity.Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                System.Console.WriteLine(velocity.Velocity + transform.Position);
+
             }
         }
     }
