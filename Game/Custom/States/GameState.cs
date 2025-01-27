@@ -8,8 +8,8 @@ using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended.ViewportAdapters;
 using Game.Custom.Input;
-using Game.Custom.Tilemap;
 using Game.Custom.ObjectComponents;
+using System;
 
 namespace Game.Custom.States
 {
@@ -52,20 +52,22 @@ namespace Game.Custom.States
                 // Initialize the world
             _world = new WorldBuilder()
                 .AddSystem(new MovementSystem())
-                //.AddSystem(new RenderSystem(_graphicsDevice))
+                .AddSystem(new RenderSystem(_graphicsDevice))
                 .Build();
 
+            playerTexture = _content.Load<Texture2D>("cursorButton"); // Ensure you have a "player" texture
 
             _player = _world.CreateEntity();
            
             _player.Attach(new Transform2(_position));
             _player.Attach(new VelocityComponent(playerVelocity)); // Moving right
             _player.Attach(new SpriteComponent(playerTexture));
-
-            var entity = _world.CreateEntity()
-                .Attach(new Transform2 { Position = new Vector2(0, 0) })
-                .Attach(new VelocityComponent{ Velocity = new Vector2(0,0)}) // Moves 100 units/second
-                .Build();
+            
+            //var entity = _world.CreateEntity()
+           // .Attach(new TransformComponent(_position))
+             //   .Attach(new VelocityComponent(playerVelocity = new Vector2(0, 0))) // Moving right
+             //   .Attach(new SpriteComponent(playerTexture))
+              //  .Build();
 
 
             // Load the Tiled map
@@ -81,8 +83,8 @@ namespace Game.Custom.States
         public void LoadContent()
         {
             // No content loading needed here for now
-            playerTexture = _content.Load<Texture2D>("cursorButton"); // Ensure you have a "player" texture
-
+            //playerTexture = _content.Load<Texture2D>("cursorButton"); // Ensure you have a "player" texture
+            
         }
 
         public override void Update(GameTime gameTime)
@@ -93,21 +95,26 @@ namespace Game.Custom.States
             // Get the movement direction from input
             var movementDirection = GetMovementDirection();
 
+            if (InputManager.MouseClicked) {
+                _camera.ZoomOut(0.1f);
+            }
+
             // Define camera speed
             float cameraSpeed = 300f; // Adjust speed as necessary
-            TransformComponent playerTransform = _player.Get<TransformComponent>();
+            Transform2 playerTransform = _player.Get<Transform2>();
             VelocityComponent playerVelocity = _player.Get<VelocityComponent>();
             playerVelocity.Velocity = movementDirection;
             // Update the camera's position with scaled movement direction
             _camera.LookAt(playerTransform.Position * cameraSpeed * deltaTime);
-            System.Console.WriteLine(playerTransform.Position+ "" + playerVelocity.Velocity + " " + movementDirection
+            System.Console.WriteLine(InputManager.MouseClicked + _camera.GetViewMatrix().ToString()
             );
-
+            _world.Update(gameTime);
 
             // Update other game elements
             var mouseState = Mouse.GetState();
             var mousePosition = _camera.ScreenToWorld(mouseState.Position.ToVector2());
             // Do something with mousePosition if necessary
+            InputManager.Update();
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch _spriteBatch)

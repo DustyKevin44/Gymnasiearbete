@@ -11,11 +11,11 @@ namespace Game.Custom.ObjectComponents
         private readonly GraphicsDevice _graphicsDevice;
         private readonly SpriteBatch _spriteBatch;
 
-        private ComponentMapper<TransformComponent> _transformMapper;
+        private ComponentMapper<Transform2> _transformMapper;
         private ComponentMapper<SpriteComponent> _spriteMapper;
 
         public RenderSystem(GraphicsDevice graphicsDevice)
-            : base(Aspect.All(typeof(TransformComponent), typeof(SpriteComponent))) // Entities must have both Transform2 and Sprite components
+            : base(Aspect.All(typeof(Transform2), typeof(SpriteComponent))) // Entities must have both Transform2 and Sprite components
         {
             _graphicsDevice = graphicsDevice;
             _spriteBatch = new SpriteBatch(graphicsDevice);
@@ -23,20 +23,19 @@ namespace Game.Custom.ObjectComponents
 
         public override void Initialize(IComponentMapperService mapperService)
         {
-            _transformMapper = mapperService.GetMapper<TransformComponent>();
+            _transformMapper = mapperService.GetMapper<Transform2>();
             _spriteMapper = mapperService.GetMapper<SpriteComponent>(); // Mapper for Sprite component
         }
 
         public override void Draw(GameTime gameTime)
         {
-            _graphicsDevice.Clear(Color.CornflowerBlue); // Set the background color
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
             foreach (var entity in ActiveEntities)
             {
                 var transform = _transformMapper.Get(entity);
                 var sprite = _spriteMapper.Get(entity);
-
+                //System.Console.WriteLine("transform"+transform + " sprite:" + sprite.Texture);
                 // Draw each entity using its sprite and transform
                 _spriteBatch.Draw(
                     sprite.Texture,               // The sprite's texture

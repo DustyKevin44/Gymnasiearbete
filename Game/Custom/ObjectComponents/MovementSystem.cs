@@ -29,13 +29,14 @@ namespace Game.Custom.ObjectComponents
 
         public override void Update(GameTime gameTime)
         {
+            //System.Console.WriteLine(ActiveEntities);
             foreach (var entity in ActiveEntities)
             {
                 var transform = _transformMapper.Get(entity);
                 var velocity = _velocityMapper.Get(entity);
-                System.Console.WriteLine(velocity.Velocity + transform.Position);
-                transform.Position += velocity.Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                System.Console.WriteLine(velocity.Velocity + transform.Position);
+                //System.Console.WriteLine(transform.Position);
+                transform.Position += velocity.Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds * 60;
+                //System.Console.WriteLine(transform.Position);
 
             }
         }
