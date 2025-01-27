@@ -105,7 +105,7 @@ namespace Game.Custom.States
             VelocityComponent playerVelocity = _player.Get<VelocityComponent>();
             playerVelocity.Velocity = movementDirection;
             // Update the camera's position with scaled movement direction
-            _camera.LookAt(playerTransform.Position * cameraSpeed * deltaTime);
+            _camera.LookAt(_camera.WorldToScreen(playerTransform.Position * cameraSpeed * deltaTime));
             System.Console.WriteLine(InputManager.MouseClicked + _camera.GetViewMatrix().ToString()
             );
             _world.Update(gameTime);
