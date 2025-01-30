@@ -35,7 +35,7 @@ namespace Game.Custom.ObjectComponents
                 var transform = _transformMapper.Get(entity);
                 var velocity = _velocityMapper.Get(entity);
                 //System.Console.WriteLine(transform.Position);
-                transform.Position += velocity.Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds * 60;
+                transform.Position += velocity.Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds * 360;
                 //System.Console.WriteLine(transform.Position);
 
             }

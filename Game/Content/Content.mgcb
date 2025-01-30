@@ -51,10 +51,27 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Font.spritefont
 
+#begin Fonts/Sprite-TestTil65.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Fonts/Sprite-TestTil65.png
+
 #begin grassTileset.tsx
 /importer:TiledMapTilesetImporter
 /processor:TiledMapTilesetProcessor
 /build:grassTileset.tsx
+
+#begin GrassTileset2.0.tsx
+/importer:TiledMapTilesetImporter
+/processor:TiledMapTilesetProcessor
+/build:GrassTileset2.0.tsx
 
 #begin grassTilesetImages.png
 /importer:TextureImporter
@@ -84,4 +101,9 @@
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
 /build:tilemap.tmx
+
+#begin tileSetWith2Tileset.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:tileSetWith2Tileset.tmx
 

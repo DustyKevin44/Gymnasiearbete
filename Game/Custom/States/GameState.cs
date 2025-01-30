@@ -10,6 +10,7 @@ using MonoGame.Extended.ViewportAdapters;
 using Game.Custom.Input;
 using Game.Custom.ObjectComponents;
 using System;
+using Game.Custom.Graphics;
 
 namespace Game.Custom.States
 {
@@ -48,11 +49,12 @@ namespace Game.Custom.States
 
         private void Initialize(GraphicsDevice _graphicsDevice)
         {
-            
+            _spriteBatch = new SpriteBatch(_graphicsDevice);
                 // Initialize the world
             _world = new WorldBuilder()
                 .AddSystem(new MovementSystem())
-                .AddSystem(new RenderSystem(_graphicsDevice))
+                .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch))
+                
                 .Build();
 
             playerTexture = _content.Load<Texture2D>("cursorButton"); // Ensure you have a "player" texture
@@ -71,7 +73,7 @@ namespace Game.Custom.States
 
 
             // Load the Tiled map
-            _map = _content.Load<TiledMap>("tilemap"); // Use the name of your Tiled map file
+            _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file
 
             // Initialize the TiledMapRenderer
             _mapRenderer = new TiledMapRenderer(_graphicsDevice, _map);
@@ -105,7 +107,8 @@ namespace Game.Custom.States
             VelocityComponent playerVelocity = _player.Get<VelocityComponent>();
             playerVelocity.Velocity = movementDirection;
             // Update the camera's position with scaled movement direction
-            _camera.LookAt(_camera.WorldToScreen(playerTransform.Position * cameraSpeed * deltaTime));
+            //_camera.LookAt(playerTransform.Position);
+            _camera.LookAt(new Vector2(MathHelper.Lerp(_camera.Position.X, playerTransform.Position.X, 0.8f), MathHelper.Lerp(_camera.Position.Y, playerTransform.Position.Y, 0.8f)));
             System.Console.WriteLine(InputManager.MouseClicked + _camera.GetViewMatrix().ToString()
             );
             _world.Update(gameTime);
@@ -117,7 +120,7 @@ namespace Game.Custom.States
             InputManager.Update();
         }
 
-        public override void Draw(GameTime gameTime, SpriteBatch _spriteBatch)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Camera logic
             var transformMatrix = _camera.GetViewMatrix();
@@ -125,9 +128,12 @@ namespace Game.Custom.States
 
             // Render the tilemap
             _mapRenderer.Draw(transformMatrix);
-
+            Console.WriteLine(_player.Get<Transform2>().Position.ToString() );
+            Console.WriteLine(_player.Get<SpriteComponent>());
+            _spriteBatch.DrawRectangle(new(_player.Get<Transform2>().Position, _player.Get<SpriteComponent>().Texture.Bounds.Size), Color.Black, 2f);
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);
+
             _spriteBatch.End();
         }
 
@@ -135,5 +141,7 @@ namespace Game.Custom.States
         {
             // Example cleanup or post-update logic if needed
         }
+
+       
     }
 }

@@ -14,11 +14,11 @@ namespace Game.Custom.ObjectComponents
         private ComponentMapper<Transform2> _transformMapper;
         private ComponentMapper<SpriteComponent> _spriteMapper;
 
-        public RenderSystem(GraphicsDevice graphicsDevice)
+        public RenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
             : base(Aspect.All(typeof(Transform2), typeof(SpriteComponent))) // Entities must have both Transform2 and Sprite components
         {
             _graphicsDevice = graphicsDevice;
-            _spriteBatch = new SpriteBatch(graphicsDevice);
+            _spriteBatch = spriteBatch;
         }
 
         public override void Initialize(IComponentMapperService mapperService)
@@ -29,7 +29,7 @@ namespace Game.Custom.ObjectComponents
 
         public override void Draw(GameTime gameTime)
         {
-            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            //_spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
             foreach (var entity in ActiveEntities)
             {
@@ -50,7 +50,7 @@ namespace Game.Custom.ObjectComponents
                 );
             }
 
-            _spriteBatch.End();
+            //_spriteBatch.End();
         }
     }
 }
