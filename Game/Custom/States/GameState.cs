@@ -74,24 +74,25 @@ namespace Game.Custom.States
             _player.Attach(new SpriteComponent(playerTexture));
             
             
-            Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 16, 16);
+            Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
 
             SpriteSheet spriteSheet = new SpriteSheet("SpriteSheet/slime", atlas);
             spriteSheet.DefineAnimation("slimeAnimation", builder =>
             {
                 builder.IsLooping(true)
-                    .AddFrame(0, TimeSpan.FromSeconds(0.1))
-                    .AddFrame(1, TimeSpan.FromSeconds(0.1))
-                    .AddFrame(2, TimeSpan.FromSeconds(0.1))
-                    .AddFrame(3, TimeSpan.FromSeconds(0.1))
-                    .AddFrame(4, TimeSpan.FromSeconds(0.1));
+                    .AddFrame(0, TimeSpan.FromSeconds(0.4))
+                    .AddFrame(1, TimeSpan.FromSeconds(0.4))
+                    .AddFrame(2, TimeSpan.FromSeconds(0.4))
+                    .AddFrame(3, TimeSpan.FromSeconds(0.4))
+                    .AddFrame(4, TimeSpan.FromSeconds(0.4));
             });
             slime = new AnimatedSprite(spriteSheet, "slimeAnimation");
             entity = _world.CreateEntity();
             entity.Attach(new Transform2(new(100,100)));
             entity.Attach(new VelocityComponent(new())); // Moving right
-            entity.Attach(new SpriteComponent(entityTexture,new(new(0,0), new(16,16))));
+            //entity.Attach(new SpriteComponent(entityTexture,new(new(0,0), new(16,16))));
             entity.Attach(new Behavior(0));
+            entity.Attach(slime);
 
 
 
@@ -151,7 +152,7 @@ namespace Game.Custom.States
             // Update the camera's position with scaled movement direction
             _camera.LookAt(playerTransform.Position);
 
-           slime.Update(gameTime);
+            slime.Update(gameTime);
 
             _world.Update(gameTime);
             // Update other game elements
@@ -171,7 +172,6 @@ namespace Game.Custom.States
             _mapRenderer.Draw(transformMatrix);
             //Console.WriteLine(_player.Get<Transform2>().Position.ToString() );
             //Console.WriteLine(_player.Get<SpriteComponent>());
-
             //_spriteBatch.DrawRectangle(new(_player.Get<Transform2>().Position, _player.Get<SpriteComponent>().Texture.Bounds.Size), Color.Black, 2f);
             Vector2 position = _player.Get<Transform2>().Position - 
                    new Vector2(_player.Get<SpriteComponent>().Texture.Width / 2f, 
