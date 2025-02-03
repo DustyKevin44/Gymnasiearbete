@@ -72,8 +72,8 @@ namespace Game.Custom.States
             _player.Attach(new Transform2(_position));
             _player.Attach(new VelocityComponent(playerVelocity)); // Moving right
             _player.Attach(new SpriteComponent(playerTexture));
-            
-            
+
+
             Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
 
             SpriteSheet spriteSheet = new SpriteSheet("SpriteSheet/slime", atlas);
@@ -88,14 +88,11 @@ namespace Game.Custom.States
             });
             slime = new AnimatedSprite(spriteSheet, "slimeAnimation");
             entity = _world.CreateEntity();
-            entity.Attach(new Transform2(new(100,100)));
+            entity.Attach(new Transform2(new(100, 100)));
             entity.Attach(new VelocityComponent(new())); // Moving right
             //entity.Attach(new SpriteComponent(entityTexture,new(new(0,0), new(16,16))));
             entity.Attach(new Behavior(0));
             entity.Attach(slime);
-
-
-
 
             // Load the Tiled map
             _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file
@@ -123,20 +120,20 @@ namespace Game.Custom.States
             // Get the movement direction from input
             var movementDirection = GetMovementDirection();
 
-                        
+
             if (InputManager.MouseClicked)
             {
                 _camera.ZoomOut(0.2f);
-            }           
+            }
 
             Transform2 playerTransform = _player.Get<Transform2>();
             VelocityComponent playerVelocity = _player.Get<VelocityComponent>();
             playerVelocity.Velocity += movementDirection;
             if (playerVelocity.Velocity.LengthSquared() < 0.01)
                 playerVelocity.Velocity = Vector2.Zero;
-            if (Keyboard.GetState().IsKeyDown(Keys.Space)) 
+            if (Keyboard.GetState().IsKeyDown(Keys.Space))
             {
-                
+
                 Vector2 newVelocity = playerVelocity.Velocity * 2;
 
                 // Ensure each component is at most 100
@@ -173,14 +170,14 @@ namespace Game.Custom.States
             //Console.WriteLine(_player.Get<Transform2>().Position.ToString() );
             //Console.WriteLine(_player.Get<SpriteComponent>());
             //_spriteBatch.DrawRectangle(new(_player.Get<Transform2>().Position, _player.Get<SpriteComponent>().Texture.Bounds.Size), Color.Black, 2f);
-            Vector2 position = _player.Get<Transform2>().Position - 
-                   new Vector2(_player.Get<SpriteComponent>().Texture.Width / 2f, 
+            Vector2 position = _player.Get<Transform2>().Position -
+                   new Vector2(_player.Get<SpriteComponent>().Texture.Width / 2f,
                             _player.Get<SpriteComponent>().Texture.Height / 2f);
 
             RectangleF hitbox = new RectangleF(position, _player.Get<SpriteComponent>().Texture.Bounds.Size);
 
             _spriteBatch.DrawRectangle(hitbox, Color.Black, 2f);
-            
+
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);
 
