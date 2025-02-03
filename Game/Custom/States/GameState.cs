@@ -11,6 +11,9 @@ using Game.Custom.Input;
 using Game.Custom.ObjectComponents;
 using System;
 using Game.Custom.Graphics;
+using MonoGame.Extended.Collisions;
+using MonoGame.Extended.Animations;
+using MonoGame.Extended.Graphics;
 
 namespace Game.Custom.States
 {
@@ -21,12 +24,15 @@ namespace Game.Custom.States
         private TiledMapRenderer _mapRenderer;
         private Entity _player;
         private World _world;
-  
 
+        private AnimatedSprite slime;
+        private Entity entity;
         private Vector2 _position;
         private Vector2 playerVelocity;
         private EntityManager _entityManager;
         private Texture2D playerTexture;
+        private Texture2D entityTexture;
+
         private SpriteBatch _spriteBatch;
 
         // Utility function to get movement direction
@@ -36,7 +42,7 @@ namespace Game.Custom.States
             return new Vector2(
                 Utils.GetInputDirection(state.IsKeyDown(Keys.Left), state.IsKeyDown(Keys.Right)),
                 Utils.GetInputDirection(state.IsKeyDown(Keys.Up), state.IsKeyDown(Keys.Down))
-            );
+            ) * 10;
         }
 
         public GameState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
@@ -50,35 +56,53 @@ namespace Game.Custom.States
         private void Initialize(GraphicsDevice _graphicsDevice)
         {
             _spriteBatch = new SpriteBatch(_graphicsDevice);
-                // Initialize the world
+            // Initialize the world
             _world = new WorldBuilder()
                 .AddSystem(new MovementSystem())
                 .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch))
-                
+                .AddSystem(new BehaviorSystem())
                 .Build();
 
             playerTexture = _content.Load<Texture2D>("cursorButton"); // Ensure you have a "player" texture
+            entityTexture = _content.Load<Texture2D>("slimeSheet"); // Ensure you have a "player" texture
 
             _player = _world.CreateEntity();
-           
+
             _player.Attach(new Transform2(_position));
             _player.Attach(new VelocityComponent(playerVelocity)); // Moving right
             _player.Attach(new SpriteComponent(playerTexture));
             
-            //var entity = _world.CreateEntity()
-           // .Attach(new TransformComponent(_position))
-             //   .Attach(new VelocityComponent(playerVelocity = new Vector2(0, 0))) // Moving right
-             //   .Attach(new SpriteComponent(playerTexture))
-              //  .Build();
+            
+            Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 16, 16);
+
+            SpriteSheet spriteSheet = new SpriteSheet("SpriteSheet/slime", atlas);
+            spriteSheet.DefineAnimation("slimeAnimation", builder =>
+            {
+                builder.IsLooping(true)
+                    .AddFrame(0, TimeSpan.FromSeconds(0.1))
+                    .AddFrame(1, TimeSpan.FromSeconds(0.1))
+                    .AddFrame(2, TimeSpan.FromSeconds(0.1))
+                    .AddFrame(3, TimeSpan.FromSeconds(0.1))
+                    .AddFrame(4, TimeSpan.FromSeconds(0.1));
+            });
+            slime = new AnimatedSprite(spriteSheet, "slimeAnimation");
+            entity = _world.CreateEntity();
+            entity.Attach(new Transform2(new(100,100)));
+            entity.Attach(new VelocityComponent(new())); // Moving right
+            entity.Attach(new SpriteComponent(entityTexture,new(new(0,0), new(16,16))));
+            entity.Attach(new Behavior(0));
+
+
 
 
             // Load the Tiled map
             _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file
 
+
             // Initialize the TiledMapRenderer
             _mapRenderer = new TiledMapRenderer(_graphicsDevice, _map);
 
-            var viewportAdapter = new BoxingViewportAdapter(_game.Window, _graphicsDevice, 500, 500);
+            var viewportAdapter = new ScalingViewportAdapter(_graphicsDevice, 200, 150);
             _camera = new OrthographicCamera(viewportAdapter);
         }
 
@@ -86,7 +110,7 @@ namespace Game.Custom.States
         {
             // No content loading needed here for now
             //playerTexture = _content.Load<Texture2D>("cursorButton"); // Ensure you have a "player" texture
-            
+
         }
 
         public override void Update(GameTime gameTime)
@@ -97,22 +121,21 @@ namespace Game.Custom.States
             // Get the movement direction from input
             var movementDirection = GetMovementDirection();
 
-            if (InputManager.MouseClicked) {
-                _camera.ZoomOut(0.1f);
-            }
+                        
+            if (InputManager.MouseClicked)
+            {
+                _camera.ZoomOut(0.2f);
+            }           
 
-            // Define camera speed
-            float cameraSpeed = 300f; // Adjust speed as necessary
             Transform2 playerTransform = _player.Get<Transform2>();
             VelocityComponent playerVelocity = _player.Get<VelocityComponent>();
-            playerVelocity.Velocity = movementDirection;
+            playerVelocity.Velocity += movementDirection;
             // Update the camera's position with scaled movement direction
-            //_camera.LookAt(playerTransform.Position);
-            _camera.LookAt(new Vector2(MathHelper.Lerp(_camera.Position.X, playerTransform.Position.X, 0.8f), MathHelper.Lerp(_camera.Position.Y, playerTransform.Position.Y, 0.8f)));
-            System.Console.WriteLine(InputManager.MouseClicked + _camera.GetViewMatrix().ToString()
-            );
-            _world.Update(gameTime);
+            _camera.LookAt(playerTransform.Position);
 
+           slime.Update(gameTime);
+
+            _world.Update(gameTime);
             // Update other game elements
             var mouseState = Mouse.GetState();
             var mousePosition = _camera.ScreenToWorld(mouseState.Position.ToVector2());
@@ -124,12 +147,13 @@ namespace Game.Custom.States
         {
             // Camera logic
             var transformMatrix = _camera.GetViewMatrix();
-            _spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: SpriteSortMode.Immediate, blendState: BlendState.AlphaBlend);
+            _spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: default, blendState: BlendState.AlphaBlend, samplerState: SamplerState.LinearClamp);
 
             // Render the tilemap
             _mapRenderer.Draw(transformMatrix);
-            Console.WriteLine(_player.Get<Transform2>().Position.ToString() );
-            Console.WriteLine(_player.Get<SpriteComponent>());
+            //Console.WriteLine(_player.Get<Transform2>().Position.ToString() );
+            //Console.WriteLine(_player.Get<SpriteComponent>());
+
             _spriteBatch.DrawRectangle(new(_player.Get<Transform2>().Position, _player.Get<SpriteComponent>().Texture.Bounds.Size), Color.Black, 2f);
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);
@@ -142,6 +166,6 @@ namespace Game.Custom.States
             // Example cleanup or post-update logic if needed
         }
 
-       
+
     }
 }

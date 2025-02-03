@@ -38,7 +38,7 @@ public class Game : Microsoft.Xna.Framework.Game
 
         _camera = new OrthographicCamera(GraphicsDevice);  // Initialize the camera
         _currentState = new MenuState(this, GraphicsDevice, Content, _spriteBatch);
-        Point WindowSize = new(500, 500);
+        Point WindowSize = new(1200, 900);
         _graphics.PreferredBackBufferWidth = WindowSize.X;
         _graphics.PreferredBackBufferHeight = WindowSize.Y;
         _graphics.ApplyChanges();
