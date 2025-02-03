@@ -14,6 +14,7 @@ using Game.Custom.Graphics;
 using MonoGame.Extended.Collisions;
 using MonoGame.Extended.Animations;
 using MonoGame.Extended.Graphics;
+using System.IO;
 
 namespace Game.Custom.States
 {
@@ -63,7 +64,7 @@ namespace Game.Custom.States
                 .AddSystem(new BehaviorSystem())
                 .Build();
 
-            playerTexture = _content.Load<Texture2D>("cursorButton"); // Ensure you have a "player" texture
+            playerTexture = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
             entityTexture = _content.Load<Texture2D>("slimeSheet"); // Ensure you have a "player" texture
 
             _player = _world.CreateEntity();
@@ -130,6 +131,23 @@ namespace Game.Custom.States
             Transform2 playerTransform = _player.Get<Transform2>();
             VelocityComponent playerVelocity = _player.Get<VelocityComponent>();
             playerVelocity.Velocity += movementDirection;
+            if (playerVelocity.Velocity.LengthSquared() < 0.01)
+                playerVelocity.Velocity = Vector2.Zero;
+            if (Keyboard.GetState().IsKeyDown(Keys.Space)) 
+            {
+                
+                Vector2 newVelocity = playerVelocity.Velocity * 2;
+
+                // Ensure each component is at most 100
+                newVelocity.X = Math.Min(newVelocity.X, 100);
+                newVelocity.Y = Math.Min(newVelocity.Y, 100);
+                // If you also want to allow negative velocity, you should handle that separately
+                newVelocity.X = Math.Max(newVelocity.X, -100);  // Allowing negative speeds like a backward dash
+                newVelocity.Y = Math.Max(newVelocity.Y, -100);  // Same for the Y component
+
+                playerVelocity.Velocity = newVelocity;
+                Console.WriteLine(playerVelocity.Velocity);
+            }
             // Update the camera's position with scaled movement direction
             _camera.LookAt(playerTransform.Position);
 
@@ -147,14 +165,22 @@ namespace Game.Custom.States
         {
             // Camera logic
             var transformMatrix = _camera.GetViewMatrix();
-            _spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: default, blendState: BlendState.AlphaBlend, samplerState: SamplerState.LinearClamp);
+            _spriteBatch.Begin(transformMatrix: transformMatrix, sortMode: default, blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp);
 
             // Render the tilemap
             _mapRenderer.Draw(transformMatrix);
             //Console.WriteLine(_player.Get<Transform2>().Position.ToString() );
             //Console.WriteLine(_player.Get<SpriteComponent>());
 
-            _spriteBatch.DrawRectangle(new(_player.Get<Transform2>().Position, _player.Get<SpriteComponent>().Texture.Bounds.Size), Color.Black, 2f);
+            //_spriteBatch.DrawRectangle(new(_player.Get<Transform2>().Position, _player.Get<SpriteComponent>().Texture.Bounds.Size), Color.Black, 2f);
+            Vector2 position = _player.Get<Transform2>().Position - 
+                   new Vector2(_player.Get<SpriteComponent>().Texture.Width / 2f, 
+                            _player.Get<SpriteComponent>().Texture.Height / 2f);
+
+            RectangleF hitbox = new RectangleF(position, _player.Get<SpriteComponent>().Texture.Bounds.Size);
+
+            _spriteBatch.DrawRectangle(hitbox, Color.Black, 2f);
+            
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);
 
