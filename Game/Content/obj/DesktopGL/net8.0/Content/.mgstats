@@ -1,1 +1,4 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/Users/Dusty/Desktop/gyarrepo/Gymnasiearbete/Game/Content/player.png","C:/Users/Dusty/Desktop/gyarrepo/Gymnasiearbete/Game/Content/bin/DesktopGL/Content/player.xnb","TextureProcessor","Texture2DContent",356,2133,0,089114
+"C:/Users/Dusty/Desktop/gyarrepo/Gymnasiearbete/Game/Content/player2.png","C:/Users/Dusty/Desktop/gyarrepo/Gymnasiearbete/Game/Content/bin/DesktopGL/Content/player2.xnb","TextureProcessor","Texture2DContent",397,2133,0,0025758
+"C:/Users/Dusty/Desktop/gyarrepo/Gymnasiearbete/Game/Content/slimeSheet.png","C:/Users/Dusty/Desktop/gyarrepo/Gymnasiearbete/Game/Content/bin/DesktopGL/Content/slimeSheet.xnb","TextureProcessor","Texture2DContent",984,20565,0,0024902

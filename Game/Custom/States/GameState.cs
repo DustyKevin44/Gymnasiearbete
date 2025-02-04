@@ -19,11 +19,13 @@ using MonoGame.Extended.Graphics;
 using System.IO;
 using System.Collections.Generic;
 using Game.Custom.PathfindingFiles;
+using static Game.Custom.ObjectComponents.Behavior;
 
 namespace Game.Custom.States
 {
     public class GameState : State
     {
+        #region 
         private OrthographicCamera _camera;
         private TiledMap _map;
         private TiledMapRenderer _mapRenderer;
@@ -38,10 +40,8 @@ namespace Game.Custom.States
         private Texture2D playerTexture;
         private Texture2D entityTexture;
         private SpriteBatch _spriteBatch;
+        private List<Entity> enemyList;
 
-        Map map;
-        Tank tank;
-        PathFinder pathFinder;
         // Utility function to get movement direction
         private static Vector2 GetMovementDirection()
         {
@@ -51,6 +51,8 @@ namespace Game.Custom.States
                 Utils.GetInputDirection(state.IsKeyDown(Keys.Up), state.IsKeyDown(Keys.Down))
             ) * 10;
         }
+      
+        #endregion
         
         public GameState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
             : base(game, graphicsDevice, content)
