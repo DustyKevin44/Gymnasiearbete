@@ -60,7 +60,7 @@ namespace Game.Custom.ObjectComponents
                 else if (_animatedSpriteMapper.Has(entity) != false)
                 {
                     var animsprite = _animatedSpriteMapper.Get(entity);
-                    _spriteBatch.Draw(animsprite, animsprite.Origin, 0);
+                    _spriteBatch.Draw(animsprite, transform.Position, 0);
 
                 }
 

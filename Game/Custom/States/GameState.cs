@@ -9,12 +9,16 @@ using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended.ViewportAdapters;
 using Game.Custom.Input;
 using Game.Custom.ObjectComponents;
+using Game.Custom;
+
 using System;
 using Game.Custom.Graphics;
 using MonoGame.Extended.Collisions;
 using MonoGame.Extended.Animations;
 using MonoGame.Extended.Graphics;
 using System.IO;
+using System.Collections.Generic;
+using Game.Custom.PathfindingFiles;
 
 namespace Game.Custom.States
 {
@@ -28,14 +32,16 @@ namespace Game.Custom.States
 
         private AnimatedSprite slime;
         private Entity entity;
-        private Vector2 _position;
+        private Vector2 _position = new(100, 100);
         private Vector2 playerVelocity;
         private EntityManager _entityManager;
         private Texture2D playerTexture;
         private Texture2D entityTexture;
-
         private SpriteBatch _spriteBatch;
 
+        Map map;
+        Tank tank;
+        PathFinder pathFinder;
         // Utility function to get movement direction
         private static Vector2 GetMovementDirection()
         {
@@ -45,7 +51,7 @@ namespace Game.Custom.States
                 Utils.GetInputDirection(state.IsKeyDown(Keys.Up), state.IsKeyDown(Keys.Down))
             ) * 10;
         }
-
+        
         public GameState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
             : base(game, graphicsDevice, content)
         {
@@ -86,13 +92,20 @@ namespace Game.Custom.States
                     .AddFrame(3, TimeSpan.FromSeconds(0.4))
                     .AddFrame(4, TimeSpan.FromSeconds(0.4));
             });
+            spriteSheet.DefineAnimation("idleAnimation", builder =>
+            {
+                builder.IsLooping(true)
+                    .AddFrame(3, TimeSpan.FromSeconds(0.2))
+                    .AddFrame(4, TimeSpan.FromSeconds(0.2));
+            });
             slime = new AnimatedSprite(spriteSheet, "slimeAnimation");
             entity = _world.CreateEntity();
-            entity.Attach(new Transform2(new(100, 100)));
+            entity.Attach(new Transform2(new Vector2(100, 100)));
             entity.Attach(new VelocityComponent(new())); // Moving right
             //entity.Attach(new SpriteComponent(entityTexture,new(new(0,0), new(16,16))));
-            entity.Attach(new Behavior(0));
+            //entity.Attach(new Behavior(0));
             entity.Attach(slime);
+            Console.WriteLine(entity.Get<Transform2>().Position.ToPoint() + "player: " + _player.Get<Transform2>().Position.ToPoint());
 
             // Load the Tiled map
             _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file
@@ -100,6 +113,7 @@ namespace Game.Custom.States
 
             // Initialize the TiledMapRenderer
             _mapRenderer = new TiledMapRenderer(_graphicsDevice, _map);
+
 
             var viewportAdapter = new ScalingViewportAdapter(_graphicsDevice, 200, 150);
             _camera = new OrthographicCamera(viewportAdapter);
@@ -121,6 +135,8 @@ namespace Game.Custom.States
             var movementDirection = GetMovementDirection();
 
 
+            //entity.Get<Transform2>().Position = Vector2.Lerp( entity.Get<Transform2>().Position, nextWorldPos, 0.1f);
+
             if (InputManager.MouseClicked)
             {
                 _camera.ZoomOut(0.2f);
@@ -133,7 +149,6 @@ namespace Game.Custom.States
                 playerVelocity.Velocity = Vector2.Zero;
             if (Keyboard.GetState().IsKeyDown(Keys.Space))
             {
-
                 Vector2 newVelocity = playerVelocity.Velocity * 2;
 
                 // Ensure each component is at most 100

@@ -12,10 +12,10 @@ public class Game : Microsoft.Xna.Framework.Game
 {
  
 
+
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private OrthographicCamera _camera;
-
     // Game states
     private State _currentState;
     private State _nextState;
