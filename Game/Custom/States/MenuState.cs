@@ -10,7 +10,6 @@ namespace Game.Custom.States;
 public class MenuState : State
 {
     private readonly List<Component> _components;
-    private SpriteBatch _spriteBatch;
 
     public MenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content, SpriteBatch spriteBatch) : base(game, graphicsDevice, content)
     {
