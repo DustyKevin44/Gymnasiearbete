@@ -49,7 +49,7 @@ namespace Game.Custom.States
             return new Vector2(
                 Utils.GetInputDirection(state.IsKeyDown(Keys.Left), state.IsKeyDown(Keys.Right)),
                 Utils.GetInputDirection(state.IsKeyDown(Keys.Up), state.IsKeyDown(Keys.Down))
-            ) * 10;
+            ) * 20;
         }
       
         #endregion
@@ -105,7 +105,7 @@ namespace Game.Custom.States
             entity.Attach(new Transform2(new Vector2(100, 100)));
             entity.Attach(new VelocityComponent(new())); // Moving right
             //entity.Attach(new SpriteComponent(entityTexture,new(new(0,0), new(16,16))));
-            //entity.Attach(new Behavior(0));
+            entity.Attach(new Behavior(0, target:_player));
             entity.Attach(slime);
             Console.WriteLine(entity.Get<Transform2>().Position.ToPoint() + "player: " + _player.Get<Transform2>().Position.ToPoint());
 

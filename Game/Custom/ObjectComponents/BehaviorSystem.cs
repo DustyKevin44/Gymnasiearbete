@@ -41,7 +41,8 @@ namespace Game.Custom.ObjectComponents
                 var velocity = _velocityMapper.Get(entity);
                 var behavior = _behaviorMapper.Get(entity);
                 behavior.Elapsed += gameTime.ElapsedGameTime;
-                if (behavior.Elapsed.TotalSeconds > 1f){
+                
+                if (behavior.Elapsed.TotalSeconds > 5f){
                     if(behavior.Type == 0)
                     {
                         velocity.Velocity += new Vector2(60, 60);
@@ -55,7 +56,7 @@ namespace Game.Custom.ObjectComponents
 
                     }else
                     {
-                        velocity.Velocity -= new Vector2(60, 60);
+                        
                         behavior.Type = 0;
                         behavior.Elapsed = TimeSpan.Zero;
                         if(_animatedSpriteMapper.Has(entity)){
@@ -64,6 +65,15 @@ namespace Game.Custom.ObjectComponents
 
                         }
                     }
+                }
+                if(behavior.Type == 0){
+                        if(behavior.Target.Has<Transform2>()){
+                            var delta = behavior.Target.Get<Transform2>().Position - transform.Position;
+                            Console.WriteLine( behavior.Target.Get<Transform2>().Position +"slime: "+ transform.Position + "delta" + delta);
+                            
+                            if(delta != Vector2.Zero)delta.Normalize();
+                            velocity.Velocity += delta * gameTime.GetElapsedSeconds() * 1500;
+                        }
                 }
             
                 //System.Console.WriteLine(transform.Position);
