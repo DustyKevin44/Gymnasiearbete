@@ -2,28 +2,21 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
-using Game.Custom.Input;
-using Game.Custom.States;
+using Game.Custom.GameStates;
 
 namespace Game;
 
 
 public class Game : Microsoft.Xna.Framework.Game
 {
- 
-
-
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private OrthographicCamera _camera;
     // Game states
-    private State _currentState;
-    private State _nextState;
+    private GameState _currentState;
+    private GameState _nextState;
 
-    public void ChangeState(State state)
-    {
-        _nextState = state;
-    }
+    public void ChangeState(GameState state) { _nextState = state; }
 
     public Game()
     {

@@ -2,13 +2,10 @@ namespace Game.Custom.ObjectComponents
 {
     public class HealthComponent
     {
-        private int _maxHealth { get; set; }
-        private int health;
-        public int Health { get => health; set => health = (value > _maxHealth) ? _maxHealth : value; }
+        private int _health;
+        public int MaxHealth;
 
-        public bool IsAlive()
-        {
-            return Health > 0;
-        }
+        public int Health { get => _health; set => _health = (value > MaxHealth) ? MaxHealth : value; }
+        public bool IsAlive => _health > 0;
     }
 } 

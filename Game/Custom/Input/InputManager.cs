@@ -10,6 +10,17 @@ public static class InputManager{
     public static Rectangle MouseRectangle {get; private set;}
     public static float ScreenScale { get; private set;}
 
+    public static float GetAxis(Keys a, Keys b)
+    {
+        var kState = Keyboard.GetState();
+        return (kState.IsKeyDown(a) ? 1 : 0) - (kState.IsKeyDown(b) ? 1 : 0);
+    }
+
+    public static Vector2 GetDirection(Keys Up, Keys Down, Keys Left, Keys Right)
+    {
+        return new Vector2(GetAxis(Right, Left), GetAxis(Down, Up));
+    }
+
     public static void Update()
     {
         var mouseState = Mouse.GetState();

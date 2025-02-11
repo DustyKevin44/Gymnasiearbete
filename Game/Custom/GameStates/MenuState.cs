@@ -1,15 +1,15 @@
-using Game.Custom.Controls;
+using Game.Custom.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System;
 
-namespace Game.Custom.States;
+namespace Game.Custom.GameStates;
 
-public class MenuState : State
+public class MenuState : GameState
 {
-    private readonly List<Component> _components;
+    private readonly List<UIElement> UI;
 
     public MenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content, SpriteBatch spriteBatch) : base(game, graphicsDevice, content)
     {
@@ -40,7 +40,7 @@ public class MenuState : State
 
         quitGameButton.Click += QuitGameButton_Click;
 
-        _components = [
+        UI = [
             newGameButton,
             loadGameButton,
             quitGameButton,
@@ -50,7 +50,7 @@ public class MenuState : State
     private void NewGameButton_Click(object sender, EventArgs e)
     {
 
-        _game.ChangeState(new GameState(_game, _graphicsDevice, _content));
+        _game.ChangeState(new MainGameState(_game, _graphicsDevice, _content));
     }
 
     private void LoadGameButton_Click(object sender, EventArgs e)
@@ -68,24 +68,23 @@ public class MenuState : State
     {
         spriteBatch.Begin();
 
-        foreach (Component component in _components)
+        foreach (UIElement element in UI)
         {
-            component.Draw(gameTime, spriteBatch);
+            element.Draw(gameTime, spriteBatch);
         }
 
         spriteBatch.End();
     }
 
-    public override void PostUpdate(GameTime gameTime)
-    {
-        // Ta bort sprite när de inte används
-    }
+    public override void LoadContent() { }
+
+    public override void PostUpdate(GameTime gameTime) { }
 
     public override void Update(GameTime gameTime)
     {
-        foreach (Component component in _components)
+        foreach (UIElement element in UI)
         {
-            component.Update(gameTime);
+            element.Update(gameTime);
         }
     }
 }

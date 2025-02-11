@@ -4,16 +4,13 @@ using MonoGame.Extended;
 
 namespace Game.Custom.ObjectComponents;
 
-public class Physics(Vector2 position) : Component
+public class Physics(Vector2 position)
 {
-    public Vector2 _velocity { get; private set; }
-    public Vector2 _position = position; // Objektets position (Sluta med dessa kommentarer, det är skit)
+    public Vector2 Velocity = Vector2.Zero;
+    public Vector2 Position = position;
 
-    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch) {}
-	public override void Update(GameTime gameTime) {}
-
-    public void PosUpdate(GameTime gameTime, Vector2 position, Vector2 velocity)
-	{ 
-        _position += velocity * gameTime.GetElapsedSeconds(); 
+    public void Update(GameTime gameTime)
+    {
+        Position += Velocity * gameTime.GetElapsedSeconds();
     }
 }

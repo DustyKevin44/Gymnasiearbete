@@ -5,80 +5,72 @@ using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using MonoGame.Extended.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Game.Custom.ObjectComponents
+namespace Game.Custom.ObjectComponents;
+
+public class BehaviorSystem : EntityUpdateSystem
 {
-    public class BehaviorSystem : EntityUpdateSystem
+    private ComponentMapper<Transform2> _transformMapper;
+    private ComponentMapper<VelocityComponent> _velocityMapper;
+    private ComponentMapper<Behavior> _behaviorMapper;
+    private ComponentMapper<AnimatedSprite> _animatedSpriteMapper;
+
+    public BehaviorSystem() : base(Aspect.All(typeof(Transform2), typeof(VelocityComponent), typeof(Behavior), typeof(AnimatedSprite))) { }
+
+    public override void Initialize(IComponentMapperService mapperService)
     {
-        private ComponentMapper<Transform2> _transformMapper;
-        private ComponentMapper<VelocityComponent> _velocityMapper;
-        private ComponentMapper<Behavior> _behaviorMapper;
-        private ComponentMapper<AnimatedSprite> _animatedSpriteMapper;
+        _transformMapper = mapperService.GetMapper<Transform2>();
+        _velocityMapper = mapperService.GetMapper<VelocityComponent>();
+        _behaviorMapper = mapperService.GetMapper<Behavior>();
+        _animatedSpriteMapper = mapperService.GetMapper<AnimatedSprite>();
+    }
 
-        public BehaviorSystem() 
-            : base(Aspect.All(typeof(Transform2), typeof(VelocityComponent), typeof(Behavior), typeof(AnimatedSprite)))
+    public override void Update(GameTime gameTime)
+    {
+        foreach (var entity in ActiveEntities)
         {
-        }
-
-        public override void Initialize(IComponentMapperService mapperService)
-        {
-            _transformMapper = mapperService.GetMapper<Transform2>();
-            _velocityMapper = mapperService.GetMapper<VelocityComponent>();
-            _behaviorMapper = mapperService.GetMapper<Behavior>();
-            _animatedSpriteMapper = mapperService.GetMapper<AnimatedSprite>();
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            //System.Console.WriteLine(ActiveEntities.Count);
-            foreach (var entity in ActiveEntities)
+            var transform = _transformMapper.Get(entity);
+            var velocity = _velocityMapper.Get(entity);
+            var behavior = _behaviorMapper.Get(entity);
+            behavior.Elapsed += gameTime.ElapsedGameTime;
+            
+            if (behavior.Elapsed.TotalSeconds > 5f)
             {
-                var transform = _transformMapper.Get(entity);
-                var velocity = _velocityMapper.Get(entity);
-                var behavior = _behaviorMapper.Get(entity);
-                behavior.Elapsed += gameTime.ElapsedGameTime;
-                
-                if (behavior.Elapsed.TotalSeconds > 5f){
-                    if(behavior.Type == 0)
+                if(behavior.Type == 0)
+                {
+                    velocity.Velocity += new Vector2(60, 60);
+                    behavior.Type = 1;
+                    behavior.Elapsed = TimeSpan.Zero;
+                    
+                    if(_animatedSpriteMapper.Has(entity))
                     {
-                        velocity.Velocity += new Vector2(60, 60);
-                        behavior.Type = 1;
-                        behavior.Elapsed = TimeSpan.Zero;
-                        if(_animatedSpriteMapper.Has(entity)){
-                            AnimatedSprite animation = _animatedSpriteMapper.Get(entity);
-                            animation.SetAnimation("slimeAnimation");
-
-                        }
-
-                    }else
-                    {
-                        
-                        behavior.Type = 0;
-                        behavior.Elapsed = TimeSpan.Zero;
-                        if(_animatedSpriteMapper.Has(entity)){
-                            AnimatedSprite animation = _animatedSpriteMapper.Get(entity);
-                            animation.SetAnimation("idleAnimation");
-
-                        }
+                        AnimatedSprite animation = _animatedSpriteMapper.Get(entity);
+                        animation.SetAnimation("slimeAnimation");
                     }
                 }
-                if(behavior.Type == 0){
-                        if(behavior.Target.Has<Transform2>()){
-                            var delta = behavior.Target.Get<Transform2>().Position - transform.Position;
-                            Console.WriteLine( behavior.Target.Get<Transform2>().Position +"slime: "+ transform.Position + "delta" + delta);
-                            
-                            if(delta != Vector2.Zero)delta.Normalize();
-                            velocity.Velocity += delta * gameTime.GetElapsedSeconds() * 1500;
-                        }
-                }
-            
-                //System.Console.WriteLine(transform.Position);
-                //System.Console.WriteLine(transform.Position);
+                else
+                {
+                    behavior.Type = 0;
+                    behavior.Elapsed = TimeSpan.Zero;
 
+                    if(_animatedSpriteMapper.Has(entity))
+                    {
+                        AnimatedSprite animation = _animatedSpriteMapper.Get(entity);
+                        animation.SetAnimation("idleAnimation");
+                    }
+                }
+            }
+
+            if (behavior.Type == 0)
+            {
+                if (behavior.Target.Has<Transform2>())
+                {
+                    var delta = behavior.Target.Get<Transform2>().Position - transform.Position;
+
+                    if (delta != Vector2.Zero)
+                        delta.Normalize();
+                    velocity.Velocity += delta * gameTime.GetElapsedSeconds() * 1500;
+                }
             }
         }
     }

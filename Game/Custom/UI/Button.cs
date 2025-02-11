@@ -3,33 +3,27 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 
-namespace Game.Custom.Controls;
+namespace Game.Custom.UI;
 
-public class Button(Texture2D texture, SpriteFont font) : Component
+public class Button(Texture2D texture, SpriteFont font) : UIElement
 {
-	// Dessa kommentarer suger Kevin
-	private MouseState _currentMouse; // Vad musen gör nu
+	private MouseState _currentMouse;
 	private readonly SpriteFont _font = font;
-	private bool _isHovering; // Om musen är över knappen
-	private MouseState _previousMouse; // Vad musen gjorde precis
-	private readonly Texture2D _texture = texture; // Knappens bild
+	private bool _isHovering;
+	private MouseState _previousMouse;
+	private readonly Texture2D _texture = texture;
 
 	public event EventHandler Click;
 	public bool Clicked { get; private set; }
-	public Color PenColour { get; set; } = Color.Black;
-	public Vector2 Position { get; set; }
+	public Color PenColour = Color.Black;
+	public Vector2 Position;
 	public Rectangle Rectangle { get => new((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height); }
-	public string Text { get; set; }
+	public string Text;
 
 	public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
 	{
-		var colour = Color.White;
+		var colour = _isHovering ? Color.Gray : Color.White;
 
-		if (_isHovering)
-		{
-			// Om musen håller över så blir knappen grå
-			colour = Color.Gray;
-		}
 		spriteBatch.Draw(_texture, Rectangle, colour);
 
 		if (!string.IsNullOrEmpty(Text))
