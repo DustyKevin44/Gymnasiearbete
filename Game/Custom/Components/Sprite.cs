@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
-namespace Game.Custom.ObjectComponents;
+namespace Game.Custom.Components;
 
 public class SpriteComponent(Texture2D texture, Rectangle? sourceRectangle = null, Color? color = null, Vector2? origin = null)
 {

@@ -1,4 +1,3 @@
-
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
@@ -6,7 +5,7 @@ using MonoGame.Extended.ECS.Systems;
 using MonoGame.Extended.Graphics;
 using System;
 
-namespace Game.Custom.ObjectComponents;
+namespace Game.Custom.Components.Systems;
 
 public class BehaviorSystem : EntityUpdateSystem
 {

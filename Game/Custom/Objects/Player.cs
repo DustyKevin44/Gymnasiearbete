@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Game.Custom.ObjectComponents;
+using Game.Custom.Components;
 using Microsoft.Xna.Framework.Input;
 using Game.Custom.Input;
 

@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 
-namespace Game.Custom.ObjectComponents;
+namespace Game.Custom.Components;
 
 public class VelocityComponent(Vector2 velocity)
 {

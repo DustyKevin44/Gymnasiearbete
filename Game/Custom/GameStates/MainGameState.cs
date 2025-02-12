@@ -5,11 +5,13 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using Game.Custom.Input;
-using Game.Custom.ObjectComponents;
+using Game.Custom.Components;
+using Game.Custom.Components.Systems;
 using MonoGame.Extended.ViewportAdapters;
 using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended.Graphics;
 using MonoGame.Extended.Tiled;
+using MonoGame.Extended.Input;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended;
 
@@ -46,16 +48,25 @@ namespace Game.Custom.GameStates
                 .AddSystem(new MovementSystem())
                 .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch))
                 .AddSystem(new BehaviorSystem())
+                .AddSystem(new PlayerSystem())
                 .Build();
 
             playerTexture = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
             entityTexture = _content.Load<Texture2D>("slimeSheet"); // Ensure you have a "player" texture
 
             _player = _world.CreateEntity();
-
             _player.Attach(new Transform2(Vector2.Zero));
             _player.Attach(new VelocityComponent(Vector2.Zero));
             _player.Attach(new SpriteComponent(playerTexture));
+            _player.Attach(new PlayerComponent<StdActions>(
+                "Player", new Dictionary<StdActions, Keybind> {
+                    { StdActions.MOVE_UP,    new Keybind(key: Keys.W) },
+                    { StdActions.MOVE_DOWN,  new Keybind(key: Keys.S) },
+                    { StdActions.MOVE_LEFT,  new Keybind(key: Keys.A) },
+                    { StdActions.MOVE_RIGHT, new Keybind(key: Keys.D) },
+                    { StdActions.DASH,       new Keybind(key: Keys.Space) },
+                })
+            );
 
             Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
             SpriteSheet spriteSheet = new("SpriteSheet/slime", atlas);
@@ -75,6 +86,7 @@ namespace Game.Custom.GameStates
                     .AddFrame(3, TimeSpan.FromSeconds(0.2))
                     .AddFrame(4, TimeSpan.FromSeconds(0.2));
             });
+
             Entity entity = _world.CreateEntity();
             entity.Attach(new Transform2(new Vector2(100, 100)));
             entity.Attach(new VelocityComponent(new(100, 0)));
@@ -95,25 +107,13 @@ namespace Game.Custom.GameStates
 
         public override void Update(GameTime gameTime)
         {
-            // Get the movement direction from input
-            var movementDirection = InputManager.GetDirection(Keys.W, Keys.S, Keys.A, Keys.D);
-
             if (InputManager.MouseClicked)
                 _camera.ZoomOut(0.2f);
 
-            Transform2 playerTransform = _player.Get<Transform2>();
-            VelocityComponent playerVelocity = _player.Get<VelocityComponent>();
-            playerVelocity.Velocity += movementDirection * 1000f * gameTime.GetElapsedSeconds(); // 200 u/s^2
-
-            if (playerVelocity.Velocity.LengthSquared() < 0.01)
-                playerVelocity.Velocity = Vector2.Zero;
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
-                playerVelocity.Velocity = Vector2.Clamp(playerVelocity.Velocity * 2f, Vector2.One * -100f, Vector2.One * 100f);
-
             // Update the camera's position with scaled movement direction
-            _camera.LookAt(playerTransform.Position); // <-- should be in _world.Update() probably
+            _camera.LookAt(_player.Get<Transform2>().Position); // <-- should be in _world.Update() probably
             _world.Update(gameTime);
+
             InputManager.Update();
         }
 

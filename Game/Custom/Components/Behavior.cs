@@ -3,7 +3,7 @@ using MonoGame.Extended.ECS;
 using System.Collections.Generic;
 using System;
 
-namespace Game.Custom.ObjectComponents;
+namespace Game.Custom.Components;
 
 public class Behavior(int type, TimeSpan elapsed = default, Entity target = null)
 {

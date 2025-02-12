@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 
-namespace Game.Custom.ObjectComponents;
+namespace Game.Custom.Components;
 
 public class TransformComponent(Vector2 position, float rotation = 0f, Vector2 scale = default)
 {

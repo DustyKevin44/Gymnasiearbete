@@ -5,11 +5,10 @@ using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using MonoGame.Extended.Graphics;
 
-namespace Game.Custom.ObjectComponents;
+namespace Game.Custom.Components.Systems;
 
-public class RenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch) : EntityDrawSystem(
-    Aspect.All(typeof(Transform2)).One(typeof(SpriteComponent), typeof(AnimatedSprite))
-)
+public class RenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
+    : EntityDrawSystem(Aspect.All(typeof(Transform2)).One(typeof(SpriteComponent), typeof(AnimatedSprite)))
 {
     private readonly GraphicsDevice _graphicsDevice = graphicsDevice;
     private readonly SpriteBatch _spriteBatch = spriteBatch;

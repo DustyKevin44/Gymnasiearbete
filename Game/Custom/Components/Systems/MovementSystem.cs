@@ -1,10 +1,9 @@
-
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 
-namespace Game.Custom.ObjectComponents;
+namespace Game.Custom.Components.Systems;
 
 public class MovementSystem : EntityUpdateSystem
 {

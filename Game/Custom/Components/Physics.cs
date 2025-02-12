@@ -1,8 +1,7 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 
-namespace Game.Custom.ObjectComponents;
+namespace Game.Custom.Components;
 
 public class Physics(Vector2 position)
 {
