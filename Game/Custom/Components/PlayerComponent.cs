@@ -10,16 +10,16 @@ namespace Game.Custom.Components;
 
 public class PlayerComponent<T> where T : Enum
 {
-    public Dictionary<T, Keybind> _keybinds;
+    public Dictionary<T, Keybind> Keybinds;
     public string Name { get; private set; }
-    public PlayerIndex _playerIndex { get; private set; }
+    public PlayerIndex PlayerIndex { get; private set; }
     public bool IsInControl = true;
     public CountdownTimer DashTimer = new(0.3f);
     public Vector2 Direction = Vector2.Zero;
 
     public PlayerComponent(string name, Dictionary<T, Keybind> keybinds)
     {
-        _keybinds = keybinds;
+        Keybinds = keybinds;
         Name = name;
         DashTimer.Completed += (_, _) => IsInControl = true;
         DashTimer.Enabled = true;
@@ -29,22 +29,22 @@ public class PlayerComponent<T> where T : Enum
 
     public Keys GetKey(T action)
     {
-        return _keybinds.TryGetValue(action, out Keybind keybind) ? (keybind.Key ?? Keys.None) : Keys.None;
+        return Keybinds.TryGetValue(action, out Keybind keybind) ? (keybind.Key ?? Keys.None) : Keys.None;
     }
 
     public Buttons GetGamePadButton(T action)
     {
-        return _keybinds.TryGetValue(action, out Keybind keybind) ? (keybind.GamePadButton ?? Buttons.None) : Buttons.None;
+        return Keybinds.TryGetValue(action, out Keybind keybind) ? (keybind.GamePadButton ?? Buttons.None) : Buttons.None;
     }
 
     public MouseButton GetMouseButton(T action)
     {
-        return _keybinds.TryGetValue(action, out Keybind keybind) ? (keybind.MouseBtn ?? MouseButton.None) : MouseButton.None;
+        return Keybinds.TryGetValue(action, out Keybind keybind) ? (keybind.MouseBtn ?? MouseButton.None) : MouseButton.None;
     }
     
     public bool IsActionPressed(T action)
     {
-        if (!_keybinds.TryGetValue(action, out Keybind keybind))
+        if (!Keybinds.TryGetValue(action, out Keybind keybind))
             return false;
         
         if (keybind.Key.HasValue && Keyboard.GetState().IsKeyDown(keybind.Key.Value))
@@ -53,7 +53,7 @@ public class PlayerComponent<T> where T : Enum
         if (keybind.MouseBtn.HasValue && MouseExtended.GetState().IsButtonDown(keybind.MouseBtn.Value))
             return true;
         
-        if (keybind.GamePadButton.HasValue && GamePad.GetState(_playerIndex).IsButtonDown(keybind.GamePadButton.Value))
+        if (keybind.GamePadButton.HasValue && GamePad.GetState(PlayerIndex).IsButtonDown(keybind.GamePadButton.Value))
             return true;
         
         return false;
@@ -61,7 +61,7 @@ public class PlayerComponent<T> where T : Enum
 
     public bool IsActionJustPressed(T action)
     {
-        if (!_keybinds.TryGetValue(action, out Keybind keybind))
+        if (!Keybinds.TryGetValue(action, out Keybind keybind))
             return false;
         
         if (keybind.Key.HasValue && KeyboardExtended.GetState().WasKeyPressed(keybind.Key.Value))
@@ -70,7 +70,7 @@ public class PlayerComponent<T> where T : Enum
         if (keybind.MouseBtn.HasValue && MouseExtended.GetState().WasButtonPressed(keybind.MouseBtn.Value))
             return true;
 
-        if (keybind.GamePadButton.HasValue && InputManager.GamePadButtonJustPressed(keybind.GamePadButton.Value, _playerIndex))
+        if (keybind.GamePadButton.HasValue && InputManager.GamePadButtonJustPressed(keybind.GamePadButton.Value, PlayerIndex))
             return true;
 
         return false;

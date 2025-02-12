@@ -65,8 +65,13 @@ namespace Game.Custom.GameStates
                     { StdActions.MOVE_LEFT,  new Keybind(key: Keys.A) },
                     { StdActions.MOVE_RIGHT, new Keybind(key: Keys.D) },
                     { StdActions.DASH,       new Keybind(key: Keys.Space) },
+                    { StdActions.CUSTOM,     new CustomKeybind(RotateCamera, Keys.R)},
                 })
             );
+
+            void RotateCamera(GameTime gameTime) => 
+                _camera.Rotate((float)Math.PI * gameTime.GetElapsedSeconds());
+
 
             Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
             SpriteSheet spriteSheet = new("SpriteSheet/slime", atlas);

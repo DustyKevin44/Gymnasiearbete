@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Game.Custom.Input;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
@@ -9,11 +10,12 @@ namespace Game.Custom.Components.Systems;
 
 [Flags]
 public enum StdActions {
-    MOVE_LEFT   = 2 << 0,
-    MOVE_RIGHT  = 2 << 1,
-    MOVE_UP     = 2 << 2,
-    MOVE_DOWN   = 2 << 3,
-    DASH        = 2 << 4,
+    MOVE_LEFT,
+    MOVE_RIGHT,
+    MOVE_UP,
+    MOVE_DOWN,
+    DASH,
+    CUSTOM,
 }
 
 public class PlayerSystem : EntityUpdateSystem
@@ -71,6 +73,9 @@ public class PlayerSystem : EntityUpdateSystem
                 player.IsInControl = false;
                 player.DashTimer.Restart();
             }
+
+            foreach ((StdActions action, CustomKeybind keybind) in player.Keybinds.Where(kv => kv.Value is CustomKeybind customKeybind && player.IsActionPressed(kv.Key)).Select(kv => (kv.Key, (CustomKeybind)kv.Value)))
+                keybind.Action.Invoke(gameTime);
         }
     }
 }
