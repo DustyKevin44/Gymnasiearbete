@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Game.Custom.Input;
 using Microsoft.Xna.Framework;
@@ -8,7 +7,6 @@ using MonoGame.Extended.ECS.Systems;
 
 namespace Game.Custom.Components.Systems;
 
-[Flags]
 public enum StdActions {
     MOVE_LEFT,
     MOVE_RIGHT,
