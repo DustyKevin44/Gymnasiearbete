@@ -14,6 +14,8 @@ using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Input;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended;
+using System.Linq;
+using Game.Custom.Experimental;
 
 namespace Game.Custom.GameStates
 {
@@ -24,6 +26,12 @@ namespace Game.Custom.GameStates
         private TiledMapRenderer _mapRenderer;
         private Entity _player;
         private World _world;
+
+        private readonly Chain _chain = new([
+            new Joint(new Vector2(0, 0), 20f, 0f),
+            new Joint(new Vector2(0, 0), 20f, 0f, -MathHelper.PiOver2, MathHelper.PiOver2),
+            new Joint(new Vector2(0, 0), 20f, 0f, -MathHelper.PiOver2, MathHelper.PiOver2),
+        ]);
 
         private Texture2D playerTexture;
         private Texture2D entityTexture;
@@ -116,8 +124,13 @@ namespace Game.Custom.GameStates
                 _camera.ZoomOut(0.2f);
 
             // Update the camera's position with scaled movement direction
-            _camera.LookAt(_player.Get<Transform2>().Position); // <-- should be in _world.Update() probably
+            var playerPos = _player.Get<Transform2>().Position;
+            _camera.LookAt(playerPos); // <-- should be in _world.Update() probably
+
             _world.Update(gameTime);
+
+            _chain.Root.Position = playerPos;
+            _chain.Update(gameTime);
 
             InputManager.Update();
         }
@@ -143,6 +156,8 @@ namespace Game.Custom.GameStates
 
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);
+
+            _chain.Draw(gameTime, _spriteBatch);
 
             _spriteBatch.End();
         }
