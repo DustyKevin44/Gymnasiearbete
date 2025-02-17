@@ -13,6 +13,7 @@ ipch/
 bin/
 obj/
 *.xnb
+*/.mgstats
 .mgstats
 
 # Build directories
