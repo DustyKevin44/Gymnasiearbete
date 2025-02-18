@@ -9,7 +9,7 @@ namespace Game.Custom.Objects;
 public class Player(Texture2D texture, Vector2 startPosition) : Object(texture, startPosition)
 {
     private readonly VelocityComponent _input = new(Vector2.Zero);
-    private readonly Physics _physics = new(startPosition);
+    private readonly PhysicsOutdated _physics = new(startPosition);
     private readonly Texture2D _texture = texture;
 
     public override void Update(GameTime gameTime)
