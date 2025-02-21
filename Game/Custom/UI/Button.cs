@@ -17,19 +17,23 @@ public class Button(Texture2D texture, SpriteFont font) : UIElement
 	public bool Clicked { get; private set; }
 	public Color PenColour = Color.Black;
 	public Vector2 Position;
-	public Rectangle Rectangle { get => new((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height); }
+	public Rectangle Rectangle { get => new((int)Position.X, (int)Position.Y, _texture.Width + (int)(2 * xPadding), _texture.Height + (int)(2 * yPadding)); }
 	public string Text;
+
+	public float xPadding = 10f;
+	public float yPadding = 5f;
 
 	public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
 	{
-		var colour = _isHovering ? Color.Gray : Color.White;
+		var color = _isHovering ? Color.Gray : Color.White;
+		var rectangle = Rectangle;
 
-		spriteBatch.Draw(_texture, Rectangle, colour);
+		spriteBatch.Draw(_texture, rectangle, color);
 
 		if (!string.IsNullOrEmpty(Text))
 		{
-			var x = Rectangle.X + (Rectangle.Width / 2) - (_font.MeasureString(Text).X / 2);
-			var y = Rectangle.Y + (Rectangle.Height / 2) - (_font.MeasureString(Text).Y / 2);
+			var x = rectangle.X + (rectangle.Width / 2) - (_font.MeasureString(Text).X / 2);
+			var y = rectangle.Y + (rectangle.Height / 2) - (_font.MeasureString(Text).Y / 2);
 
 			spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
 		}

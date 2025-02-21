@@ -27,7 +27,7 @@ namespace Game.Custom.GameStates
         private Entity _player;
         private World _world;
 
-        private readonly Chain _chain = new([
+        private readonly Chain _chain = new(Vector2.Zero, Vector2.Zero, [
             new Joint(new Vector2(0, 0), 20f, 0f),
             new Joint(new Vector2(0, 0), 20f, 0f, -MathHelper.PiOver2, MathHelper.PiOver2),
             new Joint(new Vector2(0, 0), 20f, 0f, -MathHelper.PiOver2, MathHelper.PiOver2),
@@ -143,8 +143,9 @@ namespace Game.Custom.GameStates
             _camera.LookAt(playerPos); // <-- should be in _world.Update() probably
 
             _world.Update(gameTime);
-
-            _chain.Root.Position = playerPos;
+            
+            _chain.Anchor = targetdeath.Get<Transform2>().Position + new Vector2(20, 20);
+            _chain.Target = playerPos;
             _chain.Update(gameTime);
 
             InputManager.Update();
