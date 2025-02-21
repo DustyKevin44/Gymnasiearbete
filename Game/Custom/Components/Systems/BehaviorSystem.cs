@@ -64,15 +64,19 @@ public class BehaviorSystem : EntityUpdateSystem
 
             if (behavior.Type == 0)
             {
+                try{
 
-                if (behavior.Target.Has<Transform2>())
-                {
-                    // Åk mot spelaren. 
-                    var delta = behavior.Target.Get<Transform2>().Position - transform.Position;
-                    Random rnd = new Random();
-                    if (delta != Vector2.Zero)
-                        delta.Normalize();
-                    velocity.Velocity += delta * gameTime.GetElapsedSeconds() * 1000 * rnd.Next(1,10);
+                    if (_transformMapper.Has(behavior.Target.Id))
+                    {
+                        // Åk mot spelaren. 
+                        var delta = behavior.Target.Get<Transform2>().Position - transform.Position;
+                        Random rnd = new Random();
+                        if (delta != Vector2.Zero)
+                            delta.Normalize();
+                        velocity.Velocity += delta * gameTime.GetElapsedSeconds() * 1000 * rnd.Next(1,10);
+                    }
+                }catch{
+                    Console.WriteLine("Error"+  behavior.Target);
                 }
             }else if (behavior.Type == 2)
             {

@@ -46,7 +46,7 @@ namespace Game.Custom.GameStates
             Initialize(graphicsDevice);
             LoadContent();
         }
-
+        #region Intitialize
         private void Initialize(GraphicsDevice _graphicsDevice)
         {
             _spriteBatch = new SpriteBatch(_graphicsDevice);
@@ -60,8 +60,8 @@ namespace Game.Custom.GameStates
                 .Build();
 
             playerTexture = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
-            entityTexture = _content.Load<Texture2D>("slimeSheet"); // Ensure you have a "player" texture
 
+            #region Player       
             _player = _world.CreateEntity();
             _player.Attach(new Transform2(Vector2.Zero));
             _player.Attach(new VelocityComponent(Vector2.Zero));
@@ -77,10 +77,16 @@ namespace Game.Custom.GameStates
                 })
             );
 
-            void RotateCamera(GameTime gameTime) => 
-                _camera.Rotate((float)Math.PI * gameTime.GetElapsedSeconds());
+            void RotateCamera(GameTime gameTime) =>
+                enemyList[0].Get<HealthComponent>().Health = 0;
+            //_camera.Rotate((float)Math.PI * gameTime.GetElapsedSeconds());
+          
+
+            #endregion
 
 
+            #region Entity
+            entityTexture = _content.Load<Texture2D>("slimeSheet"); // Ensure you have a "player" texture
             Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
             SpriteSheet spriteSheet = new("SpriteSheet/slime", atlas);
             spriteSheet.DefineAnimation("slimeAnimation", builder =>
@@ -99,12 +105,16 @@ namespace Game.Custom.GameStates
                     .AddFrame(3, TimeSpan.FromSeconds(0.2))
                     .AddFrame(4, TimeSpan.FromSeconds(0.2));
             });
-
+            Entity entityTarget = null;
             Entity entity = _world.CreateEntity();
             entity.Attach(new Transform2(new Vector2(100, 100)));
             entity.Attach(new VelocityComponent(new(100, 0)));
             entity.Attach(new Behavior(0, target: _player));
             entity.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
+            entity.Attach(new HealthComponent(100));
+            enemyList[0] = entity;
+            #endregion 
+
 
             // Load the Tiled map
             _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file
@@ -114,10 +124,12 @@ namespace Game.Custom.GameStates
 
             var viewportAdapter = new ScalingViewportAdapter(_graphicsDevice, 200, 150);
             _camera = new OrthographicCamera(viewportAdapter);
-        }
+        } 
+        #endregion
 
         public override void LoadContent() { }
 
+        #region Update
         public override void Update(GameTime gameTime)
         {
             if (InputManager.MouseClicked)
@@ -161,6 +173,7 @@ namespace Game.Custom.GameStates
 
             _spriteBatch.End();
         }
+        #endregion
 
         public override void PostUpdate(GameTime gameTime) { }
     }
