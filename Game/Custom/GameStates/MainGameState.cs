@@ -39,6 +39,8 @@ namespace Game.Custom.GameStates
 
         private EntityManager _entityManager;
         private List<Entity> enemyList;
+        private Entity targetdeath;
+
 
         public MainGameState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
             : base(game, graphicsDevice, content)
@@ -78,9 +80,9 @@ namespace Game.Custom.GameStates
             );
 
             void RotateCamera(GameTime gameTime) =>
-                enemyList[0].Get<HealthComponent>().Health = 0;
+                targetdeath.Get<HealthComponent>().Health = 0; Console.WriteLine("Try to kill");
             //_camera.Rotate((float)Math.PI * gameTime.GetElapsedSeconds());
-          
+
 
             #endregion
 
@@ -112,7 +114,7 @@ namespace Game.Custom.GameStates
             entity.Attach(new Behavior(0, target: _player));
             entity.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
             entity.Attach(new HealthComponent(100));
-            enemyList[0] = entity;
+            targetdeath = entity;
             #endregion 
 
 

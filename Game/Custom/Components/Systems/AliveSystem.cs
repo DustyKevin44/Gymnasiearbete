@@ -32,6 +32,7 @@ public class AliveSystem : EntityUpdateSystem
             if(_animatedSpriteMapper.Has(entity)){
                 AnimatedSprite animation = _animatedSpriteMapper.Get(entity);
                 try{
+                    Console.WriteLine("Death animation");
                     animation.SetAnimation("Death");
                 }catch{
                     Console.WriteLine("No death animation");
@@ -42,6 +43,7 @@ public class AliveSystem : EntityUpdateSystem
 
                     if (animation.Color != targetColor)
                     {
+                        Console.WriteLine("Dead");
                         animation.Color = Color.Lerp(animation.Color, targetColor, lerpSpeed);
                     }
                 } 
