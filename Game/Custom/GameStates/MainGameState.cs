@@ -59,6 +59,7 @@ namespace Game.Custom.GameStates
                 .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch))
                 .AddSystem(new BehaviorSystem())
                 .AddSystem(new PlayerSystem())
+                .AddSystem(new AliveSystem())
                 .Build();
 
             playerTexture = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
@@ -79,8 +80,8 @@ namespace Game.Custom.GameStates
                 })
             );
 
-            void RotateCamera(GameTime gameTime) =>
-                targetdeath.Get<HealthComponent>().Health = 0; Console.WriteLine("Try to kill");
+            void RotateCamera(GameTime gameTime) {
+                targetdeath.Get<HealthComponent>().Health = 0; Console.WriteLine("Try to kill"); }
             //_camera.Rotate((float)Math.PI * gameTime.GetElapsedSeconds());
 
 

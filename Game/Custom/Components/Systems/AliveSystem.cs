@@ -32,14 +32,14 @@ public class AliveSystem : EntityUpdateSystem
             if(_animatedSpriteMapper.Has(entity)){
                 AnimatedSprite animation = _animatedSpriteMapper.Get(entity);
                 try{
-                    Console.WriteLine("Death animation");
-                    animation.SetAnimation("Death");
+                    //Console.WriteLine("Death animation");
+                    //animation.SetAnimation("Death");
                 }catch{
                     Console.WriteLine("No death animation");
                     // fade out
                      // Fade out effect (lerp color to black)
                     Color targetColor = Color.Black;
-                    float lerpSpeed = 0.05f; // Adjust speed of transition
+                    float lerpSpeed = 0.01f; // Adjust speed of transition
 
                     if (animation.Color != targetColor)
                     {
