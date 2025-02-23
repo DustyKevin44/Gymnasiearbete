@@ -16,6 +16,7 @@ using MonoGame.Extended.ECS;
 using MonoGame.Extended;
 using System.Linq;
 using Game.Custom.Experimental;
+using System.Threading;
 
 namespace Game.Custom.GameStates
 {
@@ -41,6 +42,8 @@ namespace Game.Custom.GameStates
         private List<Entity> enemyList;
         private Entity targetdeath;
 
+        private Entity obstacle;
+
 
         public MainGameState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
             : base(game, graphicsDevice, content)
@@ -60,6 +63,7 @@ namespace Game.Custom.GameStates
                 .AddSystem(new BehaviorSystem())
                 .AddSystem(new PlayerSystem())
                 .AddSystem(new AliveSystem())
+                .AddSystem(new ColliderSystem())
                 .Build();
 
             playerTexture = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
@@ -69,6 +73,7 @@ namespace Game.Custom.GameStates
             _player.Attach(new Transform2(Vector2.Zero));
             _player.Attach(new VelocityComponent(Vector2.Zero));
             _player.Attach(new SpriteComponent(playerTexture));
+            _player.Attach(new CollisionBox<Layer>(new RectangleF(0, 0, 20, 20), Layer.Tile, false));
             _player.Attach(new PlayerComponent<StdActions>(
                 "Player", new Dictionary<StdActions, Keybind> {
                     { StdActions.MOVE_UP,    new Keybind(key: Keys.W) },
@@ -119,6 +124,12 @@ namespace Game.Custom.GameStates
             #endregion 
 
 
+            obstacle = _world.CreateEntity();
+            obstacle.Attach(new Transform2(new(200, 200)));
+            obstacle.Attach(new SpriteComponent(playerTexture));
+            obstacle.Attach(new CollisionBox<Layer>(new RectangleF(0f, 0f, 50f, 50f), Layer.Tile, false));
+
+
             // Load the Tiled map
             _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file
 
@@ -166,9 +177,14 @@ namespace Game.Custom.GameStates
                 _player.Get<SpriteComponent>().Texture.Height / 2f
             );
 
-            RectangleF hitbox = new(position, _player.Get<SpriteComponent>().Texture.Bounds.Size);
+            var Pcollider = _player.Get<CollisionBox<Layer>>();
+            var Ppos = _player.Get<Transform2>().Position;
 
-            _spriteBatch.DrawRectangle(hitbox, Color.Black, 2f);
+            _spriteBatch.DrawRectangle(Pcollider.Shape.Position + Ppos, Pcollider.Shape.BoundingRectangle.Size, Color.Black, 2f);
+
+            var collider = obstacle.Get<CollisionBox<Layer>>();
+            var pos = obstacle.Get<Transform2>().Position;
+            _spriteBatch.DrawRectangle(collider.Shape.Position + pos, collider.Shape.BoundingRectangle.Size, Color.Black, 2f);
 
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);
