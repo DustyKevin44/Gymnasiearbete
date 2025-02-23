@@ -16,7 +16,8 @@ using MonoGame.Extended.ECS;
 using MonoGame.Extended;
 using System.Linq;
 using Game.Custom.Experimental;
-using System.Threading;
+using System.Threading.Tasks.Dataflow;
+using MonoGame.Extended.Collections;
 
 namespace Game.Custom.GameStates
 {
@@ -27,7 +28,7 @@ namespace Game.Custom.GameStates
         private TiledMapRenderer _mapRenderer;
         private Entity _player;
         private World _world;
-
+        private HashSet<Point> _solidTiles = new HashSet<Point>(); 
         private readonly Chain _chain = new(Vector2.Zero, Vector2.Zero, [
             new Joint(new Vector2(0, 0), 20f, 0f),
             new Joint(new Vector2(0, 0), 20f, 0f, -MathHelper.PiOver2, MathHelper.PiOver2),
@@ -38,12 +39,12 @@ namespace Game.Custom.GameStates
         private Texture2D entityTexture;
         private SpriteBatch _spriteBatch;
 
-        private EntityManager _entityManager;
+        //private EntityManager _entityManager;
         private List<Entity> enemyList;
         private Entity targetdeath;
 
         private Entity obstacle;
-
+        private Entity _slime;
 
         public MainGameState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
             : base(game, graphicsDevice, content)
@@ -64,6 +65,7 @@ namespace Game.Custom.GameStates
                 .AddSystem(new PlayerSystem())
                 .AddSystem(new AliveSystem())
                 .AddSystem(new ColliderSystem())
+                .AddSystem(new TileCollisionSystem(_solidTiles))
                 .Build();
 
             playerTexture = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
@@ -81,13 +83,20 @@ namespace Game.Custom.GameStates
                     { StdActions.MOVE_LEFT,  new Keybind(key: Keys.A) },
                     { StdActions.MOVE_RIGHT, new Keybind(key: Keys.D) },
                     { StdActions.DASH,       new Keybind(key: Keys.Space) },
-                    { StdActions.CUSTOM,     new CustomKeybind(RotateCamera, Keys.R)},
+                    { StdActions.CUSTOM,     new CustomKeybind(ZoomIn, mouseButton: MouseButton.Right)},
+                    { StdActions.CUSTOM2,    new CustomKeybind(ZoomOut, mouseButton: MouseButton.Left)}
                 })
             );
 
-            void RotateCamera(GameTime gameTime) {
-                targetdeath.Get<HealthComponent>().Health = 0; Console.WriteLine("Try to kill"); }
-            //_camera.Rotate((float)Math.PI * gameTime.GetElapsedSeconds());
+            void ZoomOut(GameTime gameTime)
+            {
+                _camera.ZoomOut(0.5f * gameTime.GetElapsedSeconds());
+            }
+
+            void ZoomIn(GameTime gameTime)
+            {
+                _camera.ZoomIn(0.5f * gameTime.GetElapsedSeconds());
+            }
 
 
             #endregion
@@ -114,19 +123,27 @@ namespace Game.Custom.GameStates
                     .AddFrame(4, TimeSpan.FromSeconds(0.2));
             });
             Entity entityTarget = null;
-            Entity entity = _world.CreateEntity();
-            entity.Attach(new Transform2(new Vector2(100, 100)));
-            entity.Attach(new VelocityComponent(new(100, 0)));
-            entity.Attach(new Behavior(0, target: _player));
-            entity.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
-            entity.Attach(new HealthComponent(100));
-            targetdeath = entity;
-            #endregion 
+            for (int i = 0; i < 1; i++)
+            {
+                Random rnd = new Random();
+                _slime = _world.CreateEntity();
+                _slime.Attach(new Transform2(new Vector2(rnd.Next(-100, 100), rnd.Next(-100, 100))));
+                _slime.Attach(new VelocityComponent(new(100, 0)));
+                _slime.Attach(new Behavior(0, target: _player));
+                _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
+                _slime.Attach(new HealthComponent(100));
+                _slime.Attach(new CollisionBox<Layer>(new RectangleF(0, 0, entityTexture.Width, entityTexture.Height), Layer.Tile, false));
+                List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
+                _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
+
+            }
+
+
+            #endregion
 
 
             obstacle = _world.CreateEntity();
             obstacle.Attach(new Transform2(new(200, 200)));
-            obstacle.Attach(new SpriteComponent(playerTexture));
             obstacle.Attach(new CollisionBox<Layer>(new RectangleF(0f, 0f, 50f, 50f), Layer.Tile, false));
 
 
@@ -138,27 +155,60 @@ namespace Game.Custom.GameStates
 
             var viewportAdapter = new ScalingViewportAdapter(_graphicsDevice, 200, 150);
             _camera = new OrthographicCamera(viewportAdapter);
-        } 
+        }
         #endregion
 
-        public override void LoadContent() { }
+        public override void LoadContent()
+        {
+            _solidTiles = new HashSet<Point>();
+
+            var collisionLayer = _map.GetLayer<TiledMapTileLayer>("Tile Layer 1");
+            Console.WriteLine(collisionLayer.Width);
+            if (collisionLayer != null)
+            {
+                for (ushort x = 0; x < collisionLayer.Width; x++)
+                {
+                    for (ushort y = 0; y < collisionLayer.Height; y++)
+                    {
+                      
+                        if (collisionLayer.TryGetTile(x, y, out var tile) && tile.Value.GlobalIdentifier != 0)
+                        {
+
+                            _solidTiles.Add(new Point(x, y)); // Store only tile coordinates
+                            Console.WriteLine($"Tile at ({x}, {y}): ID = {tile.Value.GlobalIdentifier} was added");
+
+                        }
+                        Console.WriteLine($"Tile at ({x}, {y}): ID = {tile.Value.GlobalIdentifier}");
+
+                    }
+                }
+            }
+        }
 
         #region Update
         public override void Update(GameTime gameTime)
         {
             if (InputManager.MouseClicked)
-                _camera.ZoomOut(0.2f);
+            {
+                Console.WriteLine("ObjectPoolIsFullPolicy");
+            }
+            foreach (var layer in _map.Layers)
+            {
+                Console.WriteLine($"Layer: {layer.Name}");
+            }
 
             // Update the camera's position with scaled movement direction
             var playerPos = _player.Get<Transform2>().Position;
             _camera.LookAt(playerPos); // <-- should be in _world.Update() probably
 
             _world.Update(gameTime);
-            
-            _chain.Anchor = targetdeath.Get<Transform2>().Position + new Vector2(20, 20);
-            _chain.Target = playerPos;
-            _chain.Update(gameTime);
 
+            /*foreach(Entity i in enemyList)
+            {
+                _chain.Anchor = targetdeath.Get<Transform2>().Position + new Vector2(20, 20);
+                _chain.Target = playerPos;
+                _chain.Update(gameTime);
+            }*/
             InputManager.Update();
         }
 
@@ -172,11 +222,6 @@ namespace Game.Custom.GameStates
             // Render the tilemap
             _mapRenderer.Draw(transformMatrix);
 
-            Vector2 position = _player.Get<Transform2>().Position - new Vector2(
-                _player.Get<SpriteComponent>().Texture.Width / 2f,
-                _player.Get<SpriteComponent>().Texture.Height / 2f
-            );
-
             var Pcollider = _player.Get<CollisionBox<Layer>>();
             var Ppos = _player.Get<Transform2>().Position;
 
@@ -185,6 +230,10 @@ namespace Game.Custom.GameStates
             var collider = obstacle.Get<CollisionBox<Layer>>();
             var pos = obstacle.Get<Transform2>().Position;
             _spriteBatch.DrawRectangle(collider.Shape.Position + pos, collider.Shape.BoundingRectangle.Size, Color.Black, 2f);
+
+            var Scollider = _slime.Get<CollisionBox<Layer>>();
+            var Spos = _slime.Get<Transform2>().Position;
+            _spriteBatch.DrawRectangle(collider.Shape.Position + Spos, collider.Shape.BoundingRectangle.Size, Color.Black, 2f);
 
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);

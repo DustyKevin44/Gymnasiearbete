@@ -14,6 +14,7 @@ public enum StdActions {
     MOVE_DOWN,
     DASH,
     CUSTOM,
+    CUSTOM2,
 }
 
 public class PlayerSystem : EntityUpdateSystem
