@@ -38,6 +38,9 @@ public class TileCollisionSystem : EntityUpdateSystem
             Vector2 newPosition = transform.Position + velocity.Velocity * gameTime.GetElapsedSeconds();
             RectangleF newBounds = new RectangleF(newPosition, collider.Bounds.Size);
 
+            string collisionInfo = GetNearbySolidTiles(transform.Position);
+            Console.WriteLine($"Collision! Solid tiles detected at: {collisionInfo}");
+
             if (!IsCollidingWithTile(newBounds))
             {
                 transform.Position = newPosition; // Apply movement if no collision
@@ -45,6 +48,7 @@ public class TileCollisionSystem : EntityUpdateSystem
             else
             {
                 velocity.Velocity = Vector2.Zero; // Stop movement if collision
+                Console.WriteLine($"Collision! Solid tiles detected at: {collisionInfo}");
             }
         }
     }
@@ -55,25 +59,60 @@ public class TileCollisionSystem : EntityUpdateSystem
         int rightTile = (int)(bounds.Right / tileSize);
         int topTile = (int)(bounds.Top / tileSize);
         int bottomTile = (int)(bounds.Bottom / tileSize);
-        //Console.WriteLine("Tries" + leftTile + rightTile + topTile + bottomTile);
-        Console.WriteLine($"Checking collision from ({leftTile}, {topTile}) to ({rightTile}, {bottomTile})");
+        
         for (int x = leftTile; x <= rightTile; x++)
         {
             for (int y = topTile; y <= bottomTile; y++)
             {
-                Console.WriteLine($"Checking Tile: {x}, {y}");
-                Console.WriteLine("Solid Tiles:");
-                foreach (var tile in _solidTiles)
-                {
-                    Console.WriteLine($"Tile: {tile.X}, {tile.Y}");
-                }
                 if (_solidTiles.Contains(new Point(x, y)))
                 {
-                    Console.WriteLine("Collision detected!");
                     return true; // Collision detected
                 }
             }
         }
         return false;
+    }
+
+    private string GetNearbySolidTiles(Vector2 position)
+    {
+        int centerTileX = (int)(position.X / tileSize);
+        int centerTileY = (int)(position.Y / tileSize);
+
+        string result = "";
+
+        for (int offsetX = -1; offsetX <= 1; offsetX++)
+        {
+            for (int offsetY = -1; offsetY <= 1; offsetY++)
+            {
+                int tileX = centerTileX + offsetX;
+                int tileY = centerTileY + offsetY;
+
+                if (_solidTiles.Contains(new Point(tileX, tileY)))
+                {
+                    string direction = GetDirectionFromOffset(offsetX, offsetY);
+                    if (!string.IsNullOrEmpty(direction))
+                    {
+                        if (result.Length > 0) result += ", ";
+                        result += direction;
+                    }
+                }
+            }
+        }
+
+        return string.IsNullOrEmpty(result) ? "No solid tiles nearby" : result;
+    }
+
+    private string GetDirectionFromOffset(int offsetX, int offsetY)
+    {
+        if (offsetX == 0 && offsetY == -1) return "North";
+        if (offsetX == 0 && offsetY == 1) return "South";
+        if (offsetX == -1 && offsetY == 0) return "West";
+        if (offsetX == 1 && offsetY == 0) return "East";
+        if (offsetX == -1 && offsetY == -1) return "North-West";
+        if (offsetX == 1 && offsetY == -1) return "North-East";
+        if (offsetX == -1 && offsetY == 1) return "South-West";
+        if (offsetX == 1 && offsetY == 1) return "South-East";
+
+        return "";
     }
 }
