@@ -88,7 +88,8 @@ public class BehaviorSystem : EntityUpdateSystem
 
                 Vector2 vel;
                 rnd.NextUnitVector(out vel);
-                velocity.Velocity += vel * 1000 * gameTime.GetElapsedSeconds();
+                velocity.Velocity += vel * 100 * gameTime.GetElapsedSeconds();
+
 
                 //velocity.Velocity += new Vector2(rnd.Next(-1000, 1000), rnd.Next(-1000, 1000));
                 var delta = behavior.Target.Get<Transform2>().Position - transform.Position;
