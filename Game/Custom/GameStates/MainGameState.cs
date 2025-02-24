@@ -77,7 +77,7 @@ namespace Game.Custom.GameStates
             _player.Attach(new VelocityComponent(Vector2.Zero));
             _player.Attach(new SpriteComponent(playerTexture));
             _player.Attach(new ColliderComponent(new RectangleF(0, 0, 20, 20)));
-            _player.Attach(new CollisionBox<Layer>(new RectangleF(0, 0, 20, 20), Layer.Tile, false));
+            _player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20)));
             _player.Attach(new PlayerComponent<StdActions>(
                 "Player", new Dictionary<StdActions, Keybind> {
                     { StdActions.MOVE_UP,    new Keybind(key: Keys.W) },
@@ -135,7 +135,7 @@ namespace Game.Custom.GameStates
                 _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
                 _slime.Attach(new HealthComponent(100));
                 _slime.Attach(new ColliderComponent(new RectangleF(0, 0, 16, 16)));
-                _slime.Attach(new CollisionBox<Layer>(new RectangleF(0, 0, 16, 16), Layer.Tile, false));
+                _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16)));
                 List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
                 _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
 
