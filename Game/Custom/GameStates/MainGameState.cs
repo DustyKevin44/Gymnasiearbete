@@ -75,7 +75,7 @@ namespace Game.Custom.GameStates
             _player.Attach(new Transform2(Vector2.Zero));
             _player.Attach(new VelocityComponent(Vector2.Zero));
             _player.Attach(new SpriteComponent(playerTexture));
-            _player.Attach(new CollisionBox<Layer>(new RectangleF(0, 0, 20, 20), Layer.Tile, false));
+            _player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20)));
             _player.Attach(new PlayerComponent<StdActions>(
                 "Player", new Dictionary<StdActions, Keybind> {
                     { StdActions.MOVE_UP,    new Keybind(key: Keys.W) },
@@ -132,7 +132,7 @@ namespace Game.Custom.GameStates
                 _slime.Attach(new Behavior(0, target: _player));
                 _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
                 _slime.Attach(new HealthComponent(100));
-                _slime.Attach(new CollisionBox<Layer>(new RectangleF(0, 0, 16, 16), Layer.Tile, false));
+                _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16)));
                 List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
                 _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
 
@@ -144,7 +144,7 @@ namespace Game.Custom.GameStates
 
             obstacle = _world.CreateEntity();
             obstacle.Attach(new Transform2(new(200, 200)));
-            obstacle.Attach(new CollisionBox<Layer>(new RectangleF(0f, 0f, 50f, 50f), Layer.Tile, false));
+            obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f)));
 
 
             // Load the Tiled map
@@ -222,16 +222,16 @@ namespace Game.Custom.GameStates
             // Render the tilemap
             _mapRenderer.Draw(transformMatrix);
 
-            var Pcollider = _player.Get<CollisionBox<Layer>>();
+            var Pcollider = _player.Get<CollisionBox>();
             var Ppos = _player.Get<Transform2>().Position;
 
             _spriteBatch.DrawRectangle(Pcollider.Shape.Position + Ppos, Pcollider.Shape.BoundingRectangle.Size, Color.Black, 2f);
 
-            var collider = obstacle.Get<CollisionBox<Layer>>();
+            var collider = obstacle.Get<CollisionBox>();
             var pos = obstacle.Get<Transform2>().Position;
             _spriteBatch.DrawRectangle(collider.Shape.Position + pos, collider.Shape.BoundingRectangle.Size, Color.Black, 2f);
 
-            var Scollider = _slime.Get<CollisionBox<Layer>>();
+            var Scollider = _slime.Get<CollisionBox>();
             var Spos = _slime.Get<Transform2>().Position;
             _spriteBatch.DrawRectangle(Scollider.Shape.Position + Spos, Scollider.Shape.BoundingRectangle.Size, Color.Black, 2f);
 

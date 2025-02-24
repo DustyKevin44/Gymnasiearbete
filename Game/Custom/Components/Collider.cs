@@ -1,16 +1,39 @@
 using MonoGame.Extended;
-using System;
+using MonoGame.Extended.Collisions;
 
 namespace Game.Custom.Components;
 
 
-public abstract class ColliderBox<Layer>(IShapeF shape, Layer layers, bool isStatic) where Layer : Enum
+public abstract class ColliderBox(IShapeF shape) : ICollisionActor
 {
     public IShapeF Shape = shape;
-    public Layer Layers = layers;
-    public bool IsStatic = isStatic;
+    public IShapeF Bounds => Shape;
+
+    public abstract void OnCollision(CollisionEventArgs collisionInfo);
 }
 
-public class HitBox<Layer>(IShapeF shape, Layer layers, bool isStatic) : ColliderBox<Layer>(shape, layers, isStatic) where Layer : Enum;
-public class HurtBox<Layer>(IShapeF shape, Layer layers, bool isStatic) : ColliderBox<Layer>(shape, layers, isStatic) where Layer : Enum;
-public class CollisionBox<Layer>(IShapeF shape, Layer layers, bool isStatic) : ColliderBox<Layer>(shape, layers, isStatic) where Layer : Enum;
+public class HitBox(IShapeF shape) : ColliderBox(shape)
+{
+    public override void OnCollision(CollisionEventArgs collisionInfo)
+    {
+        
+    }
+}
+
+public class HurtBox(IShapeF shape) : ColliderBox(shape)
+{
+    public override void OnCollision(CollisionEventArgs collisionInfo)
+    {
+        
+    }
+}
+
+public class CollisionBox(IShapeF shape, bool isStatic=false) : ColliderBox(shape)
+{
+    public bool IsStatic = isStatic;
+    
+    public override void OnCollision(CollisionEventArgs collisionInfo)
+    {
+        
+    }
+}
