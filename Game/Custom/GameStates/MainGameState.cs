@@ -35,7 +35,7 @@ namespace Game.Custom.GameStates
             new Joint(new Vector2(0, 0), 20f, 0f, -MathHelper.PiOver2, MathHelper.PiOver2),
             new Joint(new Vector2(0, 0), 20f, 0f, -MathHelper.PiOver2, MathHelper.PiOver2),
         ]);
-
+        private SpriteSheet spriteSheet;
         private Texture2D playerTexture;
         private Texture2D entityTexture;
         private SpriteBatch _spriteBatch;
@@ -88,7 +88,7 @@ namespace Game.Custom.GameStates
             _player.Attach(new Transform2(Vector2.Zero));
             _player.Attach(new VelocityComponent(Vector2.Zero));
             _player.Attach(new SpriteComponent(playerTexture));
-            _player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20), _collisionComponent, _player));
+            _player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20), _collisionComponent));
             _player.Attach(new PlayerComponent<StdActions>(
                 "Player", new Dictionary<StdActions, Keybind> {
                     { StdActions.MOVE_UP,    new Keybind(key: Keys.W) },
@@ -123,7 +123,7 @@ namespace Game.Custom.GameStates
             #region Entity
             entityTexture = _content.Load<Texture2D>("slimeSheet"); // Ensure you have a "player" texture
             Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
-            SpriteSheet spriteSheet = new("SpriteSheet/slime", atlas);
+            spriteSheet = new("SpriteSheet/slime", atlas);
             spriteSheet.DefineAnimation("slimeAnimation", builder =>
             {
                 builder.IsLooping(true)
@@ -142,16 +142,17 @@ namespace Game.Custom.GameStates
             });
             for (int i = 0; i < 5; i++)
             {
-                Random rnd = new Random();
+                 Random rnd = new Random();
                 _slime = _world.CreateEntity();
                 _slime.Attach(new Transform2(new Vector2(rnd.Next(-100, 100), rnd.Next(-100, 100))));
                 _slime.Attach(new VelocityComponent(new(0, 0)));
                 _slime.Attach(new Behavior(0, target: _player));
                 _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
                 _slime.Attach(new HealthComponent(100));
-                _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16), _collisionComponent, _slime));
+                _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16), _collisionComponent));
                 List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
                 _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
+                _slime.Get<CollisionBox>().Initialize(_slime);
 
             }
 
@@ -161,7 +162,7 @@ namespace Game.Custom.GameStates
 
             obstacle = _world.CreateEntity();
             obstacle.Attach(new Transform2(new(200, 200)));
-            obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f), _collisionComponent, obstacle));
+            obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f), _collisionComponent));
 
 
             // Load the Tiled map
@@ -222,12 +223,24 @@ namespace Game.Custom.GameStates
             if (InputManager.MouseClicked)
             {
                 Console.WriteLine("ObjectPoolIsFullPolicy");
-            }
-            foreach (var layer in _map.Layers)
+                 for (int i = 0; i < 5; i++)
             {
-                Console.WriteLine($"Layer: {layer.Name}");
+                Random rnd = new Random();
+                _slime = _world.CreateEntity();
+                _slime.Attach(new Transform2(new Vector2(rnd.Next(-100, 100), rnd.Next(-100, 100))));
+                _slime.Attach(new VelocityComponent(new(0, 0)));
+                _slime.Attach(new Behavior(0, target: _player));
+                _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
+                _slime.Attach(new HealthComponent(100));
+                _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16), _collisionComponent));
+                List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
+                _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
+                _slime.Get<CollisionBox>().Initialize(_slime);
+
             }
 
+            }
+          
             // Update the camera's position with scaled movement direction
             var playerPos = _player.Get<Transform2>().Position;
             _camera.LookAt(playerPos); // <-- should be in _world.Update() probably
