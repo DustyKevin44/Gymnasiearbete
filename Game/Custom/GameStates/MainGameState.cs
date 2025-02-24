@@ -152,7 +152,7 @@ namespace Game.Custom.GameStates
                 _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16), _collisionComponent));
                 List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
                 _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
-                _slime.Get<CollisionBox>().Initialize(_slime);
+                _slime.Get<CollisionBox>().Initialize(_slime.Id);
 
             }
 
@@ -161,7 +161,7 @@ namespace Game.Custom.GameStates
 
 
             obstacle = _world.CreateEntity();
-            obstacle.Attach(new Transform2(new(200, 200)));
+            obstacle.Attach(new Transform2(new(500, 500)));
             obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f), _collisionComponent));
 
 
@@ -223,7 +223,7 @@ namespace Game.Custom.GameStates
             if (InputManager.MouseClicked)
             {
                 Console.WriteLine("ObjectPoolIsFullPolicy");
-                 for (int i = 0; i < 5; i++)
+                 /*for (int i = 0; i < 5; i++)
             {
                 Random rnd = new Random();
                 _slime = _world.CreateEntity();
@@ -237,7 +237,7 @@ namespace Game.Custom.GameStates
                 _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
                 _slime.Get<CollisionBox>().Initialize(_slime);
 
-            }
+            }*/
 
             }
           

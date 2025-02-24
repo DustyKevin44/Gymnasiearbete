@@ -12,7 +12,6 @@ public class MovementSystem : EntityUpdateSystem
     private ComponentMapper<Transform2> _transformMapper;
     private ComponentMapper<CollisionBox> _colliderMapper;
     private ComponentMapper<VelocityComponent> _velocityMapper;
-    private bool _collidersAdded = false;
 
     private readonly CollisionComponent _collisionWorld;
 
@@ -40,6 +39,11 @@ public class MovementSystem : EntityUpdateSystem
             var transform = _transformMapper.Get(entity);
             var collider = _colliderMapper.Get(entity);
             var velocity = _velocityMapper.Get(entity);
+            if(collider.onCollisionBool){
+                velocity.Velocity = Vector2.Zero;
+                collider.onCollisionBool = false;
+            }
+
             // Example movement logic (move right at 100 pixels per second)
             transform.Position += velocity.Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
             velocity.Velocity -= velocity.Velocity / 5f;
@@ -48,10 +52,30 @@ public class MovementSystem : EntityUpdateSystem
             // Update collider bounds
             collider.Shape.Position = transform.Position;
             // Check for collision
+            //collider.Initialize(entity);
+           
         }
+
         //Console.WriteLine($"CollisionComponent has {ColliderBox.} colliders registered.");
 
         _collisionWorld.Update(gameTime);
+        // Second pass: Resolve overlap by moving entities apart
+        foreach (var entity in ActiveEntities)
+            {
+                var transform = _transformMapper.Get(entity);
+                var collider = _colliderMapper.Get(entity);
 
-    }
+                if (collider.onCollisionBool)
+                {
+                    // Resolve overlap by moving the entity out of collision
+                    transform.Position += collider.PenetrationVector;
+                    collider.Shape.Position = transform.Position; // Sync collider position
+
+                    // Reset collision state
+                    collider.onCollisionBool = false;
+                    collider.PenetrationVector = Vector2.Zero;
+                }
+            }
+
+        }
 }

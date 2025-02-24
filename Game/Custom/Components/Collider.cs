@@ -34,33 +34,29 @@ public class HurtBox(IShapeF shape) : ColliderBox(shape)
 
 public class CollisionBox : ColliderBox
 {
-    public bool IsStatic;
-    public bool onCollision;
+   public bool IsStatic;
+    public bool onCollisionBool;
+    public Vector2 PenetrationVector = Vector2.Zero; // Store collision resolution vector
 
-    public Entity entity {get; private set;}
-    
-    public CollisionBox(IShapeF shape, CollisionComponent collisionComponent, bool isStatic=false) : base(shape)
+    public int entityId { get; set; }
+
+    public CollisionBox(IShapeF shape, CollisionComponent collisionComponent, bool isStatic = false) 
+        : base(shape)
     {
         IsStatic = isStatic;
         collisionComponent.Insert(this);
         Console.WriteLine("Collision added");
-
     }
-     // 🔹 This will be called when the component is attached to an entity
-    public void Initialize(Entity Entity)
+
+    public void Initialize(int EntityId)
     {
-        Entity = entity; // 🔹 Automatically set the parent entity
+        entityId = EntityId; 
     }
 
     public override void OnCollision(CollisionEventArgs collisionInfo)
     {
-        Console.WriteLine($"Collision detected for: {entity}");
-        onCollision = true;
-
-        // 🔹 Example: Change the entity's sprite color when colliding
-        //if (entity.Has<AnimatedSprite>())
-        //{
-        //   entity.Get<AnimatedSprite>().Color = Color.Black;
-        //}
+        Console.WriteLine($"Collision detected for: {entityId}");
+        onCollisionBool = true;
+        PenetrationVector = collisionInfo.PenetrationVector; // Store penetration vector
     }
 }
