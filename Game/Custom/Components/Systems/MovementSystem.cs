@@ -34,21 +34,6 @@ public class MovementSystem : EntityUpdateSystem
     public override void Update(GameTime gameTime)
     {
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        if (!_collidersAdded) // Only run once after entities are created
-        {
-            Console.WriteLine("Adding colliders...");
-            foreach (var entity in ActiveEntities)
-            {
-
-                if (entity.Has<CollisionBox>())
-                {
-                    var collider = entity.Get<CollisionBox>();
-                    _collisionComponent.Insert(collider);
-                    Console.WriteLine($"Inserted collider for entity {i}");
-                }
-            }
-            _collidersAdded = true; // Prevents re-running
-        }
         foreach (var entity in ActiveEntities)
         {
 

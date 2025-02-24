@@ -56,8 +56,12 @@ namespace Game.Custom.GameStates
         #region Intitialize
         private void Initialize(GraphicsDevice _graphicsDevice)
         {
-            _spriteBatch = new SpriteBatch(_graphicsDevice);
 
+
+
+
+            _spriteBatch = new SpriteBatch(_graphicsDevice);
+            #region World
             // Initialize the world
             _world = new WorldBuilder()
                 .AddSystem(new MovementSystem(_collisionComponent))
@@ -69,9 +73,14 @@ namespace Game.Custom.GameStates
                 .Build();
 
             _collisionComponent.Initialize();
+            #endregion
+            /*
+                Världen är uppdelad in many systems using the monogame extendeds ecs system. 
+                Och detta makes it very easy to 
+                hold is separerat and not have it be clustered even with many processes going on.
 
 
-
+            */
             #region Player      
             playerTexture = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
 
@@ -79,7 +88,7 @@ namespace Game.Custom.GameStates
             _player.Attach(new Transform2(Vector2.Zero));
             _player.Attach(new VelocityComponent(Vector2.Zero));
             _player.Attach(new SpriteComponent(playerTexture));
-            _player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20)));
+            _player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20), _collisionComponent));
             _player.Attach(new PlayerComponent<StdActions>(
                 "Player", new Dictionary<StdActions, Keybind> {
                     { StdActions.MOVE_UP,    new Keybind(key: Keys.W) },
@@ -104,8 +113,13 @@ namespace Game.Custom.GameStates
 
 
             #endregion
+            /*   
+                The player is an ECS entity with a specific Player component that makes it so you can control it.
 
 
+
+
+            */
             #region Entity
             entityTexture = _content.Load<Texture2D>("slimeSheet"); // Ensure you have a "player" texture
             Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
@@ -135,7 +149,7 @@ namespace Game.Custom.GameStates
                 _slime.Attach(new Behavior(0, target: _player));
                 _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
                 _slime.Attach(new HealthComponent(100));
-                _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16)));
+                _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16), _collisionComponent));
                 List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
                 _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
 
@@ -147,7 +161,7 @@ namespace Game.Custom.GameStates
 
             obstacle = _world.CreateEntity();
             obstacle.Attach(new Transform2(new(200, 200)));
-            obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f)));
+            obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f), _collisionComponent));
 
 
             // Load the Tiled map
@@ -172,7 +186,7 @@ namespace Game.Custom.GameStates
             }
         }
         #endregion
-
+        #region LoadContent
         public override void LoadContent()
         {
             _solidTiles = new HashSet<Point>();
@@ -199,6 +213,7 @@ namespace Game.Custom.GameStates
                 }
             }
         }
+        #endregion
 
         #region Update
         public override void Update(GameTime gameTime)
@@ -225,7 +240,8 @@ namespace Game.Custom.GameStates
 
             InputManager.Update();
         }
-
+        #endregion
+        #region Draw
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Get the camera view
@@ -251,13 +267,14 @@ namespace Game.Custom.GameStates
 
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);
+            #endregion
 
             _chain.Draw(gameTime, _spriteBatch);
 
             _spriteBatch.End();
         }
-        #endregion
 
         public override void PostUpdate(GameTime gameTime) { }
     }
+
 }

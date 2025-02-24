@@ -37,6 +37,8 @@ public class CollisionBox : ColliderBox
     {
         IsStatic = isStatic;
         collisionComponent.Insert(this);
+        Console.WriteLine("Collision added");
+
     }
 
     public override void OnCollision(CollisionEventArgs collisionInfo)
