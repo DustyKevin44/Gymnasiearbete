@@ -123,16 +123,16 @@ namespace Game.Custom.GameStates
                     .AddFrame(4, TimeSpan.FromSeconds(0.2));
             });
             Entity entityTarget = null;
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 5; i++)
             {
                 Random rnd = new Random();
                 _slime = _world.CreateEntity();
                 _slime.Attach(new Transform2(new Vector2(rnd.Next(-100, 100), rnd.Next(-100, 100))));
-                _slime.Attach(new VelocityComponent(new(100, 0)));
+                _slime.Attach(new VelocityComponent(new(0, 0)));
                 _slime.Attach(new Behavior(0, target: _player));
                 _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
                 _slime.Attach(new HealthComponent(100));
-                _slime.Attach(new CollisionBox<Layer>(new RectangleF(0, 0, entityTexture.Width, entityTexture.Height), Layer.Tile, false));
+                _slime.Attach(new CollisionBox<Layer>(new RectangleF(0, 0, 16, 16), Layer.Tile, false));
                 List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
                 _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
 
@@ -233,7 +233,7 @@ namespace Game.Custom.GameStates
 
             var Scollider = _slime.Get<CollisionBox<Layer>>();
             var Spos = _slime.Get<Transform2>().Position;
-            _spriteBatch.DrawRectangle(collider.Shape.Position + Spos, collider.Shape.BoundingRectangle.Size, Color.Black, 2f);
+            _spriteBatch.DrawRectangle(Scollider.Shape.Position + Spos, Scollider.Shape.BoundingRectangle.Size, Color.Black, 2f);
 
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);

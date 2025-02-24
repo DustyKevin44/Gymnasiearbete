@@ -74,7 +74,7 @@ public class BehaviorSystem : EntityUpdateSystem
                         Random rnd = new Random();
                         if (delta != Vector2.Zero)
                             delta.Normalize();
-                        velocity.Velocity += delta * gameTime.GetElapsedSeconds() * 1000 * rnd.Next(1, 10);
+                        velocity.Velocity += delta * gameTime.GetElapsedSeconds() * 200 * rnd.Next(10, 12);
                     }
                 }
                 catch
