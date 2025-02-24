@@ -206,12 +206,10 @@ namespace Game.Custom.GameStates
 
             _world.Update(gameTime);
 
-            /*foreach(Entity i in enemyList)
-            {
-                _chain.Anchor = targetdeath.Get<Transform2>().Position + new Vector2(20, 20);
-                _chain.Target = playerPos;
-                _chain.Update(gameTime);
-            }*/
+            _chain.Anchor = _slime.Get<Transform2>().Position + new Vector2(20, 20);
+            _chain.Target = playerPos;
+            _chain.Update(gameTime);
+
             InputManager.Update();
         }
 

@@ -11,12 +11,12 @@ public class TileCollisionSystem : EntityUpdateSystem
 {
     private ComponentMapper<Transform2> _transformMapper;
     private ComponentMapper<VelocityComponent> _velocityMapper;
-    private ComponentMapper<CollisionBox<Layer>> _colliderMapper;
+    private ComponentMapper<CollisionBox> _colliderMapper;
     private HashSet<Point> _solidTiles;
     private int tileSize = 32; // Adjust based on your tile size
 
     public TileCollisionSystem(HashSet<Point> solidTiles)
-        : base(Aspect.All(typeof(Transform2), typeof(VelocityComponent), typeof(CollisionBox<Layer>)))
+        : base(Aspect.All(typeof(Transform2), typeof(VelocityComponent), typeof(CollisionBox)))
     {
         _solidTiles = solidTiles ?? throw new ArgumentNullException(nameof(solidTiles));
     }
@@ -25,7 +25,7 @@ public class TileCollisionSystem : EntityUpdateSystem
     {
         _transformMapper = mapperService.GetMapper<Transform2>();
         _velocityMapper = mapperService.GetMapper<VelocityComponent>();
-        _colliderMapper = mapperService.GetMapper<CollisionBox<Layer>>();
+        _colliderMapper = mapperService.GetMapper<CollisionBox>();
     }
 
     public override void Update(GameTime gameTime)
