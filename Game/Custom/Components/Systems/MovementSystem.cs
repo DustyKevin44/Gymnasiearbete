@@ -5,17 +5,19 @@ using MonoGame.Extended.Collisions;
 using MonoGame.Extended.Tweening;
 using MonoGame.Extended;
 using Game.Custom.Components;
+using System;
 
 public class MovementSystem : EntityUpdateSystem
 {
     private ComponentMapper<Transform2> _transformMapper;
-    private ComponentMapper<ColliderComponent> _colliderMapper;
+    private ComponentMapper<CollisionBox> _colliderMapper;
     private ComponentMapper<VelocityComponent> _velocityMapper;
+    private bool _collidersAdded = false;
 
     private readonly CollisionComponent _collisionWorld;
 
     public MovementSystem(CollisionComponent collisionWorld)
-        : base(Aspect.All(typeof(Transform2), typeof(ColliderComponent), typeof(VelocityComponent)))
+        : base(Aspect.All(typeof(Transform2), typeof(CollisionBox), typeof(VelocityComponent)))
     {
         _collisionWorld = collisionWorld;
     }
@@ -25,29 +27,46 @@ public class MovementSystem : EntityUpdateSystem
         _transformMapper = mapperService.GetMapper<Transform2>();
         _velocityMapper = mapperService.GetMapper<VelocityComponent>();
 
-        _colliderMapper = mapperService.GetMapper<ColliderComponent>();
+        _colliderMapper = mapperService.GetMapper<CollisionBox>();
+
     }
 
     public override void Update(GameTime gameTime)
     {
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        if (!_collidersAdded) // Only run once after entities are created
+        {
+            Console.WriteLine("Adding colliders...");
+            foreach (var entity in ActiveEntities)
+            {
 
+                if (entity.Has<CollisionBox>())
+                {
+                    var collider = entity.Get<CollisionBox>();
+                    _collisionComponent.Insert(collider);
+                    Console.WriteLine($"Inserted collider for entity {i}");
+                }
+            }
+            _collidersAdded = true; // Prevents re-running
+        }
         foreach (var entity in ActiveEntities)
         {
+
             var transform = _transformMapper.Get(entity);
             var collider = _colliderMapper.Get(entity);
             var velocity = _velocityMapper.Get(entity);
             // Example movement logic (move right at 100 pixels per second)
-            transform.Position += velocity.Velocity  * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            transform.Position += velocity.Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
             velocity.Velocity -= velocity.Velocity / 5f;
+            if (velocity.Velocity.LengthSquared() < 0.01f)
+                velocity.Velocity = Vector2.Zero; // Prevent tiny drift
             // Update collider bounds
-            if (collider.Bounds is RectangleF rect)
-            {
-                rect.Position = transform.Position;
-            }
-
+            collider.Shape.Position = transform.Position;
             // Check for collision
-            _collisionWorld.Update(gameTime);
         }
+        //Console.WriteLine($"CollisionComponent has {ColliderBox.} colliders registered.");
+
+        _collisionWorld.Update(gameTime);
+
     }
 }

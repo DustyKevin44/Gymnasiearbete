@@ -1,3 +1,4 @@
+using System;
 using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
 
@@ -34,6 +35,8 @@ public class CollisionBox(IShapeF shape, bool isStatic=false) : ColliderBox(shap
     
     public override void OnCollision(CollisionEventArgs collisionInfo)
     {
+        Console.WriteLine("Collision");
+        
         
     }
 }

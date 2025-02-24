@@ -29,7 +29,7 @@ namespace Game.Custom.GameStates
         private TiledMapRenderer _mapRenderer;
         private Entity _player;
         private World _world;
-        private HashSet<Point> _solidTiles = new HashSet<Point>(); 
+        private HashSet<Point> _solidTiles = new HashSet<Point>();
         private readonly Chain _chain = new(Vector2.Zero, Vector2.Zero, [
             new Joint(new Vector2(0, 0), 20f, 0f),
             new Joint(new Vector2(0, 0), 20f, 0f, -MathHelper.PiOver2, MathHelper.PiOver2),
@@ -39,7 +39,7 @@ namespace Game.Custom.GameStates
         private Texture2D playerTexture;
         private Texture2D entityTexture;
         private SpriteBatch _spriteBatch;
-
+        private CollisionComponent _collisionComponent = new CollisionComponent(new RectangleF(int.MinValue, int.MinValue, int.MaxValue, int.MaxValue));
         //private EntityManager _entityManager;
         private List<Entity> enemyList;
         private Entity targetdeath;
@@ -60,23 +60,25 @@ namespace Game.Custom.GameStates
 
             // Initialize the world
             _world = new WorldBuilder()
-                .AddSystem(new MovementSystem(new CollisionComponent(new RectangleF(0,0,800,600))))
+                .AddSystem(new MovementSystem(_collisionComponent))
                 .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch))
                 .AddSystem(new BehaviorSystem())
                 .AddSystem(new PlayerSystem())
                 .AddSystem(new AliveSystem())
-                .AddSystem(new ColliderSystem())
-                .AddSystem(new TileCollisionSystem(_solidTiles))
+                //.AddSystem(new ColliderSystem())
                 .Build();
 
+            _collisionComponent.Initialize();
+
+
+
+            #region Player      
             playerTexture = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
 
-            #region Player       
             _player = _world.CreateEntity();
             _player.Attach(new Transform2(Vector2.Zero));
             _player.Attach(new VelocityComponent(Vector2.Zero));
             _player.Attach(new SpriteComponent(playerTexture));
-            _player.Attach(new ColliderComponent(new RectangleF(0, 0, 20, 20)));
             _player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20)));
             _player.Attach(new PlayerComponent<StdActions>(
                 "Player", new Dictionary<StdActions, Keybind> {
@@ -124,7 +126,6 @@ namespace Game.Custom.GameStates
                     .AddFrame(3, TimeSpan.FromSeconds(0.2))
                     .AddFrame(4, TimeSpan.FromSeconds(0.2));
             });
-            Entity entityTarget = null;
             for (int i = 0; i < 5; i++)
             {
                 Random rnd = new Random();
@@ -134,7 +135,6 @@ namespace Game.Custom.GameStates
                 _slime.Attach(new Behavior(0, target: _player));
                 _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
                 _slime.Attach(new HealthComponent(100));
-                _slime.Attach(new ColliderComponent(new RectangleF(0, 0, 16, 16)));
                 _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16)));
                 List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
                 _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
@@ -158,6 +158,18 @@ namespace Game.Custom.GameStates
 
             var viewportAdapter = new ScalingViewportAdapter(_graphicsDevice, 200, 150);
             _camera = new OrthographicCamera(viewportAdapter);
+
+            for (int i = 0; i < _world.EntityCount; i++)
+            {
+                Console.WriteLine("try");
+
+                var entity = _world.GetEntity(i);
+                if (entity.Has<CollisionBox>())
+                {
+                    _collisionComponent.Insert(entity.Get<CollisionBox>());
+                }
+                Console.WriteLine("entity" + entity);
+            }
         }
         #endregion
 
@@ -173,15 +185,15 @@ namespace Game.Custom.GameStates
                 {
                     for (ushort y = 0; y < collisionLayer.Height; y++)
                     {
-                      
+
                         if (collisionLayer.TryGetTile(x, y, out var tile) && tile.Value.GlobalIdentifier != 0)
                         {
 
                             _solidTiles.Add(new Point(x, y)); // Store only tile coordinates
-                            Console.WriteLine($"Tile at ({x}, {y}): ID = {tile.Value.GlobalIdentifier} was added");
+                            //Console.WriteLine($"Tile at ({x}, {y}): ID = {tile.Value.GlobalIdentifier} was added");
 
                         }
-                        Console.WriteLine($"Tile at ({x}, {y}): ID = {tile.Value.GlobalIdentifier}");
+                        //Console.WriteLine($"Tile at ({x}, {y}): ID = {tile.Value.GlobalIdentifier}");
 
                     }
                 }
@@ -191,6 +203,7 @@ namespace Game.Custom.GameStates
         #region Update
         public override void Update(GameTime gameTime)
         {
+           
             if (InputManager.MouseClicked)
             {
                 Console.WriteLine("ObjectPoolIsFullPolicy");
@@ -226,15 +239,15 @@ namespace Game.Custom.GameStates
             var Pcollider = _player.Get<CollisionBox>();
             var Ppos = _player.Get<Transform2>().Position;
 
-            _spriteBatch.DrawRectangle(Pcollider.Shape.Position + Ppos, Pcollider.Shape.BoundingRectangle.Size, Color.Black, 2f);
+            _spriteBatch.DrawRectangle(Pcollider.Shape.Position, Pcollider.Shape.BoundingRectangle.Size, Color.Black, 2f);
 
             var collider = obstacle.Get<CollisionBox>();
             var pos = obstacle.Get<Transform2>().Position;
-            _spriteBatch.DrawRectangle(collider.Shape.Position + pos, collider.Shape.BoundingRectangle.Size, Color.Black, 2f);
+            _spriteBatch.DrawRectangle(collider.Shape.Position, collider.Shape.BoundingRectangle.Size, Color.Black, 2f);
 
             var Scollider = _slime.Get<CollisionBox>();
             var Spos = _slime.Get<Transform2>().Position;
-            _spriteBatch.DrawRectangle(Scollider.Shape.Position + Spos, Scollider.Shape.BoundingRectangle.Size, Color.Black, 2f);
+            _spriteBatch.DrawRectangle(Scollider.Shape.Position, Scollider.Shape.BoundingRectangle.Size, Color.Black, 2f);
 
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);
