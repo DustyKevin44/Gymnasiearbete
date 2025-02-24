@@ -29,10 +29,16 @@ public class HurtBox(IShapeF shape) : ColliderBox(shape)
     }
 }
 
-public class CollisionBox(IShapeF shape, bool isStatic=false) : ColliderBox(shape)
+public class CollisionBox : ColliderBox
 {
-    public bool IsStatic = isStatic;
+    public bool IsStatic;
     
+    public CollisionBox(IShapeF shape, CollisionComponent collisionComponent, bool isStatic=false) : base(shape)
+    {
+        IsStatic = isStatic;
+        collisionComponent.Insert(this);
+    }
+
     public override void OnCollision(CollisionEventArgs collisionInfo)
     {
         Console.WriteLine("Collision");
