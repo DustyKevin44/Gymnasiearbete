@@ -39,7 +39,7 @@ namespace Game.Custom.GameStates
         private Texture2D playerTexture;
         private Texture2D entityTexture;
         private SpriteBatch _spriteBatch;
-        private CollisionComponent _collisionComponent = new CollisionComponent(new RectangleF(int.MinValue, int.MinValue, int.MaxValue, int.MaxValue));
+        private CollisionComponent _collisionComponent = new CollisionComponent(new RectangleF(int.MinValue / 2, int.MinValue / 2, int.MaxValue, int.MaxValue));
         //private EntityManager _entityManager;
         private List<Entity> enemyList;
         private Entity targetdeath;
@@ -88,7 +88,7 @@ namespace Game.Custom.GameStates
             _player.Attach(new Transform2(Vector2.Zero));
             _player.Attach(new VelocityComponent(Vector2.Zero));
             _player.Attach(new SpriteComponent(playerTexture));
-            _player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20), _collisionComponent));
+            _player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20), _collisionComponent, _player));
             _player.Attach(new PlayerComponent<StdActions>(
                 "Player", new Dictionary<StdActions, Keybind> {
                     { StdActions.MOVE_UP,    new Keybind(key: Keys.W) },
@@ -149,7 +149,7 @@ namespace Game.Custom.GameStates
                 _slime.Attach(new Behavior(0, target: _player));
                 _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
                 _slime.Attach(new HealthComponent(100));
-                _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16), _collisionComponent));
+                _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16), _collisionComponent, _slime));
                 List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
                 _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
 
@@ -161,7 +161,7 @@ namespace Game.Custom.GameStates
 
             obstacle = _world.CreateEntity();
             obstacle.Attach(new Transform2(new(200, 200)));
-            obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f), _collisionComponent));
+            obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f), _collisionComponent, obstacle));
 
 
             // Load the Tiled map
