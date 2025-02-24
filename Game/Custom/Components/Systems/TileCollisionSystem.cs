@@ -40,7 +40,7 @@ public class TileCollisionSystem : EntityUpdateSystem
             RectangleF newBounds = new RectangleF(newPosition, collider.Shape.BoundingRectangle.Size);
 
             string collisionInfo = GetNearbySolidTiles(transform.Position);
-            Console.WriteLine($"Collision! Solid tiles detected at: {collisionInfo}");
+            //Console.WriteLine($"Collision! Solid tiles detected at: {collisionInfo}");
 
             if (!IsCollidingWithTile(newBounds))
             {

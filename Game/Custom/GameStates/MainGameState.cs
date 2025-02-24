@@ -18,6 +18,7 @@ using System.Linq;
 using Game.Custom.Experimental;
 using System.Threading.Tasks.Dataflow;
 using MonoGame.Extended.Collections;
+using MonoGame.Extended.Collisions;
 
 namespace Game.Custom.GameStates
 {
@@ -59,7 +60,7 @@ namespace Game.Custom.GameStates
 
             // Initialize the world
             _world = new WorldBuilder()
-                .AddSystem(new MovementSystem())
+                .AddSystem(new MovementSystem(new CollisionComponent(new RectangleF(0,0,800,600))))
                 .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch))
                 .AddSystem(new BehaviorSystem())
                 .AddSystem(new PlayerSystem())
@@ -75,6 +76,7 @@ namespace Game.Custom.GameStates
             _player.Attach(new Transform2(Vector2.Zero));
             _player.Attach(new VelocityComponent(Vector2.Zero));
             _player.Attach(new SpriteComponent(playerTexture));
+            _player.Attach(new ColliderComponent(new RectangleF(0, 0, 20, 20)));
             _player.Attach(new CollisionBox<Layer>(new RectangleF(0, 0, 20, 20), Layer.Tile, false));
             _player.Attach(new PlayerComponent<StdActions>(
                 "Player", new Dictionary<StdActions, Keybind> {
@@ -132,6 +134,7 @@ namespace Game.Custom.GameStates
                 _slime.Attach(new Behavior(0, target: _player));
                 _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
                 _slime.Attach(new HealthComponent(100));
+                _slime.Attach(new ColliderComponent(new RectangleF(0, 0, 16, 16)));
                 _slime.Attach(new CollisionBox<Layer>(new RectangleF(0, 0, 16, 16), Layer.Tile, false));
                 List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
                 _slime.Get<AnimatedSprite>().Color = colors[rnd.Next(0, 5)];
