@@ -156,7 +156,6 @@ namespace Game.Custom.GameStates
 
             #endregion
 
-
             obstacle = _world.CreateEntity();
             obstacle.Attach(new Transform2(new(500, 500)));
             obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f), _collisionComponent));

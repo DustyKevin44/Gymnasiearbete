@@ -68,7 +68,17 @@ public class MovementSystem : EntityUpdateSystem
                     // Resolve overlap by moving the entity out of collision
                     transform.Position -= collider.CollisionInfo.PenetrationVector;
                     collider.Shape.Position = transform.Position; // Sync collider position
-                    velocity.Velocity = Vector2.Zero;
+                    if(collider.CollisionInfo.Other is CollisionBox otherBox && _velocityMapper.Has(otherBox.entityId)){
+                        var otherVelocity = _velocityMapper.Get(otherBox.entityId);
+                        var a = otherVelocity.Velocity;
+                        var b = velocity.Velocity;
+                        velocity.Velocity = a;
+                        otherVelocity.Velocity = b;
+
+                        
+                        
+
+                    }
                     // Reset collision state
                     collider.onCollisionBool = false;
                     //collider.CollisionInfo.PenetrationVector = Vector2.Zero;
