@@ -40,9 +40,6 @@ namespace Game.Custom.GameStates
         private Texture2D entityTexture;
         private SpriteBatch _spriteBatch;
         private CollisionComponent _collisionComponent = new CollisionComponent(new RectangleF(int.MinValue / 2, int.MinValue / 2, int.MaxValue, int.MaxValue));
-        //private EntityManager _entityManager;
-        private List<Entity> enemyList;
-        private Entity targetdeath;
 
         private Entity obstacle;
         private Entity _slime;
