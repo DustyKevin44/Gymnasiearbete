@@ -262,18 +262,13 @@ namespace Game.Custom.GameStates
             // Render the tilemap
             _mapRenderer.Draw(transformMatrix);
 
-            var Pcollider = _player.Get<CollisionBox>();
-            var Ppos = _player.Get<Transform2>().Position;
+            foreach (Entity e in new List<Entity>([_player, _slime, obstacle]))
+            {
+                var transform = e.Get<Transform2>();
+                var collisionBox = e.Get<CollisionBox>();
 
-            _spriteBatch.DrawRectangle(Pcollider.Shape.Position, Pcollider.Shape.BoundingRectangle.Size, Color.Black, 2f);
-
-            var collider = obstacle.Get<CollisionBox>();
-            var pos = obstacle.Get<Transform2>().Position;
-            _spriteBatch.DrawRectangle(collider.Shape.Position, collider.Shape.BoundingRectangle.Size, Color.Black, 2f);
-
-            var Scollider = _slime.Get<CollisionBox>();
-            var Spos = _slime.Get<Transform2>().Position;
-            _spriteBatch.DrawRectangle(Scollider.Shape.Position, Scollider.Shape.BoundingRectangle.Size, Color.Black, 2f);
+                _spriteBatch.DrawRectangle(collisionBox.Bounds.Position + transform.Position, collisionBox.Bounds.BoundingRectangle.Size, Color.Black, 2f);
+            }
 
             // Render all entities (handled by RenderSystem)
             _world.Draw(gameTime);

@@ -25,55 +25,52 @@ public class MovementSystem : EntityUpdateSystem
     {
         _transformMapper = mapperService.GetMapper<Transform2>();
         _velocityMapper = mapperService.GetMapper<VelocityComponent>();
-
         _colliderMapper = mapperService.GetMapper<CollisionBox>();
-
     }
 
     public override void Update(GameTime gameTime)
     {
-        float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
         foreach (var entity in ActiveEntities)
         {
-
             var transform = _transformMapper.Get(entity);
             var collider = _colliderMapper.Get(entity);
             var velocity = _velocityMapper.Get(entity);
         
-
             // Example movement logic (move right at 100 pixels per second)
             transform.Position += velocity.Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
             velocity.Velocity -= velocity.Velocity / 5f;
             if (velocity.Velocity.LengthSquared() < 0.01f)
                 velocity.Velocity = Vector2.Zero; // Prevent tiny drift
+
             // Update collider bounds
-            collider.Shape.Position = transform.Position;
+            collider.Shape.Position += transform.Position;
+
             // Check for collision
             //collider.Initialize(entity);
-           
         }
 
         //Console.WriteLine($"CollisionComponent has {ColliderBox.} colliders registered.");
 
         _collisionWorld.Update(gameTime);
+
         // Second pass: Resolve overlap by moving entities apart
         foreach (var entity in ActiveEntities)
+        {
+            var transform = _transformMapper.Get(entity);
+            var collider = _colliderMapper.Get(entity);
+            var velocity = _velocityMapper.Get(entity);
+
+            if (collider.onCollisionBool)
             {
-                var transform = _transformMapper.Get(entity);
-                var collider = _colliderMapper.Get(entity);
-                var velocity = _velocityMapper.Get(entity);
-
-                if (collider.onCollisionBool)
-                {
-                    // Resolve overlap by moving the entity out of collision
-                    transform.Position -= collider.CollisionInfo.PenetrationVector;
-                    collider.Shape.Position = transform.Position; // Sync collider position
-                    velocity.Velocity = Vector2.Zero;
-                    // Reset collision state
-                    collider.onCollisionBool = false;
-                    //collider.CollisionInfo.PenetrationVector = Vector2.Zero;
-                }
+                // Resolve overlap by moving the entity out of collision
+                transform.Position -= collider.CollisionInfo.PenetrationVector;
+                collider.Shape.Position = transform.Position; // Sync collider position
+                velocity.Velocity = Vector2.Zero;
+                // Reset collision state
+                collider.onCollisionBool = false;
+                //collider.CollisionInfo.PenetrationVector = Vector2.Zero;
             }
-
+            collider.Bounds.Position -= transform.Position;
         }
+    }
 }
