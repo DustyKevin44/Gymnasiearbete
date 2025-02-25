@@ -39,10 +39,7 @@ public class MovementSystem : EntityUpdateSystem
             var transform = _transformMapper.Get(entity);
             var collider = _colliderMapper.Get(entity);
             var velocity = _velocityMapper.Get(entity);
-            if(collider.onCollisionBool){
-                velocity.Velocity = Vector2.Zero;
-                collider.onCollisionBool = false;
-            }
+        
 
             // Example movement logic (move right at 100 pixels per second)
             transform.Position += velocity.Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -64,16 +61,17 @@ public class MovementSystem : EntityUpdateSystem
             {
                 var transform = _transformMapper.Get(entity);
                 var collider = _colliderMapper.Get(entity);
+                var velocity = _velocityMapper.Get(entity);
 
                 if (collider.onCollisionBool)
                 {
                     // Resolve overlap by moving the entity out of collision
-                    transform.Position += collider.PenetrationVector;
+                    transform.Position -= collider.CollisionInfo.PenetrationVector;
                     collider.Shape.Position = transform.Position; // Sync collider position
-
+                    velocity.Velocity = Vector2.Zero;
                     // Reset collision state
                     collider.onCollisionBool = false;
-                    collider.PenetrationVector = Vector2.Zero;
+                    //collider.CollisionInfo.PenetrationVector = Vector2.Zero;
                 }
             }
 

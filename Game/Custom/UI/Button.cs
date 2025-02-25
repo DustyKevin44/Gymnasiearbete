@@ -15,12 +15,11 @@ public class Button : UIElement
     private bool _isHovering;
     private MouseState _previousMouse;
     private readonly AnimatedSprite _animatedSprite;
-	private readonly float _scale = 6f;
-
+    private readonly float _scale = 6f;
 
     public event EventHandler Click;
     public bool Clicked { get; private set; }
-    public Color PenColour = Color.Black;
+    public Color PenColour = Color.White; //Best colour
     public Vector2 Position;
     public string Text;
 
@@ -28,7 +27,7 @@ public class Button : UIElement
     public float yPadding = 5f;
 
     public Rectangle Rectangle
-        => new((int)Position.X, (int)Position.Y, (int)_animatedSprite.TextureRegion.Width + (int)(2 * xPadding), (int)_animatedSprite.TextureRegion.Height + (int)(2 * yPadding));
+        => new((int)Position.X, (int)Position.Y, (int)(_animatedSprite.TextureRegion.Width * _scale) + (int)(2 * xPadding), (int)(_animatedSprite.TextureRegion.Height * _scale) + (int)(2 * yPadding));
 
     public Button(AnimatedSprite animatedSprite, SpriteFont font)
     {
@@ -40,13 +39,18 @@ public class Button : UIElement
     {
         var rectangle = Rectangle;
 
-		spriteBatch.Draw(_animatedSprite, Position,0, new Vector2(_scale, _scale));
+        spriteBatch.Draw(_animatedSprite, Position, 0, new Vector2(_scale, _scale));
+        
         if (!string.IsNullOrEmpty(Text))
         {
-            var x = rectangle.X + (rectangle.Width * _scale / 2) - (_font.MeasureString(Text).X / 2);
-            var y = rectangle.Y + (rectangle.Height * _scale / 2) - (_font.MeasureString(Text).Y / 2);
+            float maxFontHeight = (_animatedSprite.TextureRegion.Height * _scale) - 2;
+            float textScale = Math.Min(maxFontHeight / _font.MeasureString(Text).Y, _scale);
+            
+            var textSize = _font.MeasureString(Text) * textScale;
+            var x = Position.X + (rectangle.Width / 2) - (textSize.X / 2);
+            var y = Position.Y + (rectangle.Height / 2) - (textSize.Y / 2);
 
-            spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour, 0, 0, 0, SpriteEffects.None, 1);
+            spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour, 0f, Vector2.Zero, textScale, SpriteEffects.None, 1f);
         }
     }
 
@@ -54,7 +58,7 @@ public class Button : UIElement
     {
         _previousMouse = _currentMouse;
         _currentMouse = Mouse.GetState();
-		_animatedSprite.Update(gameTime);
+        _animatedSprite.Update(gameTime);
         var mouseRectangle = new Rectangle(_currentMouse.X, _currentMouse.Y, 1, 1);
         _isHovering = mouseRectangle.Intersects(Rectangle);
 
