@@ -66,6 +66,7 @@ namespace Game.Custom.GameStates
                 .AddSystem(new BehaviorSystem())
                 .AddSystem(new PlayerSystem())
                 .AddSystem(new AliveSystem())
+                .AddSystem(new EntityColliderSystem(_collisionComponent))
                 //.AddSystem(new ColliderSystem())
                 .Build();
 
