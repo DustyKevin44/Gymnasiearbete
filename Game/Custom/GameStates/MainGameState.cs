@@ -56,6 +56,8 @@ namespace Game.Custom.GameStates
                 .AddSystem(new BehaviorSystem())
                 .AddSystem(new PlayerSystem())
                 .AddSystem(new AliveSystem())
+                .AddSystem(new EntityColliderSystem(Global.CollisionSystem))
+                //.AddSystem(new ColliderSystem())
                 .Build();
 
             Global.Initialize(world, new Random(), collisionSystem, _content);

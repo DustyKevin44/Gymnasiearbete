@@ -49,28 +49,5 @@ public class MovementSystem : EntityUpdateSystem
             //collider.Initialize(entity);
         }
 
-        //Console.WriteLine($"CollisionComponent has {ColliderBox.} colliders registered.");
-
-        _collisionWorld.Update(gameTime);
-
-        // Second pass: Resolve overlap by moving entities apart
-        foreach (var entity in ActiveEntities)
-        {
-            var transform = _transformMapper.Get(entity);
-            var collider = _colliderMapper.Get(entity);
-            var velocity = _velocityMapper.Get(entity);
-
-            if (collider.onCollisionBool)
-            {
-                // Resolve overlap by moving the entity out of collision
-                transform.Position -= collider.CollisionInfo.PenetrationVector;
-                collider.Shape.Position = transform.Position; // Sync collider position
-                velocity.Velocity = Vector2.Zero;
-                // Reset collision state
-                collider.onCollisionBool = false;
-                //collider.CollisionInfo.PenetrationVector = Vector2.Zero;
-            }
-            collider.Bounds.Position -= transform.Position;
-        }
     }
 }
