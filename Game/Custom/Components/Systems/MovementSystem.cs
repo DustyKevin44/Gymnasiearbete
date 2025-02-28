@@ -30,7 +30,7 @@ public class MovementSystem : EntityUpdateSystem
         {
             var transform = _transformMapper.Get(entity);
             var velocity = _velocityMapper.Get(entity);
-        
+            
             // Example movement logic (move right at 100 pixels per second)
             transform.Position += velocity.Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
             velocity.Velocity -= velocity.Velocity / 5f;
