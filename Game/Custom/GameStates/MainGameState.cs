@@ -51,13 +51,12 @@ namespace Game.Custom.GameStates
 
             // Initialize the world
             World world = new WorldBuilder()
-                .AddSystem(new MovementSystem(collisionSystem))
-                .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch))
+                .AddSystem(new MovementSystem())
+                .AddSystem(new EntityColliderSystem(collisionSystem))
                 .AddSystem(new BehaviorSystem())
                 .AddSystem(new PlayerSystem())
                 .AddSystem(new AliveSystem())
-                .AddSystem(new EntityColliderSystem(collisionSystem))
-                //.AddSystem(new ColliderSystem())
+                .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch))
                 .Build();
 
             Global.Initialize(world, new Random(), collisionSystem, _content);
@@ -87,7 +86,7 @@ namespace Game.Custom.GameStates
 
             Global.ContentLibrary.Animations.Add("slime", spriteSheet);
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 2; i++)
             {
                 EntityFactory.CreateSlimeAt(new Vector2(
                     Global.Random.Next(-100, 100),

@@ -30,9 +30,13 @@ public class EntityColliderSystem : EntityUpdateSystem
 
     public override void Update(GameTime gameTime)
     {
-        float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
         foreach (var entity in ActiveEntities)
         {
+            
+            var transform = _transformMapper.Get(entity);
+            var collider = _colliderMapper.Get(entity);
+
+            collider.Bounds.Position += transform.Position; // Sync collider position
 
         }
 
@@ -44,24 +48,26 @@ public class EntityColliderSystem : EntityUpdateSystem
             var transform = _transformMapper.Get(entity);
             var collider = _colliderMapper.Get(entity);
 
+            var currentPosition = transform.Position;
 
             if (collider.onCollisionBool)
             {
-            
+
                 if (_velocityMapper.Has(entity))
                 {
+                
                     // Resolve overlap by moving the entity out of collision
                     transform.Position -= collider.CollisionInfo.PenetrationVector;
-                    collider.Shape.Position = transform.Position; // Sync collider position
-                    var velocity = _velocityMapper.Get(entity);
-                    velocity.Velocity = Vector2.Zero;
+                    Console.WriteLine(collider.CollisionInfo.PenetrationVector);
+                    //var velocity = _velocityMapper.Get(entity);
+                    //velocity.Velocity = Vector2.Zero;
 
                 }
                 // Reset collision state
                 collider.onCollisionBool = false;
                 //collider.CollisionInfo.PenetrationVector = Vector2.Zero;
             }
-            collider.Bounds.Position -= transform.Position;
+            collider.Bounds.Position -= currentPosition;
         }
 
         //Console.WriteLine($"CollisionComponent has {ColliderBox.} colliders registered.");

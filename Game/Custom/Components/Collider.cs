@@ -55,7 +55,7 @@ public class CollisionBox : ColliderBox
 
     public override void OnCollision(CollisionEventArgs collisionInfo)
     {
-        Console.WriteLine($"Collision detected for: {entityId}");
+        //Console.WriteLine($"Collision detected for: {entityId}");
         onCollisionBool = true;
         CollisionInfo = collisionInfo; // Store penetration vector
     }

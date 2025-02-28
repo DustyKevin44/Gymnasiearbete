@@ -10,22 +10,18 @@ using System;
 public class MovementSystem : EntityUpdateSystem
 {
     private ComponentMapper<Transform2> _transformMapper;
-    private ComponentMapper<CollisionBox> _colliderMapper;
     private ComponentMapper<VelocityComponent> _velocityMapper;
 
-    private readonly CollisionComponent _collisionWorld;
 
-    public MovementSystem(CollisionComponent collisionWorld)
+    public MovementSystem()
         : base(Aspect.All(typeof(Transform2), typeof(CollisionBox), typeof(VelocityComponent)))
     {
-        _collisionWorld = collisionWorld;
     }
 
     public override void Initialize(IComponentMapperService mapperService)
     {
         _transformMapper = mapperService.GetMapper<Transform2>();
         _velocityMapper = mapperService.GetMapper<VelocityComponent>();
-        _colliderMapper = mapperService.GetMapper<CollisionBox>();
     }
 
     public override void Update(GameTime gameTime)
@@ -33,7 +29,6 @@ public class MovementSystem : EntityUpdateSystem
         foreach (var entity in ActiveEntities)
         {
             var transform = _transformMapper.Get(entity);
-            var collider = _colliderMapper.Get(entity);
             var velocity = _velocityMapper.Get(entity);
         
             // Example movement logic (move right at 100 pixels per second)
@@ -42,11 +37,6 @@ public class MovementSystem : EntityUpdateSystem
             if (velocity.Velocity.LengthSquared() < 0.01f)
                 velocity.Velocity = Vector2.Zero; // Prevent tiny drift
 
-            // Update collider bounds
-            collider.Shape.Position += transform.Position;
-
-            // Check for collision
-            //collider.Initialize(entity);
         }
 
     }
