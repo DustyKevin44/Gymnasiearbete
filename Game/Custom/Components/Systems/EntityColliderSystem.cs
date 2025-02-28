@@ -47,11 +47,12 @@ public class EntityColliderSystem : EntityUpdateSystem
 
             if (collider.onCollisionBool)
             {
-                // Resolve overlap by moving the entity out of collision
-                transform.Position -= collider.CollisionInfo.PenetrationVector;
-                collider.Shape.Position = transform.Position; // Sync collider position
+            
                 if (_velocityMapper.Has(entity))
                 {
+                    // Resolve overlap by moving the entity out of collision
+                    transform.Position -= collider.CollisionInfo.PenetrationVector;
+                    collider.Shape.Position = transform.Position; // Sync collider position
                     var velocity = _velocityMapper.Get(entity);
                     velocity.Velocity = Vector2.Zero;
 
