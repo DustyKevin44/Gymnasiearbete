@@ -1,4 +1,8 @@
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+using MonoGame.Extended.ECS;
+using MonoGame.Extended.Graphics;
 
 namespace Game.Custom.Components;
 
@@ -18,6 +22,8 @@ public class Stack(int stackSize)
 public class Inventory
 {
     public Stack[,] inventory;
+    public float PickupRange;
+    public bool IsAutoPickupActive;
 }
 
 public class Effect
