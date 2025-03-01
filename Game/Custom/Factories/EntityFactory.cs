@@ -31,7 +31,7 @@ public static class EntityFactory
         player.Attach(new Transform2(position));
         player.Attach(new VelocityComponent(Vector2.Zero));
         player.Attach(new SpriteComponent(Global.ContentLibrary.Sprites["player"]));
-        player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20), Global.CollisionSystem));
+        player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20)));
         player.Attach(new PlayerComponent<StdActions>(
             "Player", new Dictionary<StdActions, Keybind> {
                 { StdActions.MOVE_UP,    new Keybind(key: Keys.W) },
@@ -45,13 +45,14 @@ public static class EntityFactory
         );
 
         Global.Players.Add(player);
+        player.Get<CollisionBox>().Parent = player;
         return player;
     }
 
     public static Entity CreateSlimeAt(Vector2 position)
     {
         Color[] colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
-        var slimeCollision = new CollisionBox(new RectangleF(0, 0, 16, 16), Global.CollisionSystem);
+        var slimeCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
 
         var slime = Global.World.CreateEntity();
         slime.Attach(new Transform2(position));
@@ -60,19 +61,8 @@ public static class EntityFactory
         slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation") { Color = colors[Global.Random.Next(0, 5)] } );
         slime.Attach(new HealthComponent(100));
         slime.Attach(slimeCollision);
-
-        slimeCollision.entityId = slime.Id;
-
-/*
-        _slime.Attach(new Behavior(0, target: _player));
-        _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
-        _slime.Attach(new HealthComponent(100));
-        _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16), _collisionComponent));
-        List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
-        _slime.Get<AnimatedSprite>().Color = colors[Global.Random.Next(0, 5)];
-        _slime.Get<CollisionBox>().Initialize(_slime);
-*/
-
+        
+        slimeCollision.Parent = slime;
         return slime;
     }
 }

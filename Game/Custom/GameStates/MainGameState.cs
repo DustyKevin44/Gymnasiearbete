@@ -52,7 +52,7 @@ namespace Game.Custom.GameStates
             // Initialize the world
             World world = new WorldBuilder()
                 .AddSystem(new MovementSystem())
-                .AddSystem(new EntityColliderSystem(collisionSystem))
+                .AddSystem(new EntityColliderSystem())
                 .AddSystem(new BehaviorSystem())
                 .AddSystem(new PlayerSystem())
                 .AddSystem(new AliveSystem())
@@ -86,7 +86,7 @@ namespace Game.Custom.GameStates
 
             Global.ContentLibrary.Animations.Add("slime", spriteSheet);
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 EntityFactory.CreateSlimeAt(new Vector2(
                     Global.Random.Next(-100, 100),
@@ -96,7 +96,8 @@ namespace Game.Custom.GameStates
 
             var obstacle = Global.World.CreateEntity();
             obstacle.Attach(new Transform2(new(500, 500)));
-            obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f), Global.CollisionSystem));
+            obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f)));
+            obstacle.Get<CollisionBox>().Parent = obstacle;
 
             // Load the Tiled map
             _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file

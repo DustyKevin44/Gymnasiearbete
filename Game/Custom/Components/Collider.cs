@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
@@ -12,6 +13,8 @@ public abstract class ColliderBox(IShapeF shape) : ICollisionActor
 {
     public IShapeF Shape = shape;
     public IShapeF Bounds => Shape;
+    public Entity Parent;
+    public Vector2 previousPosition;
 
     public abstract void OnCollision(CollisionEventArgs collisionInfo);
 }
@@ -35,28 +38,23 @@ public class HurtBox(IShapeF shape) : ColliderBox(shape)
 public class CollisionBox : ColliderBox
 {
     public bool IsStatic;
-    public bool onCollisionBool;
-    public CollisionEventArgs CollisionInfo; // Store collision resolution vector
 
-    public int entityId { get; set; }
-
-    public CollisionBox(IShapeF shape, CollisionComponent collisionComponent, bool isStatic = false)
+    public CollisionBox(IShapeF shape, bool isStatic = false)
         : base(shape)
     {
         IsStatic = isStatic;
-        collisionComponent.Insert(this);
-        Console.WriteLine("Collision added");
+        Global.CollisionSystem.Insert(this);
     }
 
-    public void Initialize(int EntityId)
-    {
-        entityId = EntityId;
-    }
+    public void Initialize(Entity parent) => Parent = parent;
 
     public override void OnCollision(CollisionEventArgs collisionInfo)
     {
-        //Console.WriteLine($"Collision detected for: {entityId}");
-        onCollisionBool = true;
-        CollisionInfo = collisionInfo; // Store penetration vector
+        if (!Parent.Has<Transform2>() || !Parent.Has<VelocityComponent>()) return;
+        var transfrom = Parent.Get<Transform2>();
+        var velocity = Parent.Get<VelocityComponent>();
+
+        velocity.Velocity = Vector2.Zero;
+        transfrom.Position -= collisionInfo.PenetrationVector;
     }
 }
