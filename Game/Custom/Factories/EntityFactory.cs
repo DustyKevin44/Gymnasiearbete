@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.Custom.Components;
 using Game.Custom.Components.Systems;
+using Game.Custom.Experimental;
 using Game.Custom.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -47,6 +48,34 @@ public static class EntityFactory
         Global.Players.Add(player);
         player.Get<CollisionBox>().Parent = player;
         return player;
+    }
+
+    public static Entity CreateSlimySlimeAt(Vector2 position)
+    {
+        var slimeCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
+
+        var slime = Global.World.CreateEntity();
+        slime.Attach(new Transform2(position));
+        slime.Attach(new VelocityComponent(Vector2.Zero));
+        slime.Attach(new Behavior(0, default, Global.Players.FirstOrDefault(defaultValue: null)));
+        slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation"));
+        slime.Attach(new HealthComponent(100));
+        slime.Attach(slimeCollision);
+        slime.Attach(new Skeleton([
+            new ChainComponent(Vector2.Zero, Global.Players.First(), [
+                new Joint(Vector2.Zero, 10f, 0f),
+                new Joint(Vector2.Zero, 10f, 0f),
+                new Joint(Vector2.Zero, 10f, 0f),
+            ]),
+            new ChainComponent(new Vector2(10, 10), null, [
+                new Joint(Vector2.Zero, 10f, 0f),
+                new Joint(Vector2.Zero, 10f, 0f),
+                new Joint(Vector2.Zero, 10f, 0f),
+            ]),
+        ]));
+        
+        slimeCollision.Parent = slime;
+        return slime;        
     }
 
     public static Entity CreateSlimeAt(Vector2 position)
