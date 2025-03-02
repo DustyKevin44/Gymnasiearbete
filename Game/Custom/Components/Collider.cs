@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
@@ -52,9 +53,7 @@ public class CollisionBox : ColliderBox
     {
         if (!Parent.Has<Transform2>() || !Parent.Has<VelocityComponent>()) return;
         var transfrom = Parent.Get<Transform2>();
-        var velocity = Parent.Get<VelocityComponent>();
 
-        velocity.Velocity = Vector2.Zero;
-        transfrom.Position -= collisionInfo.PenetrationVector;
+        transfrom.Position -= collisionInfo.PenetrationVector / 2f;
     }
 }

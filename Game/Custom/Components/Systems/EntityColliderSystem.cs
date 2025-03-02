@@ -3,6 +3,7 @@ using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using MonoGame.Extended.Collisions;
 using MonoGame.Extended;
+using System.Reflection;
 
 namespace Game.Custom.Components.Systems;
 
@@ -20,19 +21,22 @@ public class EntityColliderSystem() : EntityUpdateSystem(Aspect.All(typeof(Trans
 
     public override void Update(GameTime gameTime)
     {
-        foreach (int entity in ActiveEntities)
+        for (int i = 0; i < 10; i++)
         {
-            var collider = _colliderMapper.Get(entity);
-            collider.previousPosition = _transformMapper.Get(entity).Position;
-            collider.Bounds.Position += collider.previousPosition;
-        }
+            foreach (int entity in ActiveEntities)
+            {
+                var collider = _colliderMapper.Get(entity);
+                collider.previousPosition = _transformMapper.Get(entity).Position;
+                collider.Bounds.Position += collider.previousPosition;
+            }
 
-        Global.CollisionSystem.Update(gameTime);
-
-        foreach (int entity in ActiveEntities)
-        {
-            var collider = _colliderMapper.Get(entity);
-            collider.Bounds.Position -= collider.previousPosition;
+            Global.CollisionSystem.Update(gameTime);
+            
+            foreach (int entity in ActiveEntities)
+            {
+                var collider = _colliderMapper.Get(entity);
+                collider.Bounds.Position -= collider.previousPosition;
+            }
         }
     }
 }
