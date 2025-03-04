@@ -12,7 +12,7 @@ public class MenuState : GameState
 {
     private readonly List<UIElement> UI;
 
-    public MenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content, SpriteBatch spriteBatch) : base(game, graphicsDevice, content)
+    public MenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
     {
         Texture2D buttonSheet = content.Load<Texture2D>("ButtonSheet");
         Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/button", buttonSheet, 64, 8);
@@ -25,7 +25,7 @@ public class MenuState : GameState
                     .AddFrame(2, TimeSpan.FromSeconds(0.4));
             });
         SpriteFont buttonFont = _content.Load<SpriteFont>("Fonts/Font");
-        SpriteBatch _spriteBatch = spriteBatch;
+        SpriteBatch _spriteBatch = new SpriteBatch(graphicsDevice);
         AnimatedSprite buttonSprite = new AnimatedSprite(buttonSpriteSheet, "idle");
 
         var newGameButton = new Button(buttonSprite, buttonFont)

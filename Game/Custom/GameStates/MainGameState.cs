@@ -59,7 +59,7 @@ namespace Game.Custom.GameStates
                 .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch))
                 .Build();
 
-            Global.Initialize(world, new Random(), collisionSystem, _content);
+            Global.Initialize(_game, world, new Random(), collisionSystem, _content, _graphicsDevice);
 
             Global.ContentLibrary.Sprites["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
             EntityFactory.CreatePlayerAt(Vector2.Zero);
@@ -152,6 +152,7 @@ namespace Game.Custom.GameStates
            
             if (InputManager.MouseClicked)
             {
+                
                 Console.WriteLine("ObjectPoolIsFullPolicy");
                  /*for (int i = 0; i < 5; i++)
             {

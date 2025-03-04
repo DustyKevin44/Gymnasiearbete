@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.Custom.Components;
 using Game.Custom.Components.Systems;
+using Game.Custom.GameStates;
 using Game.Custom.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -26,6 +27,10 @@ public static class EntityFactory
         {
             Global.Camera?.ZoomIn(0.5f * gameTime.GetElapsedSeconds());
         }
+        void MainMenu(GameTime gameTime){
+            Global.Game.ChangeState(new MenuState(Global.Game, Global.GraphicsDevice, Global.ContentManager));
+
+        }
 
         var player = Global.World.CreateEntity();
         player.Attach(new Transform2(position));
@@ -40,7 +45,9 @@ public static class EntityFactory
                 { StdActions.MOVE_RIGHT, new Keybind(key: Keys.D) },
                 { StdActions.DASH,       new Keybind(key: Keys.Space) },
                 { StdActions.CUSTOM,     new CustomKeybind(ZoomIn, mouseButton: MouseButton.Right)},
-                { StdActions.CUSTOM2,    new CustomKeybind(ZoomOut, mouseButton: MouseButton.Left)}
+                { StdActions.CUSTOM2,    new CustomKeybind(ZoomOut, mouseButton: MouseButton.Left)},
+                { StdActions.MENU,       new CustomKeybind(MainMenu, key: Keys.Escape)}
+
             })
         );
 

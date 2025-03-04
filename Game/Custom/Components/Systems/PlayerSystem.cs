@@ -15,6 +15,7 @@ public enum StdActions {
     DASH,
     CUSTOM,
     CUSTOM2,
+    MENU
 }
 
 public class PlayerSystem : EntityUpdateSystem

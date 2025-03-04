@@ -12,14 +12,14 @@ public class AttackSystem : EntityUpdateSystem
     private ComponentMapper<MeleeAttack> _meleeMapper;
 
 
-    public MovementSystem()
-        : base(Aspect.All(typeof(_meleeMapper)))
+    public AttackSystem()
+        : base(Aspect.All(typeof(MeleeAttack)))
     {
     }
 
     public override void Initialize(IComponentMapperService mapperService)
     {
-        _meleeMapper = mapperService.GetMapper<_meleeMapper>();
+        _meleeMapper = mapperService.GetMapper<MeleeAttack>();
     }
 
     public override void Update(GameTime gameTime)
@@ -27,7 +27,7 @@ public class AttackSystem : EntityUpdateSystem
         foreach (var entity in ActiveEntities)
         {
             var melee = _meleeMapper.Get(entity);
-            if(melee. > 0)
+            if(melee.Cooldown == 0)
             {
                 
             }
