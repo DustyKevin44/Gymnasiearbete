@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Game.Custom.Static;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.ECS;
 
 
 namespace Game.Custom.Components;
@@ -56,6 +58,17 @@ public class EquipmentSlot
     public bool IsLocked = false;
 }
 
+public class Weapon : Equipable
+{
+    public int WeaponId;
+
+    public Weapon(int weaponId, Action<float> passiveEffect) : base(passiveEffect)
+    {
+        var weapon = Global.World.GetEntity(weaponId) ?? throw new Exception("Entity does not exist.");
+        if (weapon.Get<MeleeAttack>() is null && weapon.Get<RangedAttack>() is null) throw new Exception("Entity does not have a melee nor a ranged Attack.");
+        WeaponId = weaponId;
+    }
+}
 
 public class Equipment
 {
@@ -84,14 +97,24 @@ public class Equipment
         return true;
     }
 
-    public bool TryUnequip(string slot, out Equipable equipable)
+    public bool TryGet(string slot, out Equipable equipable)
     {
         if (_equipment.TryGetValue(slot, out EquipmentSlot eq))
         {
             equipable = eq.Equipable;
             return true;
         }
-        equipable = default;
+        equipable = null;
+        return false;
+    }
+
+    public bool TryUnequip(string slot, out Equipable equipable)
+    {
+        if (TryGet(slot, out equipable))
+        {
+            _equipment[slot].Equipable = null;
+            return true;
+        }
         return false;
     }
 
@@ -104,7 +127,6 @@ public class Equipment
     }
 }
 
-
 public abstract class Attack
 {
     public float Damage;
@@ -116,12 +138,12 @@ public abstract class Attack
 
 public class MeleeAttack : Attack
 {
-    public readonly int MeleeId;
+    public readonly MeleeId MeleeId;
 }
 
 public class RangedAttack : Attack
 {
-    public readonly int RangedId;
+    public readonly RangedId RangedId;
     public float Range;
 }
 

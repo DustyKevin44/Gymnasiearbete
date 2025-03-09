@@ -17,7 +17,7 @@ public sealed class Global
 
     public static Global Instance { get { lock (padlock) { instance ??= new Global(); return instance; } } }
 
-    public static void Initialize(Game game, World world, Random random, CollisionComponent collisionComponent, ContentManager contentManager, GraphicsDevice graphicsDevice)
+    public static void Initialize(Game game, World world, Random random, CollisionComponent collisionComponent, ContentManager contentManager, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
     {
         Instance._game = game;
         Instance._world = world;
@@ -25,6 +25,7 @@ public sealed class Global
         Instance._collisionComponent = collisionComponent;
         Instance._contentManager = contentManager;
         Instance._graphicsDevice = graphicsDevice;
+        Instance._spriteBatch = spriteBatch;
     }
 
     private World _world;
@@ -35,6 +36,7 @@ public sealed class Global
     private ContentManager _contentManager;
     private ContentLibrary _contentLibrary = new();
     private GraphicsDevice _graphicsDevice; 
+    private SpriteBatch _spriteBatch;
     private readonly List<Entity> _players = [];
 
     public static List<Entity> Players { get => Instance._players; }
@@ -46,7 +48,7 @@ public sealed class Global
     public static ContentManager ContentManager { get => Instance._contentManager; set => Instance._contentManager = value; }
     public static ContentLibrary ContentLibrary { get => Instance._contentLibrary; set => Instance._contentLibrary = value; }
     public static GraphicsDevice GraphicsDevice { get => Instance._graphicsDevice; set => Instance._graphicsDevice = value; }
-
+    public static SpriteBatch SpriteBatch { get => Instance._spriteBatch; set => Instance._spriteBatch = value; }
 }
 
 

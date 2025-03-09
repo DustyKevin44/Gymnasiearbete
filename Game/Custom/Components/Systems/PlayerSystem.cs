@@ -1,5 +1,6 @@
 using System.Linq;
 using Game.Custom.Input;
+using Game.Custom.Static;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
@@ -15,28 +16,31 @@ public enum StdActions {
     DASH,
     CUSTOM,
     CUSTOM2,
-    MENU
+    MENU,
+    MainAttack
 }
 
 public class PlayerSystem : EntityUpdateSystem
 {
-    private ComponentMapper<PlayerComponent<StdActions>> playerMapper;
-    private ComponentMapper<VelocityComponent> velocityMapper;
+    private ComponentMapper<PlayerComponent<StdActions>> _playerMapper;
+    private ComponentMapper<VelocityComponent> _velocityMapper;
+    private ComponentMapper<Equipment> _equipmentMapper;
 
     public PlayerSystem() : base(Aspect.All(typeof(PlayerComponent<StdActions>), typeof(VelocityComponent))) { }
 
     public override void Initialize(IComponentMapperService mapperService)
     {
-        playerMapper = mapperService.GetMapper<PlayerComponent<StdActions>>();
-        velocityMapper = mapperService.GetMapper<VelocityComponent>();
+        _playerMapper = mapperService.GetMapper<PlayerComponent<StdActions>>();
+        _velocityMapper = mapperService.GetMapper<VelocityComponent>();
+        _equipmentMapper = mapperService.GetMapper<Equipment>();
     }
 
     public override void Update(GameTime gameTime)
     {
         foreach (int entity in ActiveEntities)
         {
-            var player = playerMapper.Get(entity);
-            var velocity = velocityMapper.Get(entity);
+            var player = _playerMapper.Get(entity);
+            var velocity = _velocityMapper.Get(entity);
 
             player.DashTimer.Update(gameTime);
 
@@ -72,6 +76,28 @@ public class PlayerSystem : EntityUpdateSystem
             {
                 player.IsInControl = false;
                 player.DashTimer.Restart();
+            }
+
+            if (_equipmentMapper.Has(entity))
+            {
+                var equipment = _equipmentMapper.Get(entity);
+                if (player.IsActionJustPressed(StdActions.MainAttack) && equipment.TryGet("mainHand", out Equipable equipable) && equipable is Weapon weapon)
+                {
+                    Entity WeaponEntity = Global.World.GetEntity(weapon.WeaponId);
+                    if (WeaponEntity.Has<MeleeAttack>())
+                    {
+                        var melee = WeaponEntity.Get<MeleeAttack>();
+                        if (melee.IsOffCooldown(gameTime))
+                            Melee.Activate(melee);
+                    }
+
+                    if (WeaponEntity.Has<RangedAttack>())
+                    {
+                        var ranged = WeaponEntity.Get<RangedAttack>();
+                        if (ranged.IsOffCooldown(gameTime))
+                            Ranged.Activate(ranged);
+                    }
+                }
             }
 
             foreach ((StdActions action, CustomKeybind keybind) in player.Keybinds.Where(kv => kv.Value is CustomKeybind customKeybind && player.IsActionPressed(kv.Key)).Select(kv => (kv.Key, (CustomKeybind)kv.Value)))

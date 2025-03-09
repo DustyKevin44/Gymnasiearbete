@@ -12,6 +12,7 @@ public class EntityColliderSystem() : EntityUpdateSystem(Aspect.All(typeof(Trans
 {
     private ComponentMapper<Transform2> _transformMapper;
     private ComponentMapper<CollisionBox> _colliderMapper;
+    private const int _iterations = 10;
 
     public override void Initialize(IComponentMapperService mapperService)
     {
@@ -21,7 +22,7 @@ public class EntityColliderSystem() : EntityUpdateSystem(Aspect.All(typeof(Trans
 
     public override void Update(GameTime gameTime)
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < _iterations; i++)
         {
             foreach (int entity in ActiveEntities)
             {

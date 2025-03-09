@@ -50,10 +50,12 @@ public class MainGameState : GameState
             .AddSystem(new PlayerSystem())
             .AddSystem(new AliveSystem())
             .AddSystem(new ProceduralAnimationSystem())
-            .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch))
+            .AddSystem(new TweenerSystem())
+            .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch)) // <-- TODO: remove parameters and use Global instead
+            .AddSystem(new DebugRenderSystem())
             .Build();
 
-            Global.Initialize(_game, world, new Random(), collisionSystem, _content, _graphicsDevice);
+        Global.Initialize(_game, world, new Random(), collisionSystem, _content, _graphicsDevice, _spriteBatch);
 
         Global.ContentLibrary.Sprites["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
         EntityFactory.CreatePlayerAt(Vector2.Zero);
@@ -93,6 +95,11 @@ public class MainGameState : GameState
         obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f)));
         obstacle.Get<CollisionBox>().Parent = obstacle;
 
+        var obstacle2 = Global.World.CreateEntity();
+        obstacle2.Attach(new Transform2(new(100, 100)));
+        obstacle2.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f)));
+        obstacle2.Get<CollisionBox>().Parent = obstacle2;
+
         // Load the Tiled map
         _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file
 
@@ -131,36 +138,13 @@ public class MainGameState : GameState
         }
     }
 
-        public override void Update(GameTime gameTime)
-        {
-           
-            if (InputManager.MouseClicked)
-            {
-                Console.WriteLine("ObjectPoolIsFullPolicy");
-                 /*for (int i = 0; i < 5; i++)
-            {
-                Random Global.Random = new Random();
-                _slime = Global.World.CreateEntity();
-                _slime.Attach(new Transform2(new Vector2(Global.Random.Next(-100, 100), Global.Random.Next(-100, 100))));
-                _slime.Attach(new VelocityComponent(new(0, 0)));
-                _slime.Attach(new Behavior(0, target: _player));
-                _slime.Attach(new AnimatedSprite(spriteSheet, "slimeAnimation"));
-                _slime.Attach(new HealthComponent(100));
-                _slime.Attach(new CollisionBox(new RectangleF(0, 0, 16, 16), _collisionComponent));
-                List<Color> colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
-                _slime.Get<AnimatedSprite>().Color = colors[Global.Random.Next(0, 5)];
-                _slime.Get<CollisionBox>().Initialize(_slime);
-
-            }*/
-
-            }
-          
-            // Update the camera's position with scaled movement direction
-            var playerPos = Global.Players.First().Get<Transform2>().Position;
-            Global.Camera.LookAt(playerPos); // <-- should be in Global.World.Update() probably
+    public override void Update(GameTime gameTime)
+    {
+        // Update the camera's position with scaled movement direction
+        var playerPos = Global.Players.First().Get<Transform2>().Position;
+        Global.Camera.LookAt(playerPos); // <-- should be in Global.World.Update() probably
 
         Global.World.Update(gameTime);
-
         InputManager.Update();
     }
 
@@ -173,23 +157,6 @@ public class MainGameState : GameState
 
         // Render the tilemap
         _mapRenderer.Draw(transformMatrix);
-
-        // Debug drawing
-        for (int i=0; i < Global.World.EntityCount; i++)
-        {
-            Entity e = Global.World.GetEntity(i);
-
-            if (e.Has<Transform2>() && e.Has<CollisionBox>())
-            {
-                var transform = e.Get<Transform2>();
-                var collisionBox = e.Get<CollisionBox>();
-
-                _spriteBatch.DrawRectangle(collisionBox.Bounds.Position + transform.Position, collisionBox.Bounds.BoundingRectangle.Size, Color.Black, 2f);
-
-                if (e.Has<Skeleton>())
-                    e.Get<Skeleton>().Draw(gameTime, _spriteBatch);
-            }
-        }
 
         // Render all entities (handled by RenderSystem)
         Global.World.Draw(gameTime);
