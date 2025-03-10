@@ -28,9 +28,10 @@ public static class EntityFactory
         {
             Global.Camera?.ZoomIn(0.5f * gameTime.GetElapsedSeconds());
         }
-        void MainMenu(GameTime gameTime){
-            Global.Game.ChangeState(new MenuState(Global.Game, Global.GraphicsDevice, Global.ContentManager));
 
+        void MainMenu(GameTime gameTime)
+        {
+            Global.Game.ChangeState(new MenuState(Global.Game, Global.GraphicsDevice, Global.ContentManager));
         }
 
         var player = Global.World.CreateEntity();
@@ -45,16 +46,35 @@ public static class EntityFactory
                 { StdActions.MOVE_LEFT,  new Keybind(key: Keys.A) },
                 { StdActions.MOVE_RIGHT, new Keybind(key: Keys.D) },
                 { StdActions.DASH,       new Keybind(key: Keys.Space) },
-                { StdActions.CUSTOM,     new CustomKeybind(ZoomIn, mouseButton: MouseButton.Right)},
-                { StdActions.CUSTOM2,    new CustomKeybind(ZoomOut, mouseButton: MouseButton.Left)},
-                { StdActions.MENU,       new CustomKeybind(MainMenu, key: Keys.Escape)}
-
+                { StdActions.CUSTOM,     new CustomKeybind(ZoomIn, key: Keys.D2) },
+                { StdActions.CUSTOM2,    new CustomKeybind(ZoomOut, key: Keys.D1) },
+                { StdActions.MENU,       new CustomKeybind(MainMenu, key: Keys.Escape) },
+                { StdActions.MainAttack, new Keybind(mouseButton: MouseButton.Left) }
             })
         );
+        player.Attach(new Equipment(["hand"]));
 
         Global.Players.Add(player);
         player.Get<CollisionBox>().Parent = player;
         return player;
+    }
+
+    public static Entity CreateSwordAt(Vector2 position)
+    {
+        var equipable = new Equipable();
+        var hitbox = new HitBox(new RectangleF(0, 0, 20, 20));
+
+        var sword = Global.World.CreateEntity();
+        sword.Attach(new Transform2(position));
+        sword.Attach(new Item(Global.ContentLibrary.Sprites["player"]));
+        sword.Attach(equipable);
+        sword.Attach(hitbox);
+        sword.Attach(new MeleeAttack(1, 1, Static.MeleeType.Slash));
+        sword.Attach(new SpriteComponent(Global.ContentLibrary.Sprites["player"]));
+
+        hitbox.Parent = sword;
+        equipable.Entity = sword;
+        return sword;
     }
 
     public static Entity CreateSlimySlimeAt(Vector2 position)
@@ -80,9 +100,9 @@ public static class EntityFactory
                 new Joint(Vector2.Zero, 10f, 0f),
             ]),
         ]));
-        
+
         slimeCollision.Parent = slime;
-        return slime;        
+        return slime;
     }
 
     public static Entity CreateSlimeAt(Vector2 position)
@@ -94,10 +114,10 @@ public static class EntityFactory
         slime.Attach(new Transform2(position));
         slime.Attach(new VelocityComponent(Vector2.Zero));
         slime.Attach(new Behavior(0, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
-        slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation") { Color = colors[Global.Random.Next(0, 5)] } );
+        slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation") { Color = colors[Global.Random.Next(0, 5)] });
         slime.Attach(new HealthComponent(100));
         slime.Attach(slimeCollision);
-        
+
         slimeCollision.Parent = slime;
         return slime;
     }

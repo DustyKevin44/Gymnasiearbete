@@ -81,21 +81,20 @@ public class PlayerSystem : EntityUpdateSystem
             if (_equipmentMapper.Has(entity))
             {
                 var equipment = _equipmentMapper.Get(entity);
-                if (player.IsActionJustPressed(StdActions.MainAttack) && equipment.TryGet("mainHand", out Equipable equipable) && equipable is Weapon weapon)
+                if (player.IsActionJustPressed(StdActions.MainAttack) && equipment.TryGet("hand", out Entity WeaponEntity))
                 {
-                    Entity WeaponEntity = Global.World.GetEntity(weapon.WeaponId);
                     if (WeaponEntity.Has<MeleeAttack>())
                     {
                         var melee = WeaponEntity.Get<MeleeAttack>();
                         if (melee.IsOffCooldown(gameTime))
-                            Melee.Activate(melee);
+                            Melee.Attack(WeaponEntity);
                     }
 
                     if (WeaponEntity.Has<RangedAttack>())
                     {
                         var ranged = WeaponEntity.Get<RangedAttack>();
                         if (ranged.IsOffCooldown(gameTime))
-                            Ranged.Activate(ranged);
+                            Ranged.Attack(ranged);
                     }
                 }
             }

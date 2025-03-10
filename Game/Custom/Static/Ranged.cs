@@ -2,21 +2,21 @@ using Game.Custom.Components;
 
 namespace Game.Custom.Static;
 
-public enum RangedId
+public enum RangedType
 {
     Arrow,
 }
 
 public static class Ranged
 {
-    public static void Activate(RangedAttack ranged)
+    public static void Attack(RangedAttack ranged)
     {
-        switch (ranged.RangedId)
+        switch (ranged.RangedType)
         {
-            case RangedId.Arrow:
+            case RangedType.Arrow:
                 break;
             default:
-                throw new System.Exception("Ranged Attack '" + ranged.RangedId + "' not implemented.");
+                throw new System.Exception("Ranged Attack '" + ranged.RangedType + "' not implemented.");
         }
     }
 }

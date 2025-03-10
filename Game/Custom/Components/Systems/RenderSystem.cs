@@ -16,6 +16,8 @@ public class RenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch
     private ComponentMapper<Transform2> _transformMapper;
     private ComponentMapper<SpriteComponent> _spriteMapper;
     private ComponentMapper<AnimatedSprite> _animatedSpriteMapper;
+    private ComponentMapper<Item> _itemMapper;
+    private ComponentMapper<Equipable> _equipableMapper;
 
     public override void Initialize(IComponentMapperService mapperService)
     {
@@ -23,12 +25,29 @@ public class RenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch
         _transformMapper = mapperService.GetMapper<Transform2>();
         _spriteMapper = mapperService.GetMapper<SpriteComponent>();
         _animatedSpriteMapper = mapperService.GetMapper<AnimatedSprite>();
+        _equipableMapper = mapperService.GetMapper<Equipable>();
+        _itemMapper = mapperService.GetMapper<Item>();
     }
 
     public override void Draw(GameTime gameTime)
     {
         foreach (var entity in ActiveEntities)
         {
+            // Don't draw items that are inside an inventory
+            if (_itemMapper.Has(entity) && _itemMapper.Get(entity).InInventory) continue;
+
+            Vector2 localPosition = Vector2.Zero;
+            float localRotation = 0f;
+            Vector2 localScale = Vector2.One;
+
+            if (_equipableMapper.Has(entity))
+            {
+                var eq = _equipableMapper.Get(entity);
+                localPosition += eq.LocalTransform.Position;
+                localRotation += eq.LocalTransform.Rotation;
+                localScale *= eq.LocalTransform.Scale;
+            }
+
             var transform = _transformMapper.Get(entity);
             var sprite = _spriteMapper.Get(entity);
             
@@ -37,23 +56,23 @@ public class RenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch
                 // Draw each entity using its sprite and transform
                 _spriteBatch.Draw(
                     sprite.Texture,
-                    transform.Position,
-                    null,                           // Source rectangle (null uses the whole texture)
-                    Color.White,                    // Tint color
-                    0f,                             // Rotation
+                    transform.Position + localPosition,
+                    null,                                   // Source rectangle (null uses the whole texture)
+                    Color.White,                            // Tint color
+                    localRotation,                          // Rotation
                     new Vector2(
                         sprite.Texture.Width / 2f,
                         sprite.Texture.Height / 2f
-                    ),                              // Origin (center of the texture)
-                    transform.Scale,                // Scale factor
-                    SpriteEffects.None,             // Effects
-                    0f                              // Layer depth
+                    ),                                      // Origin (center of the texture)
+                    transform.Scale * localScale,           // Scale factor
+                    SpriteEffects.None,                     // Effects
+                    0f                                      // Layer depth
                 );
             }
             else if (_animatedSpriteMapper.Has(entity))
             {
                 var animsprite = _animatedSpriteMapper.Get(entity);
-                _spriteBatch.Draw(animsprite, transform.Position, 0);
+                _spriteBatch.Draw(animsprite, transform.Position + localPosition, localRotation, localScale);
             }
         }
     }

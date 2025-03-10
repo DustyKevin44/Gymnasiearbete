@@ -12,7 +12,6 @@ using MonoGame.Extended.Graphics;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended;
-using Game.Custom.Experimental;
 using MonoGame.Extended.Collisions;
 using Game.Custom.Factories;
 using System.Linq;
@@ -58,7 +57,9 @@ public class MainGameState : GameState
         Global.Initialize(_game, world, new Random(), collisionSystem, _content, _graphicsDevice, _spriteBatch);
 
         Global.ContentLibrary.Sprites["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
-        EntityFactory.CreatePlayerAt(Vector2.Zero);
+        var player = EntityFactory.CreatePlayerAt(Vector2.Zero);
+        var eq = player.Get<Equipment>();
+        eq.Equip("hand", EntityFactory.CreateSwordAt(Vector2.Zero));
 
         var entityTexture = _content.Load<Texture2D>("slimeSheet"); // Ensure you have a "player" texture
         Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
