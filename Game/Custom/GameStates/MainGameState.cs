@@ -52,6 +52,7 @@ public class MainGameState : GameState
             .AddSystem(new TweenerSystem())
             .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch)) // <-- TODO: remove parameters and use Global instead
             .AddSystem(new DebugRenderSystem())
+            .AddSystem(new SpawnerSystem())
             .Build();
 
         Global.Initialize(_game, world, new Random(), collisionSystem, _content, _graphicsDevice, _spriteBatch);
@@ -100,7 +101,9 @@ public class MainGameState : GameState
         obstacle2.Attach(new Transform2(new(100, 100)));
         obstacle2.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f)));
         obstacle2.Get<CollisionBox>().Parent = obstacle2;
-
+        
+        var slimeSpawner = Global.World.CreateEntity();
+        slimeSpawner.Attach(new SpawnerComponent(new(0,0), new(500,500), new("slime"), 1f));
         // Load the Tiled map
         _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file
 

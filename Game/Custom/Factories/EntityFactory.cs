@@ -85,7 +85,7 @@ public static class EntityFactory
         var slime = Global.World.CreateEntity();
         slime.Attach(new Transform2(position));
         slime.Attach(new VelocityComponent(Vector2.Zero));
-        slime.Attach(new Behavior(0, default, Global.Players.FirstOrDefault(defaultValue: null)));
+        slime.Attach(new Behavior(1, default, Global.Players.FirstOrDefault(defaultValue: null)));
         slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation"));
         slime.Attach(new HealthComponent(100));
         slime.Attach(slimeCollision);
