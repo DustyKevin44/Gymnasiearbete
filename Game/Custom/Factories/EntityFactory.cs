@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Game.Custom.Components;
@@ -31,7 +32,7 @@ public static class EntityFactory
 
         void MainMenu(GameTime gameTime)
         {
-            Global.Game.ChangeState(new MenuState(Global.Game, Global.GraphicsDevice, Global.ContentManager));
+            Global.Game.ChangeState(new MenuState(Global.Game, Global.GraphicsDevice, Global.ContentManager)); // TODO: Fix menu, just ends it right now.
         }
 
         var player = Global.World.CreateEntity();
@@ -88,6 +89,7 @@ public static class EntityFactory
         slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation"));
         slime.Attach(new HealthComponent(100));
         slime.Attach(slimeCollision);
+        
         slime.Attach(new Skeleton([
             new ChainComponent(Vector2.Zero, Global.Players.First(), [
                 new Joint(Vector2.Zero, 10f, 0f),
@@ -109,7 +111,6 @@ public static class EntityFactory
     {
         Color[] colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
         var slimeCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
-
         var slime = Global.World.CreateEntity();
         slime.Attach(new Transform2(position));
         slime.Attach(new VelocityComponent(Vector2.Zero));

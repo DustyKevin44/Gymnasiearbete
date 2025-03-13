@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -72,6 +73,8 @@ public class RenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch
             else if (_animatedSpriteMapper.Has(entity))
             {
                 var animsprite = _animatedSpriteMapper.Get(entity);
+                Console.WriteLine(transform.Position);
+                animsprite.Update(gameTime);
                 _spriteBatch.Draw(animsprite, transform.Position + localPosition, localRotation, localScale);
             }
         }

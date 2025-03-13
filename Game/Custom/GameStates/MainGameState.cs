@@ -85,9 +85,9 @@ public class MainGameState : GameState
 
         for (int i = 0; i < 1; i++)
         {
-            EntityFactory.CreateSlimySlimeAt(new Vector2(
-                Global.Random.Next(-100, 100),
-                Global.Random.Next(-100, 100))
+            EntityFactory.CreateSlimeAt(new Vector2(
+                Global.Random.Next(-10, 10),
+                Global.Random.Next(-10, 10))
             );
         }
 
@@ -141,6 +141,7 @@ public class MainGameState : GameState
 
     public override void Update(GameTime gameTime)
     {
+
         // Update the camera's position with scaled movement direction
         var playerPos = Global.Players.First().Get<Transform2>().Position;
         Global.Camera.LookAt(playerPos); // <-- should be in Global.World.Update() probably
