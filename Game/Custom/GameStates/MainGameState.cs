@@ -52,6 +52,7 @@ public class MainGameState : GameState
             .AddSystem(new TweenerSystem())
             .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch)) // <-- TODO: remove parameters and use Global instead
             .AddSystem(new DebugRenderSystem())
+            .AddSystem(new SpawnerSystem())
             .Build();
 
         Global.Initialize(_game, world, new Random(), collisionSystem, _content, _graphicsDevice, _spriteBatch);
@@ -85,9 +86,9 @@ public class MainGameState : GameState
 
         for (int i = 0; i < 1; i++)
         {
-            EntityFactory.CreateSlimySlimeAt(new Vector2(
-                Global.Random.Next(-100, 100),
-                Global.Random.Next(-100, 100))
+            EntityFactory.CreateSlimeAt(new Vector2(
+                Global.Random.Next(-10, 10),
+                Global.Random.Next(-10, 10))
             );
         }
 
@@ -100,7 +101,9 @@ public class MainGameState : GameState
         obstacle2.Attach(new Transform2(new(100, 100)));
         obstacle2.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f)));
         obstacle2.Get<CollisionBox>().Parent = obstacle2;
-
+        
+        var slimeSpawner = Global.World.CreateEntity();
+        slimeSpawner.Attach(new SpawnerComponent(new(0,0), new(500,500), new("slime"), 1f));
         // Load the Tiled map
         _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file
 
@@ -141,6 +144,7 @@ public class MainGameState : GameState
 
     public override void Update(GameTime gameTime)
     {
+
         // Update the camera's position with scaled movement direction
         var playerPos = Global.Players.First().Get<Transform2>().Position;
         Global.Camera.LookAt(playerPos); // <-- should be in Global.World.Update() probably

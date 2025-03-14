@@ -31,48 +31,49 @@ public class AliveSystem : EntityUpdateSystem
             if (!health.IsAlive)
             {
                 Global.World.DestroyEntity(entity);
-            }
-
-            if (_animatedSpriteMapper.Has(entity))
-            {
-                AnimatedSprite animation = _animatedSpriteMapper.Get(entity);
-                try
+                if (_animatedSpriteMapper.Has(entity))
                 {
-                    animation.SetAnimation("Death");
+                    AnimatedSprite animation = _animatedSpriteMapper.Get(entity);
+                    try
+                    {
+                        animation.SetAnimation("Death");
+                    }
+                    catch
+                    {
+                        Entity entityObj = Global.World.GetEntity(entity);
+                        if (entityObj.Has<Tweener>())
+                        {
+                            var tweener = entityObj.Get<Tweener>();
+                            tweener.TweenTo(animation, (animation) => animation.Color, Color.Black, 2);
+                        }
+                        else
+                        {
+                            var tweener = new Tweener();
+                            tweener.TweenTo(animation, (animation) => animation.Color, Color.Black, 2);
+                            entityObj.Attach(tweener);
+                        }
+                    }
                 }
-                catch
+
+                if (_spriteMapper.Has(entity))
                 {
+                    SpriteComponent sprite = _spriteMapper.Get(entity);
                     Entity entityObj = Global.World.GetEntity(entity);
                     if (entityObj.Has<Tweener>())
                     {
                         var tweener = entityObj.Get<Tweener>();
-                        tweener.TweenTo(animation, (animation) => animation.Color, Color.Black, 2);
+                        tweener.TweenTo(sprite, (sprite) => sprite.Color, Color.Black, 2);
                     }
                     else
                     {
                         var tweener = new Tweener();
-                        tweener.TweenTo(animation, (animation) => animation.Color, Color.Black, 2);
+                        tweener.TweenTo(sprite, (sprite) => sprite.Color, Color.Black, 2);
                         entityObj.Attach(tweener);
                     }
                 }
             }
 
-            if (_spriteMapper.Has(entity))
-            {
-                SpriteComponent sprite = _spriteMapper.Get(entity);
-                Entity entityObj = Global.World.GetEntity(entity);
-                if (entityObj.Has<Tweener>())
-                {
-                    var tweener = entityObj.Get<Tweener>();
-                    tweener.TweenTo(sprite, (sprite) => sprite.Color, Color.Black, 2);
-                }
-                else
-                {
-                    var tweener = new Tweener();
-                    tweener.TweenTo(sprite, (sprite) => sprite.Color, Color.Black, 2);
-                    entityObj.Attach(tweener);
-                }
-            }
+
         }
     }
 }
