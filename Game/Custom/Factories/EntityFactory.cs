@@ -121,4 +121,22 @@ public static class EntityFactory
         slimeCollision.Parent = slime;
         return slime;
     }
+
+    public static Entity CreateCentipedeAt(Vector2 position)
+    {
+        var centipide = Global.World.CreateEntity();
+        centipide.Attach(new Skeleton([
+            new ChainComponent(position, null, [
+                new Joint(Vector2.Zero, 10f, 0f),
+                new Joint(Vector2.Zero, 10f, 0f),
+                new Joint(Vector2.Zero, 10f, 0f),
+                new Joint(Vector2.Zero, 10f, 0f),
+                new Joint(Vector2.Zero, 10f, 0f),
+            ])
+        ]));
+
+        
+
+        return centipide;
+    }
 }

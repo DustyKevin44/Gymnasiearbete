@@ -61,7 +61,7 @@ public class MainGameState : GameState
         var eq = player.Get<Equipment>();
         eq.Equip("hand", EntityFactory.CreateSwordAt(Vector2.Zero));
 
-        var entityTexture = _content.Load<Texture2D>("slimeSheet"); // Ensure you have a "player" texture
+        var entityTexture = _content.Load<Texture2D>("slimeSheet");
         Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
         var spriteSheet = new SpriteSheet("SpriteSheet/slime", atlas);
         spriteSheet.DefineAnimation("slimeAnimation", builder =>

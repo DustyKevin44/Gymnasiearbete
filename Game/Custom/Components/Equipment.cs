@@ -42,17 +42,18 @@ public class Equipment
 
     public bool Equip(string slot, Entity entity)
     {
-        if (_equipment.ContainsKey(slot)) return false;
-        if (_equipment[slot] is not null) return false;
-        if (!entity.Has<Equipable>()) return false;
-        _equipment[slot].Entity = entity;
-
-        return true;
+        if (_equipment.TryGetValue(slot, out EquipmentSlot eq) && eq is not null)
+        {
+            if (!entity.Has<Equipable>()) return false;
+            eq.Entity = entity;
+            return true;
+        }
+        return false;
     }
 
     public bool TryGet(string slot, out Entity entity)
     {
-        if (_equipment.TryGetValue(slot, out EquipmentSlot eq))
+        if (_equipment.TryGetValue(slot, out EquipmentSlot eq) && eq.Entity is not null)
         {
             entity = eq.Entity;
             return true;

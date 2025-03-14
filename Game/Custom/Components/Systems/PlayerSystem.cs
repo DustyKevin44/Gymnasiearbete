@@ -81,18 +81,18 @@ public class PlayerSystem : EntityUpdateSystem
             if (_equipmentMapper.Has(entity))
             {
                 var equipment = _equipmentMapper.Get(entity);
-                if (player.IsActionJustPressed(StdActions.MainAttack) && equipment.TryGet("hand", out Entity WeaponEntity))
+                if (player.IsActionJustPressed(StdActions.MainAttack) && equipment.TryGet("hand", out Entity Weapon))
                 {
-                    if (WeaponEntity.Has<MeleeAttack>())
+                    if (Weapon.Has<MeleeAttack>())
                     {
-                        var melee = WeaponEntity.Get<MeleeAttack>();
+                        var melee = Weapon.Get<MeleeAttack>();
                         if (melee.IsOffCooldown(gameTime))
-                            Melee.Attack(WeaponEntity);
+                            Melee.Attack(Weapon);
                     }
 
-                    if (WeaponEntity.Has<RangedAttack>())
+                    if (Weapon.Has<RangedAttack>())
                     {
-                        var ranged = WeaponEntity.Get<RangedAttack>();
+                        var ranged = Weapon.Get<RangedAttack>();
                         if (ranged.IsOffCooldown(gameTime))
                             Ranged.Attack(ranged);
                     }

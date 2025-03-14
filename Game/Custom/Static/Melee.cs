@@ -26,6 +26,7 @@ public static class Melee
 
         /* Rules:
          *   1. melee.Cooldown must be larger than the MeleeTypes tween duration
+         *   2. transform should be relative the owner of the weapon
          */
 
         switch (melee.MeleeType)

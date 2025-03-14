@@ -17,19 +17,29 @@ public abstract class ColliderBox(IShapeF shape) : ICollisionActor
     public abstract void OnCollision(CollisionEventArgs collisionInfo);
 }
 
-public class HitBox(IShapeF shape) : ColliderBox(shape)
+public class HitBox : ColliderBox
 {
+    public HitBox(IShapeF shape) : base(shape)
+    {
+        Global.CollisionSystem.Insert(this);
+    }
+
     public override void OnCollision(CollisionEventArgs collisionInfo)
     {
         Console.WriteLine("Bonk!");
     }
 }
 
-public class HurtBox(IShapeF shape) : ColliderBox(shape)
+public class HurtBox : ColliderBox
 {
+    public HurtBox(IShapeF shape) : base(shape)
+    {
+        Global.CollisionSystem.Insert(this);
+    }
+
     public override void OnCollision(CollisionEventArgs collisionInfo)
     {
-
+        Console.WriteLine("Ouch!");
     }
 }
 
@@ -43,12 +53,10 @@ public class CollisionBox : ColliderBox
         Global.CollisionSystem.Insert(this);
     }
 
-    public void Initialize(Entity parent) => Parent = parent;
-
     public override void OnCollision(CollisionEventArgs collisionInfo)
     {
         if (!Parent.Has<Transform2>() || !Parent.Has<VelocityComponent>()) return;
-        if (collisionInfo.Other is not CollisionBox) return; // <-- TODO: Why doesn't this work!!?!
+        if (collisionInfo.Other is not CollisionBox) return;
 
         var transfrom = Parent.Get<Transform2>();
         transfrom.Position -= collisionInfo.PenetrationVector / 2f;
