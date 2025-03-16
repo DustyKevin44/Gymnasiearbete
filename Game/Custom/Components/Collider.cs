@@ -26,7 +26,6 @@ public class HitBox : ColliderBox
 
     public override void OnCollision(CollisionEventArgs collisionInfo)
     {
-        Console.WriteLine("Bonk!");
     }
 }
 
@@ -39,7 +38,6 @@ public class HurtBox : ColliderBox
 
     public override void OnCollision(CollisionEventArgs collisionInfo)
     {
-        Console.WriteLine("Ouch!");
     }
 }
 

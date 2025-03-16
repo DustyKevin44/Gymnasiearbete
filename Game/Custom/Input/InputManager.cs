@@ -53,7 +53,7 @@ public static class InputManager
         var mouseState = MouseExtended.GetState();
         MouseClicked = mouseState.LeftButton == ButtonState.Pressed && _lastMouseState.LeftButton == ButtonState.Released;
         MouseRightClicked = mouseState.RightButton == ButtonState.Pressed && _lastMouseState.RightButton == ButtonState.Released;
-        MouseRectangle = new(mouseState.Position.X/2, mouseState.Position.Y/2, 1, 1);
+        MouseRectangle = new(mouseState.Position.X, mouseState.Position.Y, 1, 1);
 
         // Save state for next frame
         _lastMouseState = mouseState;

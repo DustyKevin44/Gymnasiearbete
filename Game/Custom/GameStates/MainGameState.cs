@@ -15,6 +15,7 @@ using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
 using Game.Custom.Factories;
 using System.Linq;
+using Game.Custom.Debug;
 
 namespace Game.Custom.GameStates;
 
@@ -50,9 +51,10 @@ public class MainGameState : GameState
             .AddSystem(new AliveSystem())
             .AddSystem(new ProceduralAnimationSystem())
             .AddSystem(new TweenerSystem())
+            .AddSystem(new SpawnerSystem())
+            .AddSystem(new DebugSystem())
             .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch)) // <-- TODO: remove parameters and use Global instead
             .AddSystem(new DebugRenderSystem())
-            .AddSystem(new SpawnerSystem())
             .Build();
 
         Global.Initialize(_game, world, new Random(), collisionSystem, _content, _graphicsDevice, _spriteBatch);

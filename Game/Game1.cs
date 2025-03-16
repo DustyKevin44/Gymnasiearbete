@@ -3,6 +3,15 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using Game.Custom.GameStates;
+using MonoGameGum.GueDeriving;
+using RenderingLibrary;
+using System.Linq;
+using GumRuntime;
+using System;
+using Gum.Wireframe;
+using MonoGameGum.Forms.Controls;
+using MonoGameGum.Forms;
+using System.Collections.Generic;
 
 namespace Game;
 
@@ -15,6 +24,9 @@ public class Game : Microsoft.Xna.Framework.Game
     // Game states
     private GameState _currentState;
     private GameState _nextState;
+
+    // GUI
+    public GraphicalUiElement Root;
 
     public void ChangeState(GameState state) { _nextState = state; }
 
@@ -36,12 +48,20 @@ public class Game : Microsoft.Xna.Framework.Game
         _graphics.PreferredBackBufferHeight = WindowSize.Y;
         _graphics.ApplyChanges();
 
+        // Gum GUI
+        var project = MonoGameGum.GumService.Default.Initialize(this, "GumProject/GumProject.gumx");
+        var screen = project.Screens.Find(item => item.Name == "TitleScreen"); // Loads the title screen
+        Root = screen.ToGraphicalUiElement(SystemManagers.Default, true);
+
+        var button = Root.GetFrameworkElementByName<Button>("ButtonStandardInstance");
+        button.Click += (_, _) => Root = project.Screens.Find(item => item.Name == "Main").ToGraphicalUiElement(SystemManagers.Default, true);
+
         base.Initialize();
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
             Exit();
 
         // State logic
@@ -54,15 +74,16 @@ public class Game : Microsoft.Xna.Framework.Game
         _currentState.Update(gameTime);
         _currentState.PostUpdate(gameTime);
         
+        MonoGameGum.GumService.Default.Update(this, gameTime, Root);
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
-        // Draw state
-        _currentState.Draw(gameTime, _spriteBatch);
-
+        _currentState.Draw(gameTime, _spriteBatch);  // Draw state
+        
+        MonoGameGum.GumService.Default.Draw();
         base.Draw(gameTime);
     }
 }
