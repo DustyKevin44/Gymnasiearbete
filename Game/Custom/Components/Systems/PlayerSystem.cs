@@ -25,6 +25,7 @@ public class PlayerSystem : EntityUpdateSystem
     private ComponentMapper<PlayerComponent<StdActions>> _playerMapper;
     private ComponentMapper<VelocityComponent> _velocityMapper;
     private ComponentMapper<Equipment> _equipmentMapper;
+    private ComponentMapper<Transform2> _transformMapper;
 
     public PlayerSystem() : base(Aspect.All(typeof(PlayerComponent<StdActions>), typeof(VelocityComponent))) { }
 
@@ -33,10 +34,17 @@ public class PlayerSystem : EntityUpdateSystem
         _playerMapper = mapperService.GetMapper<PlayerComponent<StdActions>>();
         _velocityMapper = mapperService.GetMapper<VelocityComponent>();
         _equipmentMapper = mapperService.GetMapper<Equipment>();
+        _transformMapper = mapperService.GetMapper<Transform2>();
     }
 
     public override void Update(GameTime gameTime)
     {
+        int host = ActiveEntities.FirstOrDefault(-1);
+        if (host != -1 && _transformMapper.Has(host))
+        {
+            Global.Camera.LookAt(_transformMapper.Get(host).Position);
+        }
+
         foreach (int entity in ActiveEntities)
         {
             var player = _playerMapper.Get(entity);

@@ -91,7 +91,7 @@ public static class EntityFactory
         slime.Attach(slimeCollision);
         
         slime.Attach(new Skeleton([
-            new ChainComponent(Vector2.Zero, Global.Players.First(), [
+            new ChainComponent(Vector2.Zero, Global.Players.FirstOrDefault(), [
                 new Joint(Vector2.Zero, 10f, 0f),
                 new Joint(Vector2.Zero, 10f, 0f),
                 new Joint(Vector2.Zero, 10f, 0f),

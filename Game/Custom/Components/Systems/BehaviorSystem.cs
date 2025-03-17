@@ -37,10 +37,12 @@ public class BehaviorSystem : EntityUpdateSystem
             {
                 if (behavior.Type == 0) // Turn to next which is 1, 1 is idle
                 {
+                    Console.WriteLine("Now turning to idle");
+
                     velocity.Velocity += new Vector2(60, 60);
                     behavior.Type = 1;
                     behavior.Elapsed = TimeSpan.Zero;
-                    Console.WriteLine("Now turning to idle");
+                    
                     if (_animatedSpriteMapper.Has(entity))
                     {
                         AnimatedSprite animation = _animatedSpriteMapper.Get(entity);
@@ -64,32 +66,19 @@ public class BehaviorSystem : EntityUpdateSystem
 
             if (behavior.Type == 0)
             {
-                try
+                if (_transformMapper.Has(behavior.Target.Id) && behavior.Target.Has<SpriteComponent>())
                 {
-
-                    if (_transformMapper.Has(behavior.Target.Id))
-                    {
-                        // Åk mot spelaren. 
-                        var delta = behavior.Target.Get<Transform2>().Position - transform.Position - behavior.Target.Get<SpriteComponent>().Texture.Bounds.Center.ToVector2();
-                        Random rnd = new Random();
-                        if (delta != Vector2.Zero)
-                            delta.Normalize();
-                        velocity.Velocity += delta * gameTime.GetElapsedSeconds() * 200 * rnd.Next(10, 12);
-                    }
-                }
-                catch
-                {
-                    Console.WriteLine("Error" + behavior.Target);
+                    // Go towards target
+                    var delta = behavior.Target.Get<Transform2>().Position - transform.Position - behavior.Target.Get<SpriteComponent>().Texture.Bounds.Center.ToVector2();
+                    if (delta != Vector2.Zero)
+                        delta.Normalize();
+                    velocity.Velocity += delta * gameTime.GetElapsedSeconds() * 200 * Global.Random.Next(10, 12);
                 }
             }
-            else if (behavior.Type == 2)
+            else if (behavior.Type == 2 && behavior.Target is not null && behavior.Target.Has<Transform2>())
             {
-                Random rnd = new Random();
-
-                Vector2 vel;
-                rnd.NextUnitVector(out vel);
+                Global.Random.NextUnitVector(out Vector2 vel);
                 velocity.Velocity += vel * 100 * gameTime.GetElapsedSeconds();
-
 
                 //velocity.Velocity += new Vector2(rnd.Next(-1000, 1000), rnd.Next(-1000, 1000));
                 var delta = behavior.Target.Get<Transform2>().Position - transform.Position;
@@ -99,9 +88,7 @@ public class BehaviorSystem : EntityUpdateSystem
                     Console.WriteLine("Now found player");
                     behavior.Type = 0;
                 }
-
             }
-
         }
     }
 }

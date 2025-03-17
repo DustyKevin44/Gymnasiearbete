@@ -53,9 +53,6 @@ public class Game : Microsoft.Xna.Framework.Game
         var screen = project.Screens.Find(item => item.Name == "TitleScreen"); // Loads the title screen
         Root = screen.ToGraphicalUiElement(SystemManagers.Default, true);
 
-        var button = Root.GetFrameworkElementByName<Button>("ButtonStandardInstance");
-        button.Click += (_, _) => Root = project.Screens.Find(item => item.Name == "Main").ToGraphicalUiElement(SystemManagers.Default, true);
-
         base.Initialize();
     }
 
@@ -71,10 +68,11 @@ public class Game : Microsoft.Xna.Framework.Game
             _nextState = null;
         }
 
+        MonoGameGum.GumService.Default.Update(this, gameTime, Root);
+
         _currentState.Update(gameTime);
         _currentState.PostUpdate(gameTime);
         
-        MonoGameGum.GumService.Default.Update(this, gameTime, Root);
         base.Update(gameTime);
     }
 

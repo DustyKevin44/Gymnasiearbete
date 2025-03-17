@@ -41,6 +41,7 @@ public class MainGameState : GameState
         collisionSystem.Initialize();
 
         _spriteBatch = new SpriteBatch(_graphicsDevice);
+        Global.Initialize(_game, new Random(), collisionSystem, _content, _graphicsDevice, _spriteBatch);
 
         // Initialize the world
         World world = new WorldBuilder()
@@ -57,7 +58,7 @@ public class MainGameState : GameState
             .AddSystem(new DebugRenderSystem())
             .Build();
 
-        Global.Initialize(_game, world, new Random(), collisionSystem, _content, _graphicsDevice, _spriteBatch);
+        Global.SetWorld(world);
 
         Global.ContentLibrary.Sprites["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
         var player = EntityFactory.CreatePlayerAt(Vector2.Zero);
@@ -146,11 +147,6 @@ public class MainGameState : GameState
 
     public override void Update(GameTime gameTime)
     {
-
-        // Update the camera's position with scaled movement direction
-        var playerPos = Global.Players.First().Get<Transform2>().Position;
-        Global.Camera.LookAt(playerPos); // <-- should be in Global.World.Update() probably
-
         Global.World.Update(gameTime);
         InputManager.Update();
     }

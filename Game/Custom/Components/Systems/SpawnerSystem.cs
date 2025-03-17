@@ -25,7 +25,6 @@ public class SpawnerSystem : EntityUpdateSystem
     {
         foreach (var entity in ActiveEntities)
         {
-            Console.WriteLine(entity);
             SpawnerComponent spawner = _spawnerMapper.Get(entity);
             if (spawner.Elapsed.Seconds >= spawner.NextSpawn)
             {

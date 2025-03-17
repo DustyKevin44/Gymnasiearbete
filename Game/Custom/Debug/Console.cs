@@ -5,12 +5,17 @@ using System.Reflection;
 using Game.Custom.Components;
 using Game.Custom.Components.Systems;
 using Game.Custom.Input;
+using Gum.Wireframe;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using MonoGame.Extended.Graphics;
+using MonoGameGum;
+using MonoGameGum.Forms;
+using MonoGameGum.Forms.Controls;
+using RenderingLibrary;
 
 namespace Game.Custom.Debug;
 
@@ -33,13 +38,21 @@ public class DebugSystem() : EntitySystem(Aspect.All(typeof(Transform2))), IUpda
         _animatedMapper = mapperService.GetMapper<AnimatedSprite>();
 
         _possibleComponentTypes = [.. Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && !t.IsAbstract)];
+        var button = Global.Game.Root.GetFrameworkElementByName<Button>("ButtonStandardInstance");
+        button.Click += (_, _) => { _selectedEntity?.Destroy(); _selectedEntity = null; };
     }
 
     public void Update(GameTime gameTime)
     {
         if (!InputManager.MouseClicked)
             return;
-        
+
+        if (GumService.Default.Cursor.WindowOver is GraphicalUiElement element)
+        {
+            Console.WriteLine(element.Name);
+            return;
+        }
+
         var mousePosition = InputManager.MouseRectangle.Location.ToVector2();
         var worldPosition = Global.Camera.ScreenToWorld(mousePosition);
 
