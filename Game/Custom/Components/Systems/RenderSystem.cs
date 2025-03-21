@@ -1,4 +1,4 @@
-using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -8,12 +8,8 @@ using MonoGame.Extended.Graphics;
 
 namespace Game.Custom.Components.Systems;
 
-public class RenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
-    : EntityDrawSystem(Aspect.All(typeof(Transform2)).One(typeof(SpriteComponent), typeof(AnimatedSprite)))
+public class RenderSystem() : EntityDrawSystem(Aspect.All(typeof(Transform2)).One(typeof(SpriteComponent), typeof(AnimatedSprite)))
 {
-    private readonly GraphicsDevice _graphicsDevice = graphicsDevice;
-    private readonly SpriteBatch _spriteBatch = spriteBatch;
-
     private ComponentMapper<Transform2> _transformMapper;
     private ComponentMapper<SpriteComponent> _spriteMapper;
     private ComponentMapper<AnimatedSprite> _animatedSpriteMapper;
@@ -35,37 +31,38 @@ public class RenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch
         foreach (var entity in ActiveEntities)
         {
             // Don't draw items that are inside an inventory
-            if (_itemMapper.Has(entity) && _itemMapper.Get(entity).InInventory) continue;
+            if (_itemMapper.Has(entity) && _itemMapper.Get(entity).InInventory)
+                continue;
 
-            Vector2 localPosition = Vector2.Zero;
-            float localRotation = 0f;
-            Vector2 localScale = Vector2.One;
+            var offset = new Transform2();
 
             if (_equipableMapper.Has(entity))
             {
                 var eq = _equipableMapper.Get(entity);
-                localPosition += eq.LocalTransform.Position;
-                localRotation += eq.LocalTransform.Rotation;
-                localScale *= eq.LocalTransform.Scale;
+                if (eq.Parent is not null && eq.Parent.Has<Transform2>())
+                {
+                    offset = eq.Parent.Get<Transform2>();
+                }
             }
 
             var transform = _transformMapper.Get(entity);
-            var sprite = _spriteMapper.Get(entity);
             
             if (_spriteMapper.Has(entity))
             {
+                var sprite = _spriteMapper.Get(entity);
+
                 // Draw each entity using its sprite and transform
-                _spriteBatch.Draw(
+                Global.SpriteBatch.Draw(
                     sprite.Texture,
-                    transform.Position + localPosition,
+                    transform.Position + offset.Position,
                     null,                                   // Source rectangle (null uses the whole texture)
                     Color.White,                            // Tint color
-                    localRotation,                          // Rotation
+                    transform.Rotation + offset.Rotation,   // Rotation
                     new Vector2(
                         sprite.Texture.Width / 2f,
                         sprite.Texture.Height / 2f
                     ),                                      // Origin (center of the texture)
-                    transform.Scale * localScale,           // Scale factor
+                    transform.Scale * offset.Scale,         // Scale factor
                     SpriteEffects.None,                     // Effects
                     0f                                      // Layer depth
                 );
@@ -74,7 +71,7 @@ public class RenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch
             {
                 var animsprite = _animatedSpriteMapper.Get(entity);
                 animsprite.Update(gameTime);
-                _spriteBatch.Draw(animsprite, transform.Position + localPosition, localRotation, localScale);
+                Global.SpriteBatch.Draw(animsprite, transform.Position + offset.Position, transform.Rotation + offset.Rotation, transform.Scale * offset.Scale);
             }
         }
     }

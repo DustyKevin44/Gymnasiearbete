@@ -49,10 +49,8 @@ public sealed class Global
     public static GraphicsDevice GraphicsDevice { get => Instance._graphicsDevice; set => Instance._graphicsDevice = value; }
     public static SpriteBatch SpriteBatch { get => Instance._spriteBatch; set => Instance._spriteBatch = value; }
 
-    public static void SetWorld(World world)
-    {
-        Instance._world = world;
-    }
+    public static void SetWorld(World world) => Instance._world = world;
+    public static void Unload() => instance = null;
 }
 
 

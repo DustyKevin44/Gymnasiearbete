@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Game.Custom.Components;
@@ -35,11 +34,15 @@ public static class EntityFactory
             Global.Game.ChangeState(new MenuState(Global.Game, Global.GraphicsDevice, Global.ContentManager)); // TODO: Fix menu, just ends it right now.
         }
 
+        var equipment = new Equipment(["hand"]);
+        var collisionBox = new CollisionBox(new RectangleF(0, 0, 20, 20));
+
         var player = Global.World.CreateEntity();
         player.Attach(new Transform2(position));
         player.Attach(new VelocityComponent(Vector2.Zero));
         player.Attach(new SpriteComponent(Global.ContentLibrary.Sprites["player"]));
-        player.Attach(new CollisionBox(new RectangleF(0, 0, 20, 20)));
+        player.Attach(collisionBox);
+        player.Attach(equipment);
         player.Attach(new PlayerComponent<StdActions>(
             "Player", new Dictionary<StdActions, Keybind> {
                 { StdActions.MOVE_UP,    new Keybind(key: Keys.W) },
@@ -53,10 +56,10 @@ public static class EntityFactory
                 { StdActions.MainAttack, new Keybind(mouseButton: MouseButton.Left) }
             })
         );
-        player.Attach(new Equipment(["hand"]));
 
         Global.Players.Add(player);
-        player.Get<CollisionBox>().Parent = player;
+        equipment.Parent = player;
+        collisionBox.Parent = player;
         return player;
     }
 
@@ -74,7 +77,6 @@ public static class EntityFactory
         sword.Attach(new SpriteComponent(Global.ContentLibrary.Sprites["player"]));
 
         hitbox.Parent = sword;
-        equipable.Entity = sword;
         return sword;
     }
 

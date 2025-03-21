@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
-using MonoGame.Extended;
+using Game.Custom.Utilities;
 using MonoGame.Extended.ECS;
 
 namespace Game.Custom.Components;
 
 
-public class Equipable(Transform2 localTransform = null, Action<float> effect = null)
+public class Equipable(Action<float> effect = null)
 {
-    public Entity Entity;
-    public Transform2 LocalTransform = localTransform ?? new();
+    public Entity Parent;
     public Action<float> Effect = effect;
 }
 
@@ -24,6 +23,7 @@ public class EquipmentSlot
 public class Equipment
 {
     private readonly Dictionary<string, EquipmentSlot> _equipment = [];
+    public Entity Parent;
     public int Slots;
 
     public Equipment(List<string> slots)
@@ -42,10 +42,12 @@ public class Equipment
 
     public bool Equip(string slot, Entity entity)
     {
-        if (_equipment.TryGetValue(slot, out EquipmentSlot eq) && eq is not null)
+        if (_equipment.TryGetValue(slot, out EquipmentSlot eqSlot) && eqSlot is not null)
         {
-            if (!entity.Has<Equipable>()) return false;
-            eq.Entity = entity;
+            if (!Utils.TryGet(entity, out Equipable eq)) return false; // is Entity equipable
+            if (eq.Parent is not null) return false; // Already equiped by an entity
+            eq.Parent = Parent;
+            eqSlot.Entity = entity;
             return true;
         }
         return false;

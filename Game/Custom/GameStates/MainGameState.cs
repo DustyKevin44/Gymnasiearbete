@@ -14,7 +14,6 @@ using MonoGame.Extended.ECS;
 using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
 using Game.Custom.Factories;
-using System.Linq;
 using Game.Custom.Debug;
 
 namespace Game.Custom.GameStates;
@@ -37,6 +36,8 @@ public class MainGameState : GameState
 
     private void Initialize(GraphicsDevice _graphicsDevice)
     {
+        Global.Unload();
+
         var collisionSystem = new CollisionComponent(new RectangleF(int.MinValue / 2, int.MinValue / 2, int.MaxValue, int.MaxValue));
         collisionSystem.Initialize();
 
@@ -54,11 +55,11 @@ public class MainGameState : GameState
             .AddSystem(new TweenerSystem())
             .AddSystem(new SpawnerSystem())
             .AddSystem(new DebugSystem())
-            .AddSystem(new RenderSystem(_graphicsDevice, _spriteBatch)) // <-- TODO: remove parameters and use Global instead
+            .AddSystem(new RenderSystem())
             .AddSystem(new DebugRenderSystem())
             .Build();
 
-        Global.SetWorld(world);
+        Global.SetWorld(world); // <-- some systems need Globals and thus this is here
 
         Global.ContentLibrary.Sprites["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
         var player = EntityFactory.CreatePlayerAt(Vector2.Zero);
@@ -96,17 +97,14 @@ public class MainGameState : GameState
         }
 
         var obstacle = Global.World.CreateEntity();
-        obstacle.Attach(new Transform2(new(500, 500)));
-        obstacle.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f)));
+        obstacle.Attach(new Transform2(new(100, 100)));
+        obstacle.Attach(new CollisionBox(new RectangleF(10f, 10f, 50f, 50f)));
+        obstacle.Attach(new HurtBox(new RectangleF(0, 0, 50, 50)));
         obstacle.Get<CollisionBox>().Parent = obstacle;
-
-        var obstacle2 = Global.World.CreateEntity();
-        obstacle2.Attach(new Transform2(new(100, 100)));
-        obstacle2.Attach(new CollisionBox(new RectangleF(0f, 0f, 50f, 50f)));
-        obstacle2.Get<CollisionBox>().Parent = obstacle2;
         
-        var slimeSpawner = Global.World.CreateEntity();
-        slimeSpawner.Attach(new SpawnerComponent(new(0,0), new(500,500), new("slime"), 1f));
+        // var slimeSpawner = Global.World.CreateEntity();
+        // slimeSpawner.Attach(new SpawnerComponent(new(0,0), new(500,500), new("slime"), 1f));
+
         // Load the Tiled map
         _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file
 

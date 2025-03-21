@@ -60,7 +60,6 @@ public class PlayerSystem : EntityUpdateSystem
                 velocity.Velocity = player.Direction * 400f;
                 continue;
             }
-
             Vector2 direction = InputManager.GetDirection(
                 player.GetKey(StdActions.MOVE_UP),
                 player.GetKey(StdActions.MOVE_DOWN),
@@ -69,7 +68,6 @@ public class PlayerSystem : EntityUpdateSystem
             );
             if (direction != Vector2.Zero)
                 direction.Normalize();
-
             player.Direction = direction;
 
             velocity.Velocity += direction * 1000f * gameTime.GetElapsedSeconds();
@@ -89,6 +87,7 @@ public class PlayerSystem : EntityUpdateSystem
             if (_equipmentMapper.Has(entity))
             {
                 var equipment = _equipmentMapper.Get(entity);
+
                 if (player.IsActionJustPressed(StdActions.MainAttack) && equipment.TryGet("hand", out Entity Weapon))
                 {
                     if (Weapon.Has<MeleeAttack>())
