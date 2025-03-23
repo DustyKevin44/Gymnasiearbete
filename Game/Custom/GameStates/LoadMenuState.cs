@@ -1,16 +1,22 @@
+using System;
+using Game.Custom.Saving;
 using Game.Custom.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using System;
 using MonoGame.Extended.Graphics;
-using Game.Custom;
+
 namespace Game.Custom.GameStates;
+
 
 public class LoadMenuState : GameState
 {
-    private readonly List<UIElement> UI;
+    private readonly List<UIElement> _UI;
+    private SaveManager _saveManager = new();
+    private List<string> _saves;
+    private int _selectedIndex = 0;
+
 
     public LoadMenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
     {
@@ -27,60 +33,67 @@ public class LoadMenuState : GameState
         SpriteFont buttonFont = _content.Load<SpriteFont>("Fonts/Font");
         SpriteBatch _spriteBatch = new SpriteBatch(graphicsDevice);
         AnimatedSprite buttonSprite = new AnimatedSprite(buttonSpriteSheet, "idle");
-        #region Save variables
-        private SaveManager saveManager = new SaveManager;
-        private List<string> saves;
-        private int selectedIndex = 0;
-        saves = saveManager.GetSaves(); // Get all saves
-        #endregion
-        for 
-        
 
-        var LoadSaveOneGameButton = new Button(buttonSprite, buttonFont)
+        _saves = _saveManager.GetSaves(); // Get all saves
+
+        var LoadSaveOneButton = new Button(buttonSprite, buttonFont)
         {
-            Position = new Vector2(300, 300),
-            Text = "Quit"
+            Position = new Vector2(300, 200),
+            Text = "Save 1"
         };
 
-        LoadSaveOneGameButton.Click += LoadSaveOneGameButton_Click;
+        LoadSaveOneButton.Click += LoadSaveOneButton_Click;
 
-        var LoadSaveTwoGameButton = new Button(buttonSprite, buttonFont)
+        var LoadSaveTwoButton = new Button(buttonSprite, buttonFont)
         {
-            Position = new Vector2(300, 300),
-            Text = "Quit"
+            Position = new Vector2(300, 250),
+            Text = "Save 2"
         };
 
-        LoadSaveTwoGameButton.Click += LoadSaveTwoGameButton_Click;
+        LoadSaveTwoButton.Click += LoadSaveTwoButton_Click;
 
-        var LoadSaveThreeGameButton = new Button(buttonSprite, buttonFont)
+        var LoadSaveThreeButton = new Button(buttonSprite, buttonFont)
         {
             Position = new Vector2(300, 300),
-            Text = "Quit"
+            Text = "Save 3"
         };
 
-        LoadSaveThreeGameButton.Click += LoadSaveThreeGameButton_Click;
+        LoadSaveThreeButton.Click += LoadSaveThreeButton_Click;
 
-        UI = [
-            LoadSaveThreeGameButton,
-            LoadSaveTwoGameButton,
-            LoadSaveOneGameButton,
+        var BackButton = new Button(buttonSprite, buttonFont)
+        {
+            Position = new Vector2(300, 400),
+            Text = "Go back"
+        };
+
+        BackButton.Click += BackButton_Click;
+
+        _UI = [
+            BackButton,
+            LoadSaveThreeButton,
+            LoadSaveTwoButton,
+            LoadSaveOneButton,
         ];
     }
 
-    private void LoadSaveTwoGameButton_Click(object sender, EventArgs e)
+    private void LoadSaveThreeButton_Click(object sender, EventArgs e)
     {
-        Console.WriteLine("Load game");
+        Console.WriteLine("Load game 3");
     }
 
-    private void LoadSaveOneGameButton_Click(object sender, EventArgs e)
+    private void LoadSaveTwoButton_Click(object sender, EventArgs e)
     {
-        Console.WriteLine("Load game");
+        Console.WriteLine("Load game 2");
     }
 
-    private void LoadSaveThreeGameButton_Click(object sender, EventArgs e)
+    private void LoadSaveOneButton_Click(object sender, EventArgs e)
     {
-        _game.Exit();
-        Console.WriteLine("Exit game");
+        Console.WriteLine("Load game 1");
+    }
+
+    private void BackButton_Click(object sender, EventArgs e)
+    {
+        _game.ChangeState(new MenuState(_game, _graphicsDevice, _content));
     }
 
 
@@ -88,7 +101,7 @@ public class LoadMenuState : GameState
     {
         spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp);
 
-        foreach (UIElement element in UI)
+        foreach (UIElement element in _UI)
         {
             element.Draw(gameTime, spriteBatch);
         }
@@ -102,7 +115,7 @@ public class LoadMenuState : GameState
 
     public override void Update(GameTime gameTime)
     {
-        foreach (UIElement element in UI)
+        foreach (UIElement element in _UI)
         {
             element.Update(gameTime);
         }

@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-namespace Game.Custom;
+
+namespace Game.Custom.Saving;
 
 public class SaveManager
 {
@@ -16,7 +16,7 @@ public class SaveManager
     // Get all saves
     public List<string> GetSaves()
     {
-        List<string> saveFiles = new List<string>();
+        List<string> saveFiles = [];
 
         string[] files = Directory.GetFiles(saveDirectory, "*.db");
         foreach (string file in files)

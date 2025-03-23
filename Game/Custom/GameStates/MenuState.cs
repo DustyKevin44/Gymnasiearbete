@@ -10,7 +10,7 @@ namespace Game.Custom.GameStates;
 
 public class MenuState : GameState
 {
-    private readonly List<UIElement> UI;
+    private readonly List<UIElement> _UI;
 
     public MenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
     {
@@ -52,7 +52,7 @@ public class MenuState : GameState
 
         quitGameButton.Click += QuitGameButton_Click;
 
-        UI = [
+        _UI = [
             newGameButton,
             loadGameButton,
             quitGameButton,
@@ -67,7 +67,7 @@ public class MenuState : GameState
 
     private void LoadGameButton_Click(object sender, EventArgs e)
     {
-        Console.WriteLine("Load game");
+        _game.ChangeState(new LoadMenuState(_game, _graphicsDevice, _content));
     }
 
     private void QuitGameButton_Click(object sender, EventArgs e)
@@ -80,7 +80,7 @@ public class MenuState : GameState
     {
         spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp);
 
-        foreach (UIElement element in UI)
+        foreach (UIElement element in _UI)
         {
             element.Draw(gameTime, spriteBatch);
         }
@@ -94,7 +94,7 @@ public class MenuState : GameState
 
     public override void Update(GameTime gameTime)
     {
-        foreach (UIElement element in UI)
+        foreach (UIElement element in _UI)
         {
             element.Update(gameTime);
         }
