@@ -33,6 +33,18 @@ public class LoadMenuState : GameState
         AnimatedSprite buttonSprite = new AnimatedSprite(buttonSpriteSheet, "idle");
 
         _saves = _saveManager.GetSaves(); // Get all saves
+        Console.WriteLine("te: " + _saves.Capacity);
+        //_saveManager.InitializeDatabase(_saves[0]);
+
+                
+        // Add Items
+      
+        // Retrieve Items
+        var items = _saveManager.GetItems(_saves[0]);
+        foreach (var item in items)
+        {
+            Console.WriteLine($"Item: {item.Name}, Quantity: {item.Quantity}, Place: {item.Place}");
+        }
 
         var LoadSaveOneButton = new Button(buttonSprite, buttonFont)
         {
