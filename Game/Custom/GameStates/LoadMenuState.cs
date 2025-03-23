@@ -16,8 +16,6 @@ public class LoadMenuState : GameState
     private SaveManager _saveManager = new();
     private List<string> _saves;
     private int _selectedIndex = 0;
-
-
     public LoadMenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
     {
         Texture2D buttonSheet = content.Load<Texture2D>("ButtonSheet");
@@ -39,7 +37,7 @@ public class LoadMenuState : GameState
         var LoadSaveOneButton = new Button(buttonSprite, buttonFont)
         {
             Position = new Vector2(300, 200),
-            Text = "Save 1"
+            Text = (_saves != null && _saves.Count > 0) ? "Save: " + _saves[0] : "Save slot empty"
         };
 
         LoadSaveOneButton.Click += LoadSaveOneButton_Click;
@@ -47,7 +45,7 @@ public class LoadMenuState : GameState
         var LoadSaveTwoButton = new Button(buttonSprite, buttonFont)
         {
             Position = new Vector2(300, 250),
-            Text = "Save 2"
+            Text = (_saves != null && _saves.Count > 1) ? "Save: " + _saves[1] : "Save slot empty"
         };
 
         LoadSaveTwoButton.Click += LoadSaveTwoButton_Click;
@@ -55,7 +53,7 @@ public class LoadMenuState : GameState
         var LoadSaveThreeButton = new Button(buttonSprite, buttonFont)
         {
             Position = new Vector2(300, 300),
-            Text = "Save 3"
+            Text = (_saves != null && _saves.Count > 2) ? "Save: " + _saves[2] : "Save slot empty"  
         };
 
         LoadSaveThreeButton.Click += LoadSaveThreeButton_Click;
@@ -78,17 +76,38 @@ public class LoadMenuState : GameState
 
     private void LoadSaveThreeButton_Click(object sender, EventArgs e)
     {
-        Console.WriteLine("Load game 3");
+        if(_saves is not null)
+        {
+            Console.WriteLine("Save:" + _saves[2]);
+        }else
+        {
+        Console.WriteLine("Save slot empty");
+
+        }
     }
 
     private void LoadSaveTwoButton_Click(object sender, EventArgs e)
     {
-        Console.WriteLine("Load game 2");
+        if(_saves is not null)
+        {
+            Console.WriteLine("Save:" + _saves[1]);
+        }else
+        {
+        Console.WriteLine("Save slot empty");
+
+        }
     }
 
     private void LoadSaveOneButton_Click(object sender, EventArgs e)
     {
-        Console.WriteLine("Load game 1");
+        if(_saves is not null)
+        {
+            Console.WriteLine("Save:" + _saves[0]);
+        }else
+        {
+        Console.WriteLine("Save slot empty");
+
+        }
     }
 
     private void BackButton_Click(object sender, EventArgs e)
