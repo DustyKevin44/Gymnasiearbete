@@ -1,9 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Game.Custom.Components;
-using Game.Custom.Components.Systems;
 using Game.Custom.Input;
 using Gum.Wireframe;
 using Microsoft.Xna.Framework;
@@ -15,7 +11,6 @@ using MonoGame.Extended.Graphics;
 using MonoGameGum;
 using MonoGameGum.Forms;
 using MonoGameGum.Forms.Controls;
-using RenderingLibrary;
 
 namespace Game.Custom.Debug;
 
@@ -27,7 +22,6 @@ public class DebugSystem() : EntitySystem(Aspect.All(typeof(Transform2))), IUpda
     private ComponentMapper<SpriteComponent> _spriteMapper;
     private ComponentMapper<AnimatedSprite> _animatedMapper;
 
-    private List<Type> _possibleComponentTypes;
     private Entity _selectedEntity;
 
     public override void Initialize(IComponentMapperService mapperService)
@@ -37,7 +31,6 @@ public class DebugSystem() : EntitySystem(Aspect.All(typeof(Transform2))), IUpda
         _spriteMapper = mapperService.GetMapper<SpriteComponent>();
         _animatedMapper = mapperService.GetMapper<AnimatedSprite>();
 
-        _possibleComponentTypes = [.. Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && !t.IsAbstract)];
         var button = Global.Game.Root.GetFrameworkElementByName<Button>("ButtonStandardInstance");
         button.Click += (_, _) => { _selectedEntity?.Destroy(); _selectedEntity = null; };
     }
@@ -47,7 +40,7 @@ public class DebugSystem() : EntitySystem(Aspect.All(typeof(Transform2))), IUpda
         if (!InputManager.MouseClicked)
             return;
 
-        if (GumService.Default.Cursor.WindowOver is GraphicalUiElement element)
+        if (GumService.Default.Cursor.WindowOver is GraphicalUiElement element) // Ignore clicks that are on UI elements
         {
             Console.WriteLine(element.Name);
             return;
@@ -83,9 +76,7 @@ public class DebugSystem() : EntitySystem(Aspect.All(typeof(Transform2))), IUpda
     public void Draw(GameTime gameTime)
     {
         if (_selectedEntity is null)
-        {
             return;
-        }
 
         var relBBox = GetRelativeBBox(_selectedEntity.Id);
         Global.SpriteBatch.DrawRectangle(relBBox.Position + _selectedEntity.Get<Transform2>().Position - relBBox.Size / 2, relBBox.Size, Color.DeepPink, 2f);

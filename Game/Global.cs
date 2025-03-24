@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Game.Custom.Debug;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -37,7 +38,9 @@ public sealed class Global
     private GraphicsDevice _graphicsDevice; 
     private SpriteBatch _spriteBatch;
     private readonly List<Entity> _players = [];
+    private readonly DebugCommands _console = new();
 
+    public static DebugCommands Console { get => Instance._console; }
     public static List<Entity> Players { get => Instance._players; }
     public static World World { get => Instance._world; set => Instance._world = value; }
     public static Game Game { get => Instance._game; set => Instance._game = value; }
@@ -56,23 +59,17 @@ public sealed class Global
 
 public class ContentLibrary
 {
-    public Dictionary<string, Texture2D> Sprites = [];
+    public Dictionary<string, Texture2D> Textures = [];
     public Dictionary<string, SpriteSheet> Animations = [];
-    public Dictionary<string, Texture2DAtlas> Atlas = [];
 
-    public void SaveSprite(Texture2D texture, string Name)
+    public void SaveTexture(Texture2D texture, string Name)
     {
-        Sprites[Name] = texture;
+        Textures[Name] = texture;
     }
 
     public void SaveAnimation(SpriteSheet spriteSheet, string Name)
     {
         Animations[Name] = spriteSheet;
-    }
-
-    public void SaveAtlas(Texture2DAtlas atlas, string Name)
-    {
-        Atlas[Name] = atlas;
     }
 }
 
