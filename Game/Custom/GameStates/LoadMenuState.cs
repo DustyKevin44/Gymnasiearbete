@@ -40,11 +40,11 @@ public class LoadMenuState : GameState
         // Add Items
       
         // Retrieve Items
-        var items = _saveManager.GetItems(_saves[0]);
-        foreach (var item in items)
-        {
-            Console.WriteLine($"Item: {item.Name}, Quantity: {item.Quantity}, Place: {item.Place}");
-        }
+        // var items = _saveManager.GetItems(_saves[0]);
+        // foreach (var item in items)
+        // {
+        //     Console.WriteLine($"Item: {item.Name}, Quantity: {item.Quantity}, Place: {item.Place}");
+        // }
 
         var LoadSaveOneButton = new Button(buttonSprite, buttonFont)
         {

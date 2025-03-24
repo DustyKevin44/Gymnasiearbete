@@ -61,7 +61,10 @@ public class MainGameState : GameState
 
         Global.SetWorld(world); // <-- some systems need Globals and thus this is here
 
-        Global.ContentLibrary.Sprites["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
+        var swordsTexture = _content.Load<Texture2D>("swords");
+        Global.ContentLibrary.SaveTexture(swordsTexture, "swords");
+
+        Global.ContentLibrary.Textures["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
         var player = EntityFactory.CreatePlayerAt(Vector2.Zero);
         var eq = player.Get<Equipment>();
         eq.Equip("hand", EntityFactory.CreateSwordAt(Vector2.Zero));

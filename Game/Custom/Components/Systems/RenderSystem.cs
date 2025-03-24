@@ -55,7 +55,7 @@ public class RenderSystem() : EntityDrawSystem(Aspect.All(typeof(Transform2)).On
                 Global.SpriteBatch.Draw(
                     sprite.Texture,
                     transform.Position + offset.Position,
-                    null,                                   // Source rectangle (null uses the whole texture)
+                    sprite.SourceRectangle,                 // Source rectangle (null uses the whole texture)
                     Color.White,                            // Tint color
                     transform.Rotation + offset.Rotation,   // Rotation
                     new Vector2(

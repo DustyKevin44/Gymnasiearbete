@@ -40,7 +40,7 @@ public static class EntityFactory
         var player = Global.World.CreateEntity();
         player.Attach(new Transform2(position));
         player.Attach(new VelocityComponent(Vector2.Zero));
-        player.Attach(new SpriteComponent(Global.ContentLibrary.Sprites["player"]));
+        player.Attach(new SpriteComponent(Global.ContentLibrary.Textures["player"]));
         player.Attach(collisionBox);
         player.Attach(equipment);
         player.Attach(new PlayerComponent<StdActions>(
@@ -67,14 +67,15 @@ public static class EntityFactory
     {
         var equipable = new Equipable();
         var hitbox = new HitBox(new RectangleF(0, 0, 20, 20));
+        var swordSprite = Global.ContentLibrary.Textures["swords"];
 
         var sword = Global.World.CreateEntity();
         sword.Attach(new Transform2(position));
-        sword.Attach(new Item(Global.ContentLibrary.Sprites["player"]));
+        sword.Attach(new Item(Global.ContentLibrary.Textures["swords"]));
         sword.Attach(equipable);
         sword.Attach(hitbox);
         sword.Attach(new MeleeAttack(1, 1, Static.MeleeType.Slash));
-        sword.Attach(new SpriteComponent(Global.ContentLibrary.Sprites["player"]));
+        sword.Attach(new SpriteComponent(swordSprite, new(0, 0, 32, 32)));
 
         hitbox.Parent = sword;
         return sword;
