@@ -58,8 +58,9 @@ public class PlayerSystem : EntityUpdateSystem
             {
                 // Temporary fix to prevent friction in Movement System
                 velocity.Velocity = player.Direction * 400f;
-                continue;
+                continue; // TODO: Change so that some things below still run like custom actions
             }
+
             Vector2 direction = InputManager.GetDirection(
                 player.GetKey(StdActions.MOVE_UP),
                 player.GetKey(StdActions.MOVE_DOWN),

@@ -23,6 +23,8 @@ public static class Melee
         var melee = entity.Get<MeleeAttack>();
         var transform = entity.Get<Transform2>(); // Make sure that the world matrix is the parent entites transform
         var hitbox = entity.Get<HitBox>();
+        hitbox.EmptyCollisions(); // Remove all the collisions that happened last attack
+        System.Console.WriteLine(hitbox._hurtBoxesHit.Count);
 
         /* Rules:
          *   1. melee.Cooldown must be larger than the MeleeTypes tween duration

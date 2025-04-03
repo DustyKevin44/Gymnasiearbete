@@ -57,6 +57,10 @@ public class EntityColliderSystem() : EntityUpdateSystem(Aspect.All(typeof(Trans
             {
                 var collider = getCollider(entity);
                 collider.Bounds.Position -= collider.previousPosition;
+                if (collider is HitBox hBox)
+                {
+                    hBox.UpdateCollisions();
+                }
             }
         }
     }

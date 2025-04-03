@@ -99,12 +99,15 @@ public class MainGameState : GameState
             );
         }
 
+        var collisionbox = new CollisionBox(new RectangleF(10f, 10f, 50f, 50f));
+        var hurtbox = new HurtBox(new RectangleF(0, 0, 50, 50));
         var obstacle = Global.World.CreateEntity();
         obstacle.Attach(new Transform2(new(100, 100)));
-        obstacle.Attach(new CollisionBox(new RectangleF(10f, 10f, 50f, 50f)));
-        obstacle.Attach(new HurtBox(new RectangleF(0, 0, 50, 50)));
-        obstacle.Get<CollisionBox>().Parent = obstacle;
-        
+        obstacle.Attach(collisionbox);
+        obstacle.Attach(hurtbox);
+        collisionbox.Parent = obstacle;
+        hurtbox.Parent = obstacle;
+
         // var slimeSpawner = Global.World.CreateEntity();
         // slimeSpawner.Attach(new SpawnerComponent(new(0,0), new(500,500), new("slime"), 1f));
 
