@@ -1,202 +1,257 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Common;
-using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data.SQLite;
 using System.IO;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.ECS;
-using MonoGameGum.Forms.Controls;
 
-namespace Game.Custom.Saving;
-
-public class SaveManager
+namespace Game.Custom.Saving
 {
-    private string saveDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Saves");
-
-    //private string saveDirectory = "Saves/";
-
-    public SaveManager()
+    public class SaveManager
     {
-        if (!Directory.Exists(saveDirectory))
-            Directory.CreateDirectory(saveDirectory);
-    }
+        private string dbPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Saves", "GameSaves.db");
 
-    // Get all saves
-    public List<string> GetSaves()
-    {
-        List<string> saveFiles = [];
-
-        string[] files = Directory.GetFiles(saveDirectory, "*.db");
-        foreach (string file in files)
+        public SaveManager()
         {
-            saveFiles.Add(Path.GetFileNameWithoutExtension(file)); // Get filename only
-        }
+            string saveDir = Path.GetDirectoryName(dbPath)!;
+            if (!Directory.Exists(saveDir))
+                Directory.CreateDirectory(saveDir);
 
-        return saveFiles;
-    }
-
-    // Get full path of a save
-    public string GetSavePath(string saveName)
-    {
-        return Path.Combine(saveDirectory, saveName + ".db");
-    }
-
-    // Create a new save file
-    public string CreateNewSave(string saveName)
-    {
-        int saveIndex = Directory.GetFiles(saveDirectory, "*.db").Length + 1;
-        string saveFile = $"save_{saveName:D3}.db"; // Format: save_001.db, save_002.db
-        string savePath = GetSavePath(saveFile);
-
-        File.Create(savePath).Close(); // Create the DB file
-
-        return saveFile;
-    }
-    public void InitializeDatabase(string dbPath)
-    {
-        using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
-        {
-            connection.Open();
-
-            string createItemsTable = @"
-                CREATE TABLE IF NOT EXISTS Items (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Name TEXT NOT NULL,
-                    Quantity INTEGER NOT NULL,
-                    Place TEXT NOT NULL
-                );";
-
-            string createEntitiesTable = @"
-                CREATE TABLE IF NOT EXISTS Entities (
-                    EntityId INTEGER PRIMARY KEY AUTOINCREMENT,
-                    PositionX REAL NOT NULL,
-                    PositionY REAL NOT NULL,
-                    Type TEXT NOT NULL,
-                    HP INTEGER NOT NULL
-                );";
-
-            using (var command = new SQLiteCommand(createItemsTable, connection))
+            if (!File.Exists(dbPath))
             {
-                command.ExecuteNonQuery();
-            }
-
-            using (var command = new SQLiteCommand(createEntitiesTable, connection))
-            {
-                command.ExecuteNonQuery();
+                SQLiteConnection.CreateFile(dbPath);
+                InitializeDatabase();
             }
         }
-    }
-    public void AddItem(string dbPath, string name, int quantity, string place)
-    {
-        using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
-        {
-            connection.Open();
-            string query = "INSERT INTO Items (Name, Quantity, Place) VALUES (@name, @quantity, @place);";
 
-            using (var command = new SQLiteCommand(query, connection))
+        public string GetSavePath() => dbPath;
+
+        // Initializes the database schema
+        public void InitializeDatabase()
+        {
+            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
-                command.Parameters.AddWithValue("@name", name);
-                command.Parameters.AddWithValue("@quantity", quantity);
-                command.Parameters.AddWithValue("@place", place);
-                command.ExecuteNonQuery();
+                connection.Open();
+
+                string createGameSavesTable = @"
+                    CREATE TABLE IF NOT EXISTS GameSaves (
+                        GameId INTEGER PRIMARY KEY AUTOINCREMENT,
+                        SaveName TEXT NOT NULL
+                    );";
+
+                string createItemsTable = @"
+                    CREATE TABLE IF NOT EXISTS Items (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        GameId INTEGER NOT NULL,
+                        Name TEXT NOT NULL,
+                        Quantity INTEGER NOT NULL,
+                        Place TEXT NOT NULL,
+                        FOREIGN KEY (GameId) REFERENCES GameSaves(GameId)
+                    );";
+
+                string createEntitiesTable = @"
+                    CREATE TABLE IF NOT EXISTS Entities (
+                        EntityId INTEGER PRIMARY KEY AUTOINCREMENT,
+                        GameId INTEGER NOT NULL,
+                        PositionX REAL NOT NULL,
+                        PositionY REAL NOT NULL,
+                        Type TEXT NOT NULL,
+                        HP INTEGER NOT NULL,
+                        FOREIGN KEY (GameId) REFERENCES GameSaves(GameId)
+                    );";
+
+                new SQLiteCommand(createGameSavesTable, connection).ExecuteNonQuery();
+                new SQLiteCommand(createItemsTable, connection).ExecuteNonQuery();
+                new SQLiteCommand(createEntitiesTable, connection).ExecuteNonQuery();
             }
         }
-    }
-    public void AddEntity(string dbPath, Vector2 position, string type, int hp)
-    {
-        using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
+
+        // Creates a new game save entry in the database
+        public int CreateNewSave(string saveName)
         {
-            connection.Open();
-            string query = "INSERT INTO Entities (PositionX, PositionY, Type, HP) VALUES (@x, @y, @type, @hp);";
-
-            using (var command = new SQLiteCommand(query, connection))
+            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
-                command.Parameters.AddWithValue("@x", position.X);
-                command.Parameters.AddWithValue("@y", position.Y);
-                command.Parameters.AddWithValue("@type", type);
-                command.Parameters.AddWithValue("@hp", hp);
-                command.ExecuteNonQuery();
-            }
-        }
-    }
-    public List<(int ItemId, string Name, int Quantity, string Place)> GetItems(string dbPath)
-    {
-        var items = new List<(int, string, int, string)>();
+                connection.Open();
 
-        using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
-        {
-            connection.Open();
-            string query = "SELECT * FROM Items;";
+                string insertSave = "INSERT INTO GameSaves (SaveName) VALUES (@name);";
 
-            using (var command = new SQLiteCommand(query, connection))
-            using (var reader = command.ExecuteReader())
-            {
-                while (reader.Read())
+                using (var command = new SQLiteCommand(insertSave, connection))
                 {
-                    items.Add((
-                        reader.GetInt32(0), // Id
-                        reader.GetString(1), // Name
-                        reader.GetInt32(2), // Quantity
-                        reader.GetString(3) // Place
-                    ));
+                    command.Parameters.AddWithValue("@name", saveName);
+                    command.ExecuteNonQuery();
+                }
+
+                return (int)connection.LastInsertRowId;
+            }
+        }
+
+        // Retrieves all saved games
+        public List<GameSave> GetAllGameSaves()
+        {
+            var saves = new List<GameSave>();
+
+            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
+            {
+                connection.Open();
+                string query = "SELECT GameId, SaveName FROM GameSaves ORDER BY GameId ASC;";
+
+                using (var command = new SQLiteCommand(query, connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        saves.Add(new GameSave
+                        {
+                            GameId = reader.GetInt32(0),
+                            SaveName = reader.GetString(1)
+                        });
+                    }
+                }
+            }
+
+            return saves;
+        }
+
+        // Adds an item to a specific game save
+        public void AddItem(int gameId, string name, int quantity, string place)
+        {
+            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
+            {
+                connection.Open();
+                string query = "INSERT INTO Items (GameId, Name, Quantity, Place) VALUES (@gid, @name, @quantity, @place);";
+
+                using (var command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@gid", gameId);
+                    command.Parameters.AddWithValue("@name", name);
+                    command.Parameters.AddWithValue("@quantity", quantity);
+                    command.Parameters.AddWithValue("@place", place);
+                    command.ExecuteNonQuery();
                 }
             }
         }
 
-        return items;
-    }
-    public List<(int EntityId, Vector2 Position, string Type, int HP)> GetEntities(string dbPath)
-    {
-        var entities = new List<(int, Vector2, string, int)>();
-
-        using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
+        // Adds an entity to a specific game save
+        public void AddEntity(int gameId, Vector2 position, string type, int hp)
         {
-            connection.Open();
-            string query = "SELECT * FROM Entities;";
-
-            using (var command = new SQLiteCommand(query, connection))
-            using (var reader = command.ExecuteReader())
+            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
-                while (reader.Read())
+                connection.Open();
+                string query = "INSERT INTO Entities (GameId, PositionX, PositionY, Type, HP) VALUES (@gid, @x, @y, @type, @hp);";
+
+                using (var command = new SQLiteCommand(query, connection))
                 {
-                    entities.Add((
-                        reader.GetInt32(0), // EntityId
-                        new Vector2(reader.GetFloat(1), reader.GetFloat(2)), // Position (X, Y)
-                        reader.GetString(3), // Type
-                        reader.GetInt32(4) // HP
-                    ));
+                    command.Parameters.AddWithValue("@gid", gameId);
+                    command.Parameters.AddWithValue("@x", position.X);
+                    command.Parameters.AddWithValue("@y", position.Y);
+                    command.Parameters.AddWithValue("@type", type);
+                    command.Parameters.AddWithValue("@hp", hp);
+                    command.ExecuteNonQuery();
                 }
             }
         }
 
-        return entities;
-    }
-    public void StartFromSaveFile(string dbPath)
-    {
-        List<(int EntityId, Vector2 Position, string Type, int HP)> existingEntities = GetEntities(dbPath);
-        List<(int ItemId, string Name, int Quantity, string Place)> existingItems = GetItems(dbPath);
-        foreach (var entity in existingEntities)
+        // Retrieves all items for a specific game save
+        public List<(int ItemId, string Name, int Quantity, string Place)> GetItems(int gameId)
         {
-            if (entity.Type == "Player")
+            var items = new List<(int, string, int, string)>();
+
+            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
-                Factories.EntityFactory.CreatePlayerAt(entity.Position);
-            }
-            if (entity.Type == "Slime")
-            {
-                Factories.EntityFactory.CreateSlimeAt(entity.Position);
-            }
-            if (entity.Type == "Sword")
-            {
-                Factories.EntityFactory.CreateSwordAt(entity.Position);
+                connection.Open();
+                string query = "SELECT Id, Name, Quantity, Place FROM Items WHERE GameId = @gid;";
+
+                using (var command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@gid", gameId);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            items.Add((
+                                reader.GetInt32(0),
+                                reader.GetString(1),
+                                reader.GetInt32(2),
+                                reader.GetString(3)
+                            ));
+                        }
+                    }
+                }
             }
 
+            return items;
         }
 
-        foreach (var item in existingItems)
+        // Retrieves all entities for a specific game save
+        public List<(int EntityId, Vector2 Position, string Type, int HP)> GetEntities(int gameId)
         {
-            
+            var entities = new List<(int, Vector2, string, int)>();
+
+            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
+            {
+                connection.Open();
+                string query = "SELECT EntityId, PositionX, PositionY, Type, HP FROM Entities WHERE GameId = @gid;";
+
+                using (var command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@gid", gameId);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            entities.Add((
+                                reader.GetInt32(0),
+                                new Vector2(reader.GetFloat(1), reader.GetFloat(2)),
+                                reader.GetString(3),
+                                reader.GetInt32(4)
+                            ));
+                        }
+                    }
+                }
+            }
+
+            return entities;
         }
-        
+
+        // Starts the game from a specific save
+        public void StartFromSave(int gameId)
+        {
+            List<(int EntityId, Vector2 Position, string Type, int HP)> existingEntities = GetEntities(gameId);
+            List<(int ItemId, string Name, int Quantity, string Place)> existingItems = GetItems(gameId);
+
+            // Process entities
+            foreach (var entity in existingEntities)
+            {
+                switch (entity.Type)
+                {
+                    case "Player":
+                        Factories.EntityFactory.CreatePlayerAt(entity.Position);
+                        break;
+                    case "Slime":
+                        Factories.EntityFactory.CreateSlimeAt(entity.Position);
+                        break;
+                    case "Sword":
+                        Factories.EntityFactory.CreateSwordAt(entity.Position);
+                        break;
+                    // Add more entity types as needed
+                }
+            }
+
+            // Process items
+            foreach (var item in existingItems)
+            {
+                // TODO: Add your item handling logic here
+                // Example:
+                // ItemFactory.CreateItem(item.Name, item.Place, item.Quantity);
+            }
+        }
+
+        // Structure to represent a game save
+        public struct  GameSave 
+        {
+            public int GameId;
+            public string SaveName;
+        }
     }
 }
