@@ -12,7 +12,7 @@
     <Variable>
       <Type>float</Type>
       <Name>ButtonStandardInstance.Y</Name>
-      <Value xsi:type="xsd:float">445</Value>
+      <Value xsi:type="xsd:float">750</Value>
       <SetsValue>true</SetsValue>
     </Variable>
     <Variable>
@@ -78,7 +78,7 @@
     <Variable>
       <Type>float</Type>
       <Name>LabelInstance.Y</Name>
-      <Value xsi:type="xsd:float">0</Value>
+      <Value xsi:type="xsd:float">-300</Value>
       <SetsValue>true</SetsValue>
     </Variable>
     <Variable>
@@ -102,7 +102,7 @@
     <Variable>
       <Type>float</Type>
       <Name>TextBoxInstance.Y</Name>
-      <Value xsi:type="xsd:float">512</Value>
+      <Value xsi:type="xsd:float">600</Value>
       <SetsValue>true</SetsValue>
     </Variable>
   </State>
