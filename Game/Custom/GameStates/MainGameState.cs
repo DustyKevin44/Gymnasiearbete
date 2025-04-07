@@ -15,6 +15,7 @@ using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
 using Game.Custom.Factories;
 using Game.Custom.Debug;
+using Game.Custom.Saving;
 
 namespace Game.Custom.GameStates;
 
@@ -27,14 +28,14 @@ public class MainGameState : GameState
 
     private SpriteBatch _spriteBatch;
 
-    public MainGameState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
+    public MainGameState(Game game, GraphicsDevice graphicsDevice, ContentManager content, int? gameId = null)
         : base(game, graphicsDevice, content)
     {
-        Initialize(graphicsDevice);
+        Initialize(graphicsDevice, gameId);
         LoadContent();
     }
 
-    private void Initialize(GraphicsDevice _graphicsDevice)
+    private void Initialize(GraphicsDevice _graphicsDevice, int? gameId)
     {
         Global.Unload();
 
@@ -64,10 +65,6 @@ public class MainGameState : GameState
         var swordsTexture = _content.Load<Texture2D>("swords");
         Global.ContentLibrary.SaveTexture(swordsTexture, "swords");
 
-        Global.ContentLibrary.Textures["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
-        var player = EntityFactory.CreatePlayerAt(Vector2.Zero);
-        var eq = player.Get<Equipment>();
-        eq.Equip("hand", EntityFactory.CreateSwordAt(Vector2.Zero));
 
         var entityTexture = _content.Load<Texture2D>("slimeSheet");
         Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
@@ -90,23 +87,40 @@ public class MainGameState : GameState
         });
 
         Global.ContentLibrary.Animations.Add("slime", spriteSheet);
+        Global.ContentLibrary.Textures["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
 
-        for (int i = 0; i < 1; i++)
+        if (gameId.HasValue)
         {
-            EntityFactory.CreateSlimeAt(new Vector2(
-                Global.Random.Next(-10, 10),
-                Global.Random.Next(-10, 10))
-            );
+            SaveManager saveManager = new();
+            saveManager.StartFromSave(gameId.Value);
+        }
+        else
+        {
+
+            for (int i = 0; i < 1; i++)
+            {
+                EntityFactory.CreateSlimeAt(new Vector2(
+                    Global.Random.Next(-10, 10),
+                    Global.Random.Next(-10, 10))
+                );
+            }
+            var player = EntityFactory.CreatePlayerAt(Vector2.Zero);
+            var eq = player.Get<Equipment>();
+            eq.Equip("hand", EntityFactory.CreateSwordAt(Vector2.Zero));
+            var collisionbox = new CollisionBox(new RectangleF(10f, 10f, 50f, 50f));
+            var hurtbox = new HurtBox(new RectangleF(0, 0, 50, 50));
+            var obstacle = Global.World.CreateEntity();
+            obstacle.Attach(new Transform2(new(100, 100)));
+            obstacle.Attach(collisionbox);
+            obstacle.Attach(hurtbox);
+            collisionbox.Parent = obstacle;
+            hurtbox.Parent = obstacle;
         }
 
-        var collisionbox = new CollisionBox(new RectangleF(10f, 10f, 50f, 50f));
-        var hurtbox = new HurtBox(new RectangleF(0, 0, 50, 50));
-        var obstacle = Global.World.CreateEntity();
-        obstacle.Attach(new Transform2(new(100, 100)));
-        obstacle.Attach(collisionbox);
-        obstacle.Attach(hurtbox);
-        collisionbox.Parent = obstacle;
-        hurtbox.Parent = obstacle;
+
+
+
+
 
         // var slimeSpawner = Global.World.CreateEntity();
         // slimeSpawner.Attach(new SpawnerComponent(new(0,0), new(500,500), new("slime"), 1f));
