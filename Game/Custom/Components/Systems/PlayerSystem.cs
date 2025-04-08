@@ -1,6 +1,7 @@
 using System.Linq;
 using Game.Custom.Input;
 using Game.Custom.Static;
+using Game.Custom.Utilities;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
@@ -49,6 +50,9 @@ public class PlayerSystem : EntityUpdateSystem
         {
             var player = _playerMapper.Get(entity);
             var velocity = _velocityMapper.Get(entity);
+            
+            if (Utils.TryGet(entity, out HealthComponent hp))
+                System.Console.WriteLine(hp.Health);
 
             player.DashTimer.Update(gameTime);
 
@@ -58,7 +62,7 @@ public class PlayerSystem : EntityUpdateSystem
             {
                 // Temporary fix to prevent friction in Movement System
                 velocity.Velocity = player.Direction * 400f;
-                continue; // TODO: Change so that some things below still run like custom actions
+                continue;
             }
 
             Vector2 direction = InputManager.GetDirection(

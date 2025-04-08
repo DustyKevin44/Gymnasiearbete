@@ -16,6 +16,7 @@ using MonoGame.Extended.Collisions;
 using Game.Custom.Factories;
 using Game.Custom.Debug;
 using Game.Custom.Saving;
+using Game.Custom.Utilities;
 
 namespace Game.Custom.GameStates;
 
@@ -27,6 +28,7 @@ public class MainGameState : GameState
     private HashSet<Point> _solidTiles = [];
 
     private SpriteBatch _spriteBatch;
+    private Entity obstacle;
 
     public MainGameState(Game game, GraphicsDevice graphicsDevice, ContentManager content, int? gameId = null)
         : base(game, graphicsDevice, content)
@@ -109,10 +111,12 @@ public class MainGameState : GameState
             eq.Equip("hand", EntityFactory.CreateSwordAt(Vector2.Zero));
             var collisionbox = new CollisionBox(new RectangleF(10f, 10f, 50f, 50f));
             var hurtbox = new HurtBox(new RectangleF(0, 0, 50, 50));
-            var obstacle = Global.World.CreateEntity();
+            
+            obstacle = Global.World.CreateEntity();
             obstacle.Attach(new Transform2(new(100, 100)));
             obstacle.Attach(collisionbox);
             obstacle.Attach(hurtbox);
+            obstacle.Attach(new HealthComponent(100));
             collisionbox.Parent = obstacle;
             hurtbox.Parent = obstacle;
         }

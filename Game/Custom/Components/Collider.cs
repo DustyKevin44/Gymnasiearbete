@@ -15,7 +15,7 @@ public abstract class ColliderBox(IShapeF shape, bool enabled) : ICollisionActor
     public IShapeF Shape = shape;
     public IShapeF Bounds => Shape;
     public Entity Parent;
-    public Vector2 previousPosition;
+    public Vector2 currentParentPosition;
     public bool IsEnabled = enabled;
 
     public abstract void OnCollision(CollisionEventArgs collisionInfo);
@@ -23,8 +23,7 @@ public abstract class ColliderBox(IShapeF shape, bool enabled) : ICollisionActor
 
 public class HitBox : ColliderBox
 {
-    public readonly HashSet<HurtBox> _hurtBoxesHit = []; // Store collisions to ignore hitting the same enemy in 1 attack
-    private List<HurtBox> _newCollisions = [];
+    public readonly HashSet<HurtBox> HurtBoxesHit = []; // Store collisions to ignore hitting the same enemy in 1 attack
     public bool IsPerFrameHitBox; // If true: hits enemies every frame, if false then hits once and never again until 'EmptyCollisions()' is called
 
     public HitBox(IShapeF shape, bool enabled = true, bool isPerFrameHitBox = false) : base(shape, enabled)
@@ -35,29 +34,25 @@ public class HitBox : ColliderBox
 
     public override void OnCollision(CollisionEventArgs collisionInfo)
     {
-        // TODO: fix saving colliders so that attacks only hit once per swing
-        
-        // if (IsPerFrameHitBox) return;
-        // if (IsEnabled &&
-        //     collisionInfo.Other is HurtBox hurtBox &&
-        //     !HasCollidedWith(hurtBox) &&
-        //     hurtBox.IsEnabled)
-        // {
-        //     _newCollisions.Add(hurtBox);
-        // }
-        if (IsEnabled && collisionInfo.Other is HurtBox)
-            Console.WriteLine("Pow!!");
+        if (!IsPerFrameHitBox &&
+            IsEnabled &&
+            collisionInfo.Other is HurtBox hurtBox &&
+            hurtBox.IsEnabled &&
+            !HasCollidedWith(hurtBox))
+        {
+            // HitBox logic
+            HurtBoxesHit.Add(hurtBox);
+
+            // HurtBox logic
+            if (!Utils.TryGet(Parent, out MeleeAttack mAttack)) return;
+            if (!Utils.TryGet(hurtBox.Parent, out HealthComponent healthC)) return;
+            healthC.Health -= mAttack.Damage;
+            Console.WriteLine(healthC.Health);
+        }
     }
 
-    public bool HasCollidedWith(HurtBox hurtBox) => _hurtBoxesHit.Contains(hurtBox);
-    public void EmptyCollisions() => _hurtBoxesHit.Clear();
-
-    public void UpdateCollisions()
-    {
-        foreach (var c in _newCollisions)
-            _hurtBoxesHit.Add(c);
-        _newCollisions.Clear();
-    }
+    public bool HasCollidedWith(HurtBox hurtBox) => HurtBoxesHit.Contains(hurtBox);
+    public void EmptyCollisions() => HurtBoxesHit.Clear();
 }
 
 public class HurtBox : ColliderBox
@@ -67,20 +62,7 @@ public class HurtBox : ColliderBox
         Global.CollisionSystem.Insert(this);
     }
 
-    public override void OnCollision(CollisionEventArgs collisionInfo)
-    {
-        if (IsEnabled &&
-            Parent is not null &&
-            collisionInfo.Other is HitBox hitBox &&
-            hitBox.IsEnabled &&
-            !hitBox.HasCollidedWith(this))
-        {
-            Console.WriteLine("Ow");
-            if (!Utils.TryGet(hitBox.Parent, out MeleeAttack ma)) return;
-            if (!Utils.TryGet(Parent, out HealthComponent hc)) return;
-            hc.Health -= ma.Damage;
-        }
-    }
+    public override void OnCollision(CollisionEventArgs collisionInfo) { /* Hurt logic is handled by hitbox */ }
 }
 
 public class CollisionBox : ColliderBox

@@ -3,6 +3,7 @@ using MonoGame.Extended.ECS.Systems;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended;
 using Game.Custom.Utilities;
+using System.Collections.Generic;
 
 namespace Game.Custom.Components.Systems;
 
@@ -27,39 +28,39 @@ public class EntityColliderSystem() : EntityUpdateSystem(Aspect.All(typeof(Trans
 
     public override void Update(GameTime gameTime)
     {
-        ColliderBox getCollider(int i)
+        IEnumerable<ColliderBox> getColliders(int i)
         {
-            if (_collisionboxMapper.Has(i)) return _collisionboxMapper.Get(i);
-            if (_hitboxMapper.Has(i)) return _hitboxMapper.Get(i);
-            return _hurtboxMapper.Get(i);
+            if (_collisionboxMapper.Has(i)) yield return _collisionboxMapper.Get(i);
+            if (_hitboxMapper.Has(i)) yield return _hitboxMapper.Get(i);
+            if (_hurtboxMapper.Has(i)) yield return _hurtboxMapper.Get(i);
         }
 
         for (int i = 0; i < _iterations; i++)
         {
             foreach (int entity in ActiveEntities)
             {
-                var collider = getCollider(entity);
-                Vector2 offset = Vector2.Zero;
-
-                if (Utils.TryGet(_equipableMapper, entity, out Equipable eq) &&
-                    Utils.TryGet(eq.Parent, out Transform2 transform))
+                foreach (var collider in getColliders(entity))
                 {
-                    offset += transform.Position;
-                }
+                    Vector2 offset = Vector2.Zero;
 
-                collider.previousPosition = _transformMapper.Get(entity).Position + offset;
-                collider.Bounds.Position += collider.previousPosition;
+                    if (Utils.TryGet(_equipableMapper, entity, out Equipable eq) &&
+                        Utils.TryGet(eq.Parent, out Transform2 transform))
+                    {
+                        offset = transform.Position;
+                    }
+
+                    collider.currentParentPosition = _transformMapper.Get(entity).Position + offset; // Parent position + (if weapon: users position)
+                    collider.Bounds.Position += collider.currentParentPosition;
+                }
             }
 
             Global.CollisionSystem.Update(gameTime);
 
             foreach (int entity in ActiveEntities)
             {
-                var collider = getCollider(entity);
-                collider.Bounds.Position -= collider.previousPosition;
-                if (collider is HitBox hBox)
+                foreach(var collider in getColliders(entity))
                 {
-                    hBox.UpdateCollisions();
+                    collider.Bounds.Position -= collider.currentParentPosition;
                 }
             }
         }

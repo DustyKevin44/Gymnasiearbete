@@ -66,7 +66,7 @@ public static class EntityFactory
     public static Entity CreateSwordAt(Vector2 position)
     {
         var equipable = new Equipable();
-        var hitbox = new HitBox(new RectangleF(0, 0, 20, 20));
+        var hitbox = new HitBox(new RectangleF(0, 0, 20, 20), false);
         var swordSprite = Global.ContentLibrary.Textures["swords"];
 
         var sword = Global.World.CreateEntity();
