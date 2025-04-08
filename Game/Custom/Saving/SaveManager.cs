@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
+using Game.Custom.GameStates;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Game.Custom.Saving
 {
@@ -213,7 +216,10 @@ namespace Game.Custom.Saving
 
             return entities;
         }
-
+        public void StartStartFromSave(Game game, GraphicsDevice graphicsDevice, ContentManager contentManager, int gameId)
+        {
+            GameState gameState = new MainGameState(game, graphicsDevice, contentManager, gameId);
+        }
         // Starts the game from a specific save
         public void StartFromSave(int gameId)
         {
