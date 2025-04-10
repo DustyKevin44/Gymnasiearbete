@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Game.Custom.Objects;
 using Game.Custom.Saving;
 using Game.Custom.UI;
 using Microsoft.Xna.Framework;
@@ -64,21 +65,21 @@ namespace Game.Custom.GameStates
             // Button to create a new save for each slot
             var CreateSaveOneButton = new Button(buttonSprite, buttonFont)
             {
-                Position = new Vector2(500, 200),
+                Position = new Vector2(700, 200),
                 Text = "Create Save 1"
             };
             CreateSaveOneButton.Click += (s, e) => CreateNewSave(0);
 
             var CreateSaveTwoButton = new Button(buttonSprite, buttonFont)
             {
-                Position = new Vector2(500, 250),
+                Position = new Vector2(700, 250),
                 Text = "Create Save 2"
             };
             CreateSaveTwoButton.Click += (s, e) => CreateNewSave(1);
 
             var CreateSaveThreeButton = new Button(buttonSprite, buttonFont)
             {
-                Position = new Vector2(500, 300),
+                Position = new Vector2(700, 300),
                 Text = "Create Save 3"
             };
             CreateSaveThreeButton.Click += (s, e) => CreateNewSave(2);
@@ -109,7 +110,7 @@ namespace Game.Custom.GameStates
             {
                 int gameId = _saves[index].GameId;
                 Console.WriteLine($"Loading GameId: {gameId}");
-                _saveManager.StartFromSave(gameId);
+                _saveManager.StartStartFromSave(_game, _graphicsDevice, _content, gameId);
                 // Optionally: Transition to the game state after loading
                 // _game.ChangeState(new GameWorldState(...));
             }
@@ -128,7 +129,7 @@ namespace Game.Custom.GameStates
                 int gameId = _saveManager.CreateNewSave(saveName);
                 _saves = _saveManager.GetAllGameSaves(); // Refresh the list of saves after creating a new save
                 Console.WriteLine($"Created new save in slot {slot + 1} with GameId: {gameId}");
-
+                _saveManager.AddEntity(slot, new(0,0), "Player", 100);
                 // Optionally, update the button text to reflect the new save name
                 UpdateButtonText(slot);
             }

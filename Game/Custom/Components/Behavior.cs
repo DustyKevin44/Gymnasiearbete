@@ -24,7 +24,6 @@ public class Behavior(int type, TimeSpan elapsed = default, Entity target = null
     public float EnemyMoveSpeed;
     
     public Entity Target = target;
-    public Stack<Node> Path;
     public int Type { get; set; } = type;
     
     public TimeSpan Elapsed { get; set; } = elapsed;

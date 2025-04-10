@@ -82,7 +82,6 @@ namespace Game.Custom.Saving
                     command.Parameters.AddWithValue("@name", saveName);
                     command.ExecuteNonQuery();
                 }
-
                 return (int)connection.LastInsertRowId;
             }
         }
@@ -225,7 +224,7 @@ namespace Game.Custom.Saving
         {
             List<(int EntityId, Vector2 Position, string Type, int HP)> existingEntities = GetEntities(gameId);
             List<(int ItemId, string Name, int Quantity, string Place)> existingItems = GetItems(gameId);
-
+            Console.WriteLine("Game is now starting to load");
             // Process entities
             foreach (var entity in existingEntities)
             {
