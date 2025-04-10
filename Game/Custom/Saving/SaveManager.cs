@@ -85,6 +85,25 @@ namespace Game.Custom.Saving
                 return (int)connection.LastInsertRowId;
             }
         }
+        public void CreatePlayerForNewSave(int saveId)
+        {
+            // Hitta GameId baserat på saveId (eller SaveName beroende på vad som skickas)
+            if (saveId == -1)
+            {
+                Console.WriteLine("Sparfilen med det angivna ID:t finns inte.");
+                return;
+            }
+
+            // Definiera position och HP för spelaren (det här kan justeras baserat på din logik)
+            Vector2 playerStartingPosition = new Vector2(100, 100);  // Exempelposition
+            int playerHP = 100; // Exempel på liv
+
+            // Skapa spelaren som en entity i databasen
+            AddEntity(saveId, playerStartingPosition, "Player", playerHP);
+
+            Console.WriteLine($"Spelare skapad för SaveId: {saveId}");
+        }
+
 
         // Retrieves all saved games
         public List<GameSave> GetAllGameSaves()
@@ -215,6 +234,38 @@ namespace Game.Custom.Saving
 
             return entities;
         }
+        public void PrintAllSavedData()
+        {
+            var saves = GetAllGameSaves();
+            Console.WriteLine("=== All Game Saves ===");
+
+            foreach (var save in saves)
+            {
+                Console.WriteLine($"\nSave ID: {save.GameId}, Name: {save.SaveName}");
+
+                var entities = GetEntities(save.GameId);
+                Console.WriteLine("  -- Entities --");
+                foreach (var entity in entities)
+                {
+                    Console.WriteLine($"    ID: {entity.EntityId}, Type: {entity.Type}, Pos: ({entity.Position.X}, {entity.Position.Y}), HP: {entity.HP}");
+                }
+
+                var items = GetItems(save.GameId);
+                Console.WriteLine("  -- Items --");
+                foreach (var item in items)
+                {
+                    Console.WriteLine($"    ID: {item.ItemId}, Name: {item.Name}, Quantity: {item.Quantity}, Place: {item.Place}");
+                }
+            }
+
+            if (saves.Count == 0)
+            {
+                Console.WriteLine("Inga sparfiler hittades i databasen.");
+            }
+
+            Console.WriteLine("\n========================");
+        }
+
         public void StartStartFromSave(Game game, GraphicsDevice graphicsDevice, ContentManager contentManager, int gameId)
         {
             GameState gameState = new MainGameState(game, graphicsDevice, contentManager, gameId);
@@ -239,7 +290,7 @@ namespace Game.Custom.Saving
                     case "Sword":
                         Factories.EntityFactory.CreateSwordAt(entity.Position);
                         break;
-                    // Add more entity types as needed
+                        // Add more entity types as needed
                 }
             }
 
@@ -253,10 +304,11 @@ namespace Game.Custom.Saving
         }
 
         // Structure to represent a game save
-        public struct  GameSave 
+        public struct GameSave
         {
             public int GameId;
             public string SaveName;
         }
     }
+
 }

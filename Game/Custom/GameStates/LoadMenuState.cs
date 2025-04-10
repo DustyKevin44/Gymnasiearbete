@@ -37,7 +37,7 @@ namespace Game.Custom.GameStates
             AnimatedSprite buttonSprite = new AnimatedSprite(buttonSpriteSheet, "idle");
 
             _saves = _saveManager.GetAllGameSaves();  // List of GameSave objects
-
+            _saveManager.PrintAllSavedData();
             // Create button for Save Slot 1
             var LoadSaveOneButton = new Button(buttonSprite, buttonFont)
             {
