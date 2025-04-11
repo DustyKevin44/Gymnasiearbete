@@ -99,14 +99,20 @@ public class PlayerSystem : EntityUpdateSystem
                     {
                         var melee = Weapon.Get<MeleeAttack>();
                         if (melee.IsOffCooldown(gameTime))
+                        {
                             Melee.Attack(Weapon);
+                            melee.previousTimeUsed = gameTime.TotalGameTime.Seconds;
+                        }
                     }
 
                     if (Weapon.Has<RangedAttack>())
                     {
                         var ranged = Weapon.Get<RangedAttack>();
                         if (ranged.IsOffCooldown(gameTime))
+                        {
                             Ranged.Attack(ranged);
+                            ranged.previousTimeUsed = gameTime.TotalGameTime.Seconds;
+                        }
                     }
                 }
             }

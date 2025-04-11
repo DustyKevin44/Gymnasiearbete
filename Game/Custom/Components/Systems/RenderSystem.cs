@@ -55,16 +55,13 @@ public class RenderSystem() : EntityDrawSystem(Aspect.All(typeof(Transform2)).On
                 Global.SpriteBatch.Draw(
                     sprite.Texture,
                     transform.Position + offset.Position,
-                    sprite.SourceRectangle,                 // Source rectangle (null uses the whole texture)
-                    Color.White,                            // Tint color
-                    transform.Rotation + offset.Rotation,   // Rotation
-                    new Vector2(
-                        sprite.Texture.Width / 2f,
-                        sprite.Texture.Height / 2f
-                    ),                                      // Origin (center of the texture)
-                    transform.Scale * offset.Scale,         // Scale factor
-                    SpriteEffects.None,                     // Effects
-                    0f                                      // Layer depth
+                    sprite.SourceRectangle,                                 // Source rectangle (null uses the whole texture)
+                    Color.White,                                            // Tint color
+                    transform.Rotation + offset.Rotation + sprite.Rotation, // Rotation
+                    sprite.Origin,                                          // Origin (center of the texture)
+                    transform.Scale * offset.Scale * sprite.Scale,          // Scale factor
+                    SpriteEffects.None,                                     // Effects
+                    0f                                                      // Layer depth
                 );
             }
             else if (_animatedSpriteMapper.Has(entity))

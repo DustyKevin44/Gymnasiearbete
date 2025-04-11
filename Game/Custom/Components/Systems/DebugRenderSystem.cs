@@ -40,21 +40,21 @@ public class DebugRenderSystem() : EntityDrawSystem(Aspect.All(typeof(Transform2
             if (_collisionMapper.Has(entity))
             {
                 var collisionbox = _collisionMapper.Get(entity);
-                if (collisionbox.Shape is RectangleF)
+                if (collisionbox.Shape is RectangleF && collisionbox.IsEnabled)
                     Global.SpriteBatch.DrawRectangle(collisionbox.Bounds.Position + transform.Position + offset, collisionbox.Bounds.BoundingRectangle.Size, Color.Black, 2f);
             }
 
             if (_hurtboxMapper.Has(entity))
             {
                 var hurtbox = _hurtboxMapper.Get(entity);
-                if (hurtbox.Shape is RectangleF)
+                if (hurtbox.Shape is RectangleF && hurtbox.IsEnabled)
                     Global.SpriteBatch.DrawRectangle(hurtbox.Bounds.Position + transform.Position + offset, hurtbox.Bounds.BoundingRectangle.Size, Color.Green, 2f);
             }
 
             if (_hitboxMapper.Has(entity))
             {
                 var hitbox = _hitboxMapper.Get(entity);
-                if (hitbox.Shape is RectangleF)
+                if (hitbox.Shape is RectangleF && hitbox.IsEnabled)
                     Global.SpriteBatch.DrawRectangle(hitbox.Bounds.Position + transform.Position + offset, hitbox.Bounds.BoundingRectangle.Size, Color.Red, 2f);
             }
         }

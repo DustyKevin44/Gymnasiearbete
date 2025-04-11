@@ -38,15 +38,13 @@ public static class Melee
                 if (melee.OnLeftSide)
                 {
                     // Change local rotation and position to right side
-                    tweener.TweenTo(transform, (t) => t.Rotation, MathHelper.ToRadians(225), 1);
-                    tweener.TweenTo(transform, (t) => t.Position, new Vector2(10, 0), 1)
+                    tweener.TweenTo(transform, t => t.Rotation, MathHelper.ToRadians(-45), 0.1f)
                         .OnEnd(_ => { hitbox.IsEnabled = false; melee.OnLeftSide = false; });
                 }
                 else
                 {
                     // Change local rotation and position to left side
-                    tweener.TweenTo(transform, (t) => t.Rotation, MathHelper.ToRadians(-45), 1);
-                    tweener.TweenTo(transform, (t) => t.Position, new Vector2(-10, 0), 1)
+                    tweener.TweenTo(transform, t => t.Rotation, MathHelper.ToRadians(45), 0.1f)
                         .OnEnd(_ => { hitbox.IsEnabled = false; melee.OnLeftSide = true; });
                 }
                 break;

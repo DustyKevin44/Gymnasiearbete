@@ -66,7 +66,7 @@ public static class EntityFactory
     public static Entity CreateSwordAt(Vector2 position)
     {
         var equipable = new Equipable();
-        var hitbox = new HitBox(new RectangleF(0, 0, 20, 20), false);
+        var hitbox = new HitBox(new RectangleF(-20, -40, 40, 40), false);
         var swordSprite = Global.ContentLibrary.Textures["swords"];
 
         var sword = Global.World.CreateEntity();
@@ -74,8 +74,8 @@ public static class EntityFactory
         sword.Attach(new Item(Global.ContentLibrary.Textures["swords"]));
         sword.Attach(equipable);
         sword.Attach(hitbox);
-        sword.Attach(new MeleeAttack(1, 1, Static.MeleeType.Slash));
-        sword.Attach(new SpriteComponent(swordSprite, new(0, 0, 32, 32)));
+        sword.Attach(new MeleeAttack(1, 0.3f, Static.MeleeType.Slash));
+        sword.Attach(new SpriteComponent(swordSprite, new(0, 0, 32, 32)) { Rotation = MathHelper.ToRadians(-45), Origin = new(0, 30) });
 
         hitbox.Parent = sword;
         return sword;
