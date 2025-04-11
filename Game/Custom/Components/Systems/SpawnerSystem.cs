@@ -28,7 +28,7 @@ public class SpawnerSystem : EntityUpdateSystem
             SpawnerComponent spawner = _spawnerMapper.Get(entity);
             if (spawner.Elapsed.Seconds >= spawner.NextSpawn)
             {
-                if (spawner.Type == "slime")
+                if (spawner.Type.ToLower() == "slime")
                 {
                     if (spawner.CooldownVariance.HasValue)
                     {

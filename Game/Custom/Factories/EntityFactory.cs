@@ -5,6 +5,7 @@ using Game.Custom.Components.Systems;
 using Game.Custom.Experimental;
 using Game.Custom.GameStates;
 using Game.Custom.Input;
+using Game.Custom.Saving;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
@@ -31,6 +32,8 @@ public static class EntityFactory
 
         void MainMenu(GameTime gameTime)
         {
+            SaveManager saveManager = new SaveManager();
+            saveManager.SaveGame(Global.GameId);
             Global.Game.ChangeState(new MenuState(Global.Game, Global.GraphicsDevice, Global.ContentManager)); // TODO: Fix menu, just ends it right now.
         }
 
@@ -117,7 +120,7 @@ public static class EntityFactory
         var slime = Global.World.CreateEntity();
         slime.Attach(new Transform2(position));
         slime.Attach(new VelocityComponent(Vector2.Zero));
-        slime.Attach(new Behavior(0, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
+        slime.Attach(new Behavior(2, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
         slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation") { Color = colors[Global.Random.Next(0, 5)] });
         slime.Attach(new HealthComponent(100));
         slime.Attach(slimeCollision);

@@ -234,6 +234,22 @@ namespace Game.Custom.Saving
 
             return entities;
         }
+        public void SaveGame(int gameId)
+        {
+           
+
+            foreach (var entity in GetEntities(gameId))
+            {
+                AddEntity(gameId, entity.Position, entity.Type, entity.HP);
+            }
+            foreach (var item in GetItems(gameId))
+            {
+                AddItem(gameId, item.Name, item.Quantity, item.Place);
+            }
+            
+
+
+        }
         public void PrintAllSavedData()
         {
             var saves = GetAllGameSaves();
@@ -266,16 +282,16 @@ namespace Game.Custom.Saving
             Console.WriteLine("\n========================");
         }
 
-        public void StartStartFromSave(Game game, GraphicsDevice graphicsDevice, ContentManager contentManager, int gameId)
+        public GameState StartFromSave(Game game, GraphicsDevice graphicsDevice, ContentManager contentManager, int gameId)
         {
-            GameState gameState = new MainGameState(game, graphicsDevice, contentManager, gameId);
+            return new MainGameState(game, graphicsDevice, contentManager, gameId);
         }
         // Starts the game from a specific save
-        public void StartFromSave(int gameId)
+        public void LoadGame(int gameId)
         {
             List<(int EntityId, Vector2 Position, string Type, int HP)> existingEntities = GetEntities(gameId);
             List<(int ItemId, string Name, int Quantity, string Place)> existingItems = GetItems(gameId);
-            Console.WriteLine("Game is now starting to load");
+            Console.WriteLine("Game is now starting to load, entities: " + existingEntities.Count + ", items: " + existingItems.Count);
             // Process entities
             foreach (var entity in existingEntities)
             {

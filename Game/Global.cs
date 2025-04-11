@@ -30,6 +30,7 @@ public sealed class Global
 
     private World _world;
     private Game _game;
+    private int _gameId;
     private OrthographicCamera _camera;
     private Random _random;
     private CollisionComponent _collisionComponent;
@@ -44,6 +45,7 @@ public sealed class Global
     public static List<Entity> Players { get => Instance._players; }
     public static World World { get => Instance._world; set => Instance._world = value; }
     public static Game Game { get => Instance._game; set => Instance._game = value; }
+    public static int GameId { get => Instance._gameId; set => Instance._gameId = value; }
     public static OrthographicCamera Camera { get => Instance._camera; set => Instance._camera = value; }
     public static Random Random { get => Instance._random; set => Instance._random = value; }
     public static CollisionComponent CollisionSystem { get => Instance._collisionComponent; set => Instance._collisionComponent = value; }

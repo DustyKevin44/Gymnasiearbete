@@ -3,6 +3,7 @@ using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using MonoGame.Extended.Graphics;
+using MonoGame.Extended.Tweening;
 using System;
 
 namespace Game.Custom.Components.Systems;
@@ -81,6 +82,7 @@ public class BehaviorSystem : EntityUpdateSystem
             else if (behavior.Type == 2 && behavior.Target is not null && behavior.Target.Has<Transform2>())
             {
                 Global.Random.NextUnitVector(out Vector2 vel);
+                
                 velocity.Velocity += vel * 100 * gameTime.GetElapsedSeconds();
 
                 //velocity.Velocity += new Vector2(rnd.Next(-1000, 1000), rnd.Next(-1000, 1000));

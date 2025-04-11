@@ -110,9 +110,8 @@ namespace Game.Custom.GameStates
             {
                 int gameId = _saves[index].GameId;
                 Console.WriteLine($"Loading GameId: {gameId}");
-                _saveManager.StartStartFromSave(_game, _graphicsDevice, _content, gameId);
-                // Optionally: Transition to the game state after loading
-                // _game.ChangeState(new GameWorldState(...));
+                var gameState = _saveManager.StartFromSave(_game, _graphicsDevice, _content, gameId);
+                _game.ChangeState(gameState);
             }
             else
             {

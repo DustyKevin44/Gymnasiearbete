@@ -90,11 +90,16 @@ public class MainGameState : GameState
 
         Global.ContentLibrary.Animations.Add("slime", spriteSheet);
         Global.ContentLibrary.Textures["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
+        var spawner = Global.World.CreateEntity();
+        spawner.Attach(new SpawnerComponent(new(0,0), new(100,100), "Slime", 2.0f));
+        
 
         if (gameId.HasValue)
         {
             SaveManager saveManager = new();
-            saveManager.StartFromSave(gameId.Value);
+            saveManager.LoadGame(gameId.Value);
+            saveManager.PrintAllSavedData();
+            Global.GameId = gameId.Value;
         }
         else
         {
