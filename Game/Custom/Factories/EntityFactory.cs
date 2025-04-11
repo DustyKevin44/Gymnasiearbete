@@ -74,7 +74,7 @@ public static class EntityFactory
         sword.Attach(new Item(Global.ContentLibrary.Textures["swords"]));
         sword.Attach(equipable);
         sword.Attach(hitbox);
-        sword.Attach(new MeleeAttack(1, 0.3f, Static.MeleeType.Slash));
+        sword.Attach(new MeleeAttack(20, 0.3f, Static.MeleeType.Slash));
         sword.Attach(new SpriteComponent(swordSprite, new(0, 0, 32, 32)) { Rotation = MathHelper.ToRadians(-45), Origin = new(0, 30) });
 
         hitbox.Parent = sword;
