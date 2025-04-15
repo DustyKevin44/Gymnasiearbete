@@ -49,7 +49,7 @@ namespace Game.Custom.Saving
 
                 string createItemsTable = @"
                     CREATE TABLE IF NOT EXISTS Items (
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        ItemId INTEGER PRIMARY KEY AUTOINCREMENT,
                         GameId INTEGER NOT NULL,
                         Name TEXT NOT NULL,
                         Quantity INTEGER NOT NULL,
@@ -186,7 +186,7 @@ namespace Game.Custom.Saving
             using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
                 connection.Open();
-                string query = "SELECT Id, Name, Quantity, Place FROM Items WHERE GameId = @gid;";
+                string query = "SELECT ItemId, Name, Quantity, Place FROM Items WHERE GameId = @gid;";
 
                 using (var command = new SQLiteCommand(query, connection))
                 {
