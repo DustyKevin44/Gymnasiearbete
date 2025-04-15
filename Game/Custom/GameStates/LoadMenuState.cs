@@ -14,7 +14,6 @@ namespace Game.Custom.GameStates
     public class LoadMenuState : GameState
     {
         private readonly List<UIElement> _UI;
-        private SaveManager _saveManager = new();
         private List<GameSave> _saves;  // Non-nullable GameSave objects
         private int _selectedIndex = 0;
 
@@ -36,15 +35,15 @@ namespace Game.Custom.GameStates
             SpriteBatch _spriteBatch = new SpriteBatch(graphicsDevice);
             AnimatedSprite buttonSprite = new AnimatedSprite(buttonSpriteSheet, "idle");
 
-            _saves = _saveManager.GetAllGameSaves();  // List of GameSave objects
-            _saveManager.PrintAllSavedData();
+            _saves = Global.SaveManager.GetAllGameSaves();  // List of GameSave objects
+            Global.SaveManager.PrintAllSavedData();
             // Create button for Save Slot 1
             var LoadSaveOneButton = new Button(buttonSprite, buttonFont)
             {
                 Position = new Vector2(300, 200),
                 Text = (_saves.Count > 0 && _saves[0].GameId != 0) ? $"Save: {_saves[0].SaveName}" : "Save slot empty"
             };
-            LoadSaveOneButton.Click += (s, e) => TryLoadSave(0);
+            LoadSaveOneButton.Click += (s, e) => TryLoadSave(0, (e as ButtonEventArgs).gameTime);
 
             // Create button for Save Slot 2
             var LoadSaveTwoButton = new Button(buttonSprite, buttonFont)
@@ -52,7 +51,7 @@ namespace Game.Custom.GameStates
                 Position = new Vector2(300, 250),
                 Text = (_saves.Count > 1 && _saves[1].GameId != 0) ? $"Save: {_saves[1].SaveName}" : "Save slot empty"
             };
-            LoadSaveTwoButton.Click += (s, e) => TryLoadSave(1);
+            LoadSaveTwoButton.Click += (s, e) => TryLoadSave(1, (e as ButtonEventArgs).gameTime);
 
             // Create button for Save Slot 3
             var LoadSaveThreeButton = new Button(buttonSprite, buttonFont)
@@ -60,29 +59,16 @@ namespace Game.Custom.GameStates
                 Position = new Vector2(300, 300),
                 Text = (_saves.Count > 2 && _saves[2].GameId != 0) ? $"Save: {_saves[2].SaveName}" : "Save slot empty"
             };
-            LoadSaveThreeButton.Click += (s, e) => TryLoadSave(2);
+            LoadSaveThreeButton.Click += (s, e) => TryLoadSave(2, (e as ButtonEventArgs).gameTime);
 
             // Button to create a new save for each slot
-            var CreateSaveOneButton = new Button(buttonSprite, buttonFont)
+            var CreateSaveButton = new Button(buttonSprite, buttonFont)
             {
                 Position = new Vector2(700, 200),
-                Text = "Create Save 1"
+                Text = "New Save"
             };
-            CreateSaveOneButton.Click += (s, e) => CreateNewSave(0);
+            CreateSaveButton.Click += (s, e) => CreateNewSave();
 
-            var CreateSaveTwoButton = new Button(buttonSprite, buttonFont)
-            {
-                Position = new Vector2(700, 250),
-                Text = "Create Save 2"
-            };
-            CreateSaveTwoButton.Click += (s, e) => CreateNewSave(1);
-
-            var CreateSaveThreeButton = new Button(buttonSprite, buttonFont)
-            {
-                Position = new Vector2(700, 300),
-                Text = "Create Save 3"
-            };
-            CreateSaveThreeButton.Click += (s, e) => CreateNewSave(2);
 
             // Back Button
             var BackButton = new Button(buttonSprite, buttonFont)
@@ -92,26 +78,24 @@ namespace Game.Custom.GameStates
             };
             BackButton.Click += BackButton_Click;
 
-            _UI = new List<UIElement>
-            {
+            _UI = [
                 BackButton,
-                LoadSaveThreeButton,
-                LoadSaveTwoButton,
                 LoadSaveOneButton,
-                CreateSaveThreeButton,
-                CreateSaveTwoButton,
-                CreateSaveOneButton
-            };
+                LoadSaveTwoButton,
+                LoadSaveThreeButton,
+                CreateSaveButton
+            ];
         }
 
-        private void TryLoadSave(int index)
+        private void TryLoadSave(int index, GameTime gameTime)
         {
             if (index < _saves.Count && _saves[index].GameId != 0)
             {
                 int gameId = _saves[index].GameId;
                 Console.WriteLine($"Loading GameId: {gameId}");
-                var gameState = _saveManager.StartFromSave(_game, _graphicsDevice, _content, gameId);
+                var gameState = Global.SaveManager.StartFromSave(_game, _graphicsDevice, _content, gameId);
                 _game.ChangeState(gameState);
+                Global.TimeGameStarted = gameTime.TotalGameTime.Seconds;
             }
             else
             {
@@ -119,23 +103,24 @@ namespace Game.Custom.GameStates
             }
         }
 
-        private void CreateNewSave(int slot)
+        private void CreateNewSave()
         {
-            // Check if the save slot is empty before creating a new save
-            if (_saves.Count <= slot || _saves[slot].GameId == 0)
+            const int MaxSaves = 3;
+
+            if (_saves.Count >= MaxSaves)
             {
-                string saveName = $"Save Slot {slot + 1}";
-                int gameId = _saveManager.CreateNewSave(saveName);
-                _saves = _saveManager.GetAllGameSaves(); // Refresh the list of saves after creating a new save
-                Console.WriteLine($"Created new save in slot {slot + 1} with GameId: {gameId}");
-                _saveManager.AddEntity(slot, new(0,0), "Player", 100);
-                // Optionally, update the button text to reflect the new save name
-                UpdateButtonText(slot);
+                Console.WriteLine("No remaining save slots.");
+                return;
             }
-            else
-            {
-                Console.WriteLine("This slot already has a save.");
-            }
+
+            string saveName = $"Save Slot {_saves.Count + 1}";
+            int gameId = Global.SaveManager.CreateNewSave(saveName);
+
+            _saves = Global.SaveManager.GetAllGameSaves();
+            Global.SaveManager.AddEntity(gameId, new(0, 0), "Player", 100);
+
+            Console.WriteLine($"Created new save in slot {_saves.Count} with GameId: {gameId}");
+            UpdateButtonText(_saves.Count);
         }
 
         private void UpdateButtonText(int slot)
@@ -143,16 +128,16 @@ namespace Game.Custom.GameStates
             // Update the button text after creating a new save
             switch (slot)
             {
-                case 0:
-                    var LoadSaveOneButton = _UI[3] as Button;
+                case 1:
+                    var LoadSaveOneButton = _UI[1] as Button;
                     LoadSaveOneButton.Text = $"Save: {_saves[0].SaveName}";
                     break;
-                case 1:
-                    var LoadSaveTwoButton = _UI[4] as Button;
+                case 2:
+                    var LoadSaveTwoButton = _UI[2] as Button;
                     LoadSaveTwoButton.Text = $"Save: {_saves[1].SaveName}";
                     break;
-                case 2:
-                    var LoadSaveThreeButton = _UI[5] as Button;
+                case 3:
+                    var LoadSaveThreeButton = _UI[3] as Button;
                     LoadSaveThreeButton.Text = $"Save: {_saves[2].SaveName}";
                     break;
             }

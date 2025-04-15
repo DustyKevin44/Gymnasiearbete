@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Game.Custom.Debug;
+using Game.Custom.Saving;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -31,6 +32,8 @@ public sealed class Global
     private World _world;
     private Game _game;
     private int _gameId;
+    private int _timeGameStarted = 0; // For accurate play time
+    private SaveManager _saveManager = new();
     private OrthographicCamera _camera;
     private Random _random;
     private CollisionComponent _collisionComponent;
@@ -38,21 +41,23 @@ public sealed class Global
     private ContentLibrary _contentLibrary = new();
     private GraphicsDevice _graphicsDevice; 
     private SpriteBatch _spriteBatch;
-    private readonly List<Entity> _players = [];
-    private readonly DebugCommands _console = new();
+    private List<Entity> _players = [];
+    private DebugCommands _console = new();
 
-    public static DebugCommands Console { get => Instance._console; }
-    public static List<Entity> Players { get => Instance._players; }
-    public static World World { get => Instance._world; set => Instance._world = value; }
-    public static Game Game { get => Instance._game; set => Instance._game = value; }
-    public static int GameId { get => Instance._gameId; set => Instance._gameId = value; }
-    public static OrthographicCamera Camera { get => Instance._camera; set => Instance._camera = value; }
-    public static Random Random { get => Instance._random; set => Instance._random = value; }
+    public static DebugCommands Console              { get => Instance._console;            set => Instance._console = value; }
+    public static List<Entity> Players               { get => Instance._players;            set => Instance._players = value; }
+    public static World World                        { get => Instance._world;              set => Instance._world = value; }
+    public static Game Game                          { get => Instance._game;               set => Instance._game = value; }
+    public static int GameId                         { get => Instance._gameId;             set => Instance._gameId = value; }
+    public static int TimeGameStarted                { get => Instance._timeGameStarted;    set => Instance._timeGameStarted = value; }
+    public static SaveManager SaveManager            { get => Instance._saveManager;        set => Instance._saveManager = value; }
+    public static OrthographicCamera Camera          { get => Instance._camera;             set => Instance._camera = value; }
+    public static Random Random                      { get => Instance._random;             set => Instance._random = value; }
     public static CollisionComponent CollisionSystem { get => Instance._collisionComponent; set => Instance._collisionComponent = value; }
-    public static ContentManager ContentManager { get => Instance._contentManager; set => Instance._contentManager = value; }
-    public static ContentLibrary ContentLibrary { get => Instance._contentLibrary; set => Instance._contentLibrary = value; }
-    public static GraphicsDevice GraphicsDevice { get => Instance._graphicsDevice; set => Instance._graphicsDevice = value; }
-    public static SpriteBatch SpriteBatch { get => Instance._spriteBatch; set => Instance._spriteBatch = value; }
+    public static ContentManager ContentManager      { get => Instance._contentManager;     set => Instance._contentManager = value; }
+    public static ContentLibrary ContentLibrary      { get => Instance._contentLibrary;     set => Instance._contentLibrary = value; }
+    public static GraphicsDevice GraphicsDevice      { get => Instance._graphicsDevice;     set => Instance._graphicsDevice = value; }
+    public static SpriteBatch SpriteBatch            { get => Instance._spriteBatch;        set => Instance._spriteBatch = value; }
 
     public static void SetWorld(World world) => Instance._world = world;
     public static void Unload() => instance = null;

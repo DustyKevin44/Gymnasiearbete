@@ -2,10 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
+using Game.Custom.Components;
+using Game.Custom.Components.Systems;
 using Game.Custom.GameStates;
+using Game.Custom.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+using MonoGame.Extended.ECS;
 
 namespace Game.Custom.Saving
 {
@@ -38,7 +43,8 @@ namespace Game.Custom.Saving
                 string createGameSavesTable = @"
                     CREATE TABLE IF NOT EXISTS GameSaves (
                         GameId INTEGER PRIMARY KEY AUTOINCREMENT,
-                        SaveName TEXT NOT NULL
+                        SaveName TEXT NOT NULL,
+                        TotalGameTime INTEGER DEFAULT 0
                     );";
 
                 string createItemsTable = @"
@@ -85,25 +91,25 @@ namespace Game.Custom.Saving
                 return (int)connection.LastInsertRowId;
             }
         }
-        public void CreatePlayerForNewSave(int saveId)
-        {
-            // Hitta GameId baserat på saveId (eller SaveName beroende på vad som skickas)
-            if (saveId == -1)
-            {
-                Console.WriteLine("Sparfilen med det angivna ID:t finns inte.");
-                return;
-            }
 
-            // Definiera position och HP för spelaren (det här kan justeras baserat på din logik)
-            Vector2 playerStartingPosition = new Vector2(100, 100);  // Exempelposition
-            int playerHP = 100; // Exempel på liv
+        // public void CreatePlayerForNewSave(int saveId)
+        // {
+        //     // Hitta GameId baserat på saveId (eller SaveName beroende på vad som skickas)
+        //     if (saveId == -1)
+        //     {
+        //         Console.WriteLine("Sparfilen med det angivna ID:t finns inte.");
+        //         return;
+        //     }
 
-            // Skapa spelaren som en entity i databasen
-            AddEntity(saveId, playerStartingPosition, "Player", playerHP);
+        //     // Definiera position och HP för spelaren (det här kan justeras baserat på din logik)
+        //     Vector2 playerStartingPosition = new Vector2(100, 100);  // Exempelposition
+        //     int playerHP = 100; // Exempel på liv
 
-            Console.WriteLine($"Spelare skapad för SaveId: {saveId}");
-        }
+        //     // Skapa spelaren som en entity i databasen
+        //     AddEntity(saveId, playerStartingPosition, "Player", playerHP);
 
+        //     Console.WriteLine($"Spelare skapad för SaveId: {saveId}");
+        // }
 
         // Retrieves all saved games
         public List<GameSave> GetAllGameSaves()
@@ -113,7 +119,7 @@ namespace Game.Custom.Saving
             using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
                 connection.Open();
-                string query = "SELECT GameId, SaveName FROM GameSaves ORDER BY GameId ASC;";
+                string query = "SELECT GameId, SaveName, TotalGameTime FROM GameSaves ORDER BY GameId ASC;";
 
                 using (var command = new SQLiteCommand(query, connection))
                 using (var reader = command.ExecuteReader())
@@ -123,7 +129,8 @@ namespace Game.Custom.Saving
                         saves.Add(new GameSave
                         {
                             GameId = reader.GetInt32(0),
-                            SaveName = reader.GetString(1)
+                            SaveName = reader.GetString(1),
+                            PlayTime = reader.GetInt16(2)
                         });
                     }
                 }
@@ -234,22 +241,60 @@ namespace Game.Custom.Saving
 
             return entities;
         }
-        public void SaveGame(int gameId)
+        
+        public void SaveGame(int gameId, World world, GameTime gameTime)
         {
-           
-
-            foreach (var entity in GetEntities(gameId))
+            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
-                AddEntity(gameId, entity.Position, entity.Type, entity.HP);
+                connection.Open();
+                string query = "UPDATE GameSaves SET TotalGameTime = TotalGameTime + @gTime";
+
+                using (var command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@gTime", gameTime.TotalGameTime.Seconds - Global.TimeGameStarted);
+                    command.ExecuteNonQuery();
+                }
+
+                string query2 = "DELETE FROM Entities WHERE GameId = @gid"; // Delete prior save data (overwriting)
+
+                using (var command = new SQLiteCommand(query2, connection))
+                {
+                    command.Parameters.AddWithValue("@gid", gameId);
+                    command.ExecuteNonQuery();
+                }
             }
-            foreach (var item in GetItems(gameId))
+
+            for (int i = 0; i < world.EntityCount; i++)
             {
-                AddItem(gameId, item.Name, item.Quantity, item.Place);
+                try
+                {
+                    var entity = world.GetEntity(i);
+
+                    Vector2 pos = Utils.TryGet(entity, out Transform2 transform) ? transform.Position : Vector2.Zero;
+                    int hp = Utils.TryGet(entity, out HealthComponent hpc) ? (int)hpc.Health : 100;
+
+                    if (entity.Has<PlayerComponent<StdActions>>())
+                    {
+                        AddEntity(gameId, pos, "Player", hp);
+                    }
+                    else if (entity.Has<Behavior>())
+                    {
+                        AddEntity(gameId, pos, "Slime", hp);
+                    }
+                    else if (Utils.TryGet(entity, out MeleeAttack mAttack))
+                    {
+                        switch (mAttack.MeleeType)
+                        {
+                            case Static.MeleeType.Slash:
+                                AddEntity(gameId, pos, "Sword", int.MaxValue); // TODO: change database so that sword is not forced to have hp
+                                break;
+                        }
+                    }
+                }
+                catch (Exception) { }
             }
-            
-
-
         }
+
         public void PrintAllSavedData()
         {
             var saves = GetAllGameSaves();
@@ -257,7 +302,7 @@ namespace Game.Custom.Saving
 
             foreach (var save in saves)
             {
-                Console.WriteLine($"\nSave ID: {save.GameId}, Name: {save.SaveName}");
+                Console.WriteLine($"\nSave ID: {save.GameId}, Name: {save.SaveName}, PlayTime: {TimeSpan.FromSeconds(save.PlayTime)}");
 
                 var entities = GetEntities(save.GameId);
                 Console.WriteLine("  -- Entities --");
@@ -286,6 +331,7 @@ namespace Game.Custom.Saving
         {
             return new MainGameState(game, graphicsDevice, contentManager, gameId);
         }
+
         // Starts the game from a specific save
         public void LoadGame(int gameId)
         {
@@ -324,6 +370,7 @@ namespace Game.Custom.Saving
         {
             public int GameId;
             public string SaveName;
+            public int PlayTime;
         }
     }
 

@@ -2,11 +2,16 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Graphics;
-using MonoGame.Extended.Animations;
 using System;
-using System.Reflection;
 
 namespace Game.Custom.UI;
+
+
+public class ButtonEventArgs(GameTime gameTime) : EventArgs
+{
+    public GameTime gameTime = gameTime;
+}
+
 
 public class Button : UIElement
 {
@@ -66,7 +71,7 @@ public class Button : UIElement
         {
             if (_currentMouse.LeftButton == ButtonState.Released && _previousMouse.LeftButton == ButtonState.Pressed)
             {
-                Click?.Invoke(this, new EventArgs());
+                Click?.Invoke(this, new ButtonEventArgs(gameTime));
             }
         }
     }

@@ -32,8 +32,7 @@ public static class EntityFactory
 
         void MainMenu(GameTime gameTime)
         {
-            SaveManager saveManager = new SaveManager();
-            saveManager.SaveGame(Global.GameId);
+            Global.SaveManager.SaveGame(Global.GameId, Global.World, gameTime);
             Global.Game.ChangeState(new MenuState(Global.Game, Global.GraphicsDevice, Global.ContentManager)); // TODO: Fix menu, just ends it right now.
         }
 
