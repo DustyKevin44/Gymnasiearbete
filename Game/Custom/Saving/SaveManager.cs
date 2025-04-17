@@ -344,10 +344,10 @@ namespace Game.Custom.Saving
                 switch (entity.Type)
                 {
                     case "Player":
-                        Factories.EntityFactory.CreatePlayerAt(entity.Position);
+                        Factories.EntityFactory.CreatePlayerAt(entity.Position, entity.HP);
                         break;
                     case "Slime":
-                        Factories.EntityFactory.CreateSlimeAt(entity.Position);
+                        Factories.EntityFactory.CreateSlimeAt(entity.Position, entity.HP);
                         break;
                     case "Sword":
                         Factories.EntityFactory.CreateSwordAt(entity.Position);

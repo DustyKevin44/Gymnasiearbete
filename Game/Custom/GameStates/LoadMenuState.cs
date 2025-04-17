@@ -15,7 +15,7 @@ namespace Game.Custom.GameStates
     {
         private readonly List<UIElement> _UI;
         private List<GameSave> _saves;  // Non-nullable GameSave objects
-        private int _selectedIndex = 0;
+        //private int _selectedIndex = 0;
 
         public LoadMenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
             : base(game, graphicsDevice, content)

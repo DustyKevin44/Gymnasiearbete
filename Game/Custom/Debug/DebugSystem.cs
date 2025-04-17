@@ -69,16 +69,24 @@ public class DebugSystem() : EntitySystem(Aspect.All(typeof(Transform2))), IUpda
     {
         if (_textureMapper.Has(entity)) return _textureMapper.Get(entity).Bounds;
         if (_spriteMapper.Has(entity)) return _spriteMapper.Get(entity).Texture.Bounds;
-        if (_animatedMapper.Has(entity)) return (_animatedMapper.Get(entity) is AnimatedSprite t) ? t.GetBoundingRectangle(new(t.GetBoundingRectangle(new()).Size/2)) : default; // very cursed
+        if (_animatedMapper.Has(entity)) return (_animatedMapper.Get(entity) is AnimatedSprite t) ? t.GetBoundingRectangle(new(t.GetBoundingRectangle(new()).Size / 2)) : default; // very cursed
         return new(0, 0, 10, 10);
     }
 
     public void Draw(GameTime gameTime)
     {
-        if (_selectedEntity is null)
-            return;
+        try
+        {
+            if (_selectedEntity is null)
+                return;
 
-        var relBBox = GetRelativeBBox(_selectedEntity.Id);
-        Global.SpriteBatch.DrawRectangle(relBBox.Position + _selectedEntity.Get<Transform2>().Position - relBBox.Size / 2, relBBox.Size, Color.DeepPink, 2f);
+            var relBBox = GetRelativeBBox(_selectedEntity.Id);
+            Global.SpriteBatch.DrawRectangle(relBBox.Position + _selectedEntity.Get<Transform2>().Position - relBBox.Size / 2, relBBox.Size, Color.DeepPink, 2f);
+        }
+        catch (System.NullReferenceException)
+        {
+            Console.WriteLine("Null me");
+        }
+
     }
 }

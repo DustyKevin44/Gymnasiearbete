@@ -38,7 +38,7 @@ public class SpawnerSystem : EntityUpdateSystem
                         Global.Random.Next((int)spawner.Position.X, (int)spawner.Size.X),
                         Global.Random.Next((int)spawner.Position.Y, (int)spawner.Size.Y)
                     );
-                    EntityFactory.CreateSlimeAt(spawnPosition);
+                    EntityFactory.CreateSlimeAt(spawnPosition, 100f);
                     spawner.Elapsed = TimeSpan.Zero;
                 }
                 
