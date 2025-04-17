@@ -138,6 +138,29 @@ public static class EntityFactory
         slimeCollision.Parent = slime;
         return slime;
     }
+    
+    public static Entity CreateSkeletonAt(Vector2 position, float Hp)
+    {
+        Color[] colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
+        var SkeletonCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
+        var SkeletonHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
+        var SkeletonHit = new HitBox(new RectangleF(0, 0, 16, 16));
+        var Skeleton = Global.World.CreateEntity();
+        Skeleton.Attach(new Transform2(position));
+        Skeleton.Attach(new VelocityComponent(Vector2.Zero));
+        Skeleton.Attach(new Behavior(2, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
+        Skeleton.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["skeleton"], "skeletonAnimation") { Color = colors[Global.Random.Next(0, 5)] });
+        Skeleton.Attach(new HealthComponent(Hp, 100));
+        Skeleton.Attach(SkeletonCollision);
+        Skeleton.Attach(SkeletonHurt);
+        Skeleton.Attach(SkeletonHit);
+
+        SkeletonHurt.Parent = Skeleton;
+        SkeletonHit.Parent = Skeleton;
+        SkeletonCollision.Parent = Skeleton;
+        return Skeleton;
+    }
+
 
     public static Entity CreateCentipedeAt(Vector2 position)
     {

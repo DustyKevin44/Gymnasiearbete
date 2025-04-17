@@ -5,11 +5,14 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System;
 using MonoGame.Extended.Graphics;
+using Microsoft.Xna.Framework.Audio;
+using System.Threading;
 
 namespace Game.Custom.GameStates;
 
 public class MenuState : GameState
 {
+    private SoundEffect _selectSound;
     private readonly List<UIElement> _UI;
 
     public MenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content) : base(game, graphicsDevice, content)
@@ -27,7 +30,7 @@ public class MenuState : GameState
         SpriteFont buttonFont = _content.Load<SpriteFont>("Fonts/Font");
         SpriteBatch _spriteBatch = new SpriteBatch(graphicsDevice);
         AnimatedSprite buttonSprite = new AnimatedSprite(buttonSpriteSheet, "idle");
-
+        _selectSound = _content.Load<SoundEffect>("menuSelectSound");
         var newGameButton = new Button(buttonSprite, buttonFont)
         {
             Position = new Vector2(300, 200),
@@ -58,20 +61,19 @@ public class MenuState : GameState
             quitGameButton,
         ];
     }
-
     private void NewGameButton_Click(object sender, EventArgs e)
     {
-
+_selectSound.Play();
         _game.ChangeState(new MainGameState(_game, _graphicsDevice, _content));
     }
 
     private void LoadGameButton_Click(object sender, EventArgs e)
-    {
+    {_selectSound.Play();
         _game.ChangeState(new LoadMenuState(_game, _graphicsDevice, _content));
     }
 
     private void QuitGameButton_Click(object sender, EventArgs e)
-    {
+    {_selectSound.Play(); Thread.Sleep(500);
         _game.Exit();
         Console.WriteLine("Exit game");
     }
