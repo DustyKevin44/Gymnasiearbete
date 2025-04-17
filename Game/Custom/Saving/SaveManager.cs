@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
 using Game.Custom.Components;
 using Game.Custom.Components.Systems;
 using Game.Custom.GameStates;
@@ -44,7 +45,8 @@ namespace Game.Custom.Saving
                     CREATE TABLE IF NOT EXISTS GameSaves (
                         GameId INTEGER PRIMARY KEY AUTOINCREMENT,
                         SaveName TEXT NOT NULL,
-                        TotalGameTime INTEGER DEFAULT 0
+                        TotalGameTime INTEGER DEFAULT 0,
+                        LastTimePlayed INTEGER DEFAULT 0
                     );";
 
                 string createItemsTable = @"
@@ -119,7 +121,7 @@ namespace Game.Custom.Saving
             using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
                 connection.Open();
-                string query = "SELECT GameId, SaveName, TotalGameTime FROM GameSaves ORDER BY GameId ASC;";
+                string query = "SELECT GameId, SaveName, TotalGameTime, LastTimePlayed FROM GameSaves ORDER BY GameId ASC;";
 
                 using (var command = new SQLiteCommand(query, connection))
                 using (var reader = command.ExecuteReader())
@@ -130,13 +132,21 @@ namespace Game.Custom.Saving
                         {
                             GameId = reader.GetInt32(0),
                             SaveName = reader.GetString(1),
-                            PlayTime = reader.GetInt16(2)
+                            PlayTime = reader.GetInt16(2),
+                            LastTimePlayed = reader.GetInt64(3)
                         });
                     }
                 }
             }
 
             return saves;
+        }
+
+        public GameSave? GetLastPlayedSave()
+        {
+            var saves =  GetAllGameSaves();
+            if (saves.Count == 0) return null;
+            return saves.MaxBy(save => save.LastTimePlayed);
         }
 
         // Adds an item to a specific game save
@@ -247,11 +257,13 @@ namespace Game.Custom.Saving
             using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
                 connection.Open();
-                string query = "UPDATE GameSaves SET TotalGameTime = TotalGameTime + @gTime";
+                string query = "UPDATE GameSaves SET TotalGameTime = TotalGameTime + @gTime, LastTimePlayed = @currTime WHERE GameId = @gid";
 
                 using (var command = new SQLiteCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@gTime", gameTime.TotalGameTime.Seconds - Global.TimeGameStarted);
+                    command.Parameters.AddWithValue("@currTime", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+                    command.Parameters.AddWithValue("@gid", gameId);
                     command.ExecuteNonQuery();
                 }
 
@@ -302,7 +314,7 @@ namespace Game.Custom.Saving
 
             foreach (var save in saves)
             {
-                Console.WriteLine($"\nSave ID: {save.GameId}, Name: {save.SaveName}, PlayTime: {TimeSpan.FromSeconds(save.PlayTime)}");
+                Console.WriteLine($"\nSave ID: {save.GameId}, Name: {save.SaveName}, PlayTime: {TimeSpan.FromSeconds(save.PlayTime)}, LastTimePlayed: {DateTimeOffset.FromUnixTimeSeconds(save.LastTimePlayed)}");
 
                 var entities = GetEntities(save.GameId);
                 Console.WriteLine("  -- Entities --");
@@ -371,6 +383,7 @@ namespace Game.Custom.Saving
             public int GameId;
             public string SaveName;
             public int PlayTime;
+            public long LastTimePlayed;
         }
     }
 
