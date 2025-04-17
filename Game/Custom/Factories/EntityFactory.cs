@@ -18,7 +18,7 @@ namespace Game.Custom.Factories;
 
 public static class EntityFactory
 {
-    public static Entity CreatePlayerAt(Vector2 position)
+    public static Entity CreatePlayerAt(Vector2 position, float Hp)
     {
         void ZoomOut(GameTime gameTime)
         {
@@ -38,12 +38,14 @@ public static class EntityFactory
 
         var equipment = new Equipment(["hand"]);
         var collisionBox = new CollisionBox(new RectangleF(0, 0, 20, 20));
-
+        var hurtBox = new HurtBox(new RectangleF(0, 0, 20, 20));
         var player = Global.World.CreateEntity();
         player.Attach(new Transform2(position));
+        player.Attach(new HealthComponent(Hp, 100));
         player.Attach(new VelocityComponent(Vector2.Zero));
         player.Attach(new SpriteComponent(Global.ContentLibrary.Textures["player"]));
         player.Attach(collisionBox);
+        player.Attach(hurtBox);
         player.Attach(equipment);
         player.Attach(new PlayerComponent<StdActions>(
             "Player", new Dictionary<StdActions, Keybind> {
@@ -58,10 +60,12 @@ public static class EntityFactory
                 { StdActions.MainAttack, new Keybind(mouseButton: MouseButton.Left) }
             })
         );
-
         Global.Players.Add(player);
+
         equipment.Parent = player;
         collisionBox.Parent = player;
+        hurtBox.Parent = player;
+
         return player;
     }
 
@@ -76,6 +80,7 @@ public static class EntityFactory
         sword.Attach(new Item(Global.ContentLibrary.Textures["swords"]));
         sword.Attach(equipable);
         sword.Attach(hitbox);
+        
         sword.Attach(new MeleeAttack(20, 0.3f, Static.MeleeType.Slash));
         sword.Attach(new SpriteComponent(swordSprite, new(0, 0, 32, 32)) { Rotation = MathHelper.ToRadians(-45), Origin = new(0, 30) });
 
@@ -83,7 +88,7 @@ public static class EntityFactory
         return sword;
     }
 
-    public static Entity CreateSlimySlimeAt(Vector2 position)
+    public static Entity CreateSlimySlimeAt(Vector2 position, float Hp)
     {
         var slimeCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
 
@@ -92,9 +97,9 @@ public static class EntityFactory
         slime.Attach(new VelocityComponent(Vector2.Zero));
         slime.Attach(new Behavior(1, default, Global.Players.FirstOrDefault(defaultValue: null)));
         slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation"));
-        slime.Attach(new HealthComponent(100));
+        slime.Attach(new HealthComponent(Hp, 100));
         slime.Attach(slimeCollision);
-        
+
         slime.Attach(new Skeleton([
             new ChainComponent(Vector2.Zero, Global.Players.FirstOrDefault(), [
                 new Joint(Vector2.Zero, 10f, 0f),
@@ -112,21 +117,50 @@ public static class EntityFactory
         return slime;
     }
 
-    public static Entity CreateSlimeAt(Vector2 position)
+    public static Entity CreateSlimeAt(Vector2 position, float Hp)
     {
         Color[] colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
         var slimeCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
+        var slimeHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
+        var slimeHit = new HitBox(new RectangleF(0, 0, 16, 16));
         var slime = Global.World.CreateEntity();
         slime.Attach(new Transform2(position));
         slime.Attach(new VelocityComponent(Vector2.Zero));
         slime.Attach(new Behavior(2, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
         slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation") { Color = colors[Global.Random.Next(0, 5)] });
-        slime.Attach(new HealthComponent(100));
+        slime.Attach(new HealthComponent(Hp, 100));
         slime.Attach(slimeCollision);
+        slime.Attach(slimeHurt);
+        slime.Attach(slimeHit);
 
+        slimeHurt.Parent = slime;
+        slimeHit.Parent = slime;
         slimeCollision.Parent = slime;
         return slime;
     }
+    
+    public static Entity CreateSkeletonAt(Vector2 position, float Hp)
+    {
+        Color[] colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
+        var SkeletonCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
+        var SkeletonHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
+        var SkeletonHit = new HitBox(new RectangleF(0, 0, 16, 16));
+        var Skeleton = Global.World.CreateEntity();
+        Skeleton.Attach(new Transform2(position));
+        Skeleton.Attach(new VelocityComponent(Vector2.Zero));
+        Skeleton.Attach(new Behavior(2, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
+        Skeleton.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["skeleton"], "skeletonAnimation") { Color = colors[Global.Random.Next(0, 5)] });
+        Skeleton.Attach(new HealthComponent(Hp, 100));
+        Skeleton.Attach(SkeletonCollision);
+        Skeleton.Attach(SkeletonHurt);
+        Skeleton.Attach(SkeletonHit);
+
+        SkeletonHurt.Parent = Skeleton;
+        SkeletonHit.Parent = Skeleton;
+        SkeletonCollision.Parent = Skeleton;
+        return Skeleton;
+    }
+
 
     public static Entity CreateCentipedeAt(Vector2 position)
     {
@@ -141,7 +175,7 @@ public static class EntityFactory
             ])
         ]));
 
-        
+
 
         return centipide;
     }

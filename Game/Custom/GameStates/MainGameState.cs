@@ -107,10 +107,10 @@ public class MainGameState : GameState
             {
                 EntityFactory.CreateSlimeAt(new Vector2(
                     Global.Random.Next(-10, 10),
-                    Global.Random.Next(-10, 10))
+                    Global.Random.Next(-10, 10)), 100f
                 );
             }
-            var player = EntityFactory.CreatePlayerAt(Vector2.Zero);
+            var player = EntityFactory.CreatePlayerAt(Vector2.Zero, 100f);
             var eq = player.Get<Equipment>();
             eq.Equip("hand", EntityFactory.CreateSwordAt(Vector2.Zero));
             var collisionbox = new CollisionBox(new RectangleF(10f, 10f, 50f, 50f));
@@ -120,7 +120,7 @@ public class MainGameState : GameState
             obstacle.Attach(new Transform2(new(100, 100)));
             obstacle.Attach(collisionbox);
             obstacle.Attach(hurtbox);
-            obstacle.Attach(new HealthComponent(100));
+            obstacle.Attach(new HealthComponent(100, 100f));
             collisionbox.Parent = obstacle;
             hurtbox.Parent = obstacle;
         }

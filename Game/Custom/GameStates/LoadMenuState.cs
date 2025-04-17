@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using Game.Custom.Objects;
 using Game.Custom.Saving;
 using Game.Custom.UI;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Graphics;
@@ -14,11 +16,11 @@ namespace Game.Custom.GameStates
     public class LoadMenuState : GameState
     {
         private readonly List<UIElement> _UI;
+        private SoundEffect _selectSound;
         private List<GameSave> _saves;  // Non-nullable GameSave objects
-        private int _selectedIndex = 0;
-
+                                        //private int _selectedIndex = 0;
         public LoadMenuState(Game game, GraphicsDevice graphicsDevice, ContentManager content)
-            : base(game, graphicsDevice, content)
+        : base(game, graphicsDevice, content)
         {
             Texture2D buttonSheet = content.Load<Texture2D>("ButtonSheet");
             Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/button", buttonSheet, 64, 8);
@@ -33,11 +35,15 @@ namespace Game.Custom.GameStates
 
             SpriteFont buttonFont = _content.Load<SpriteFont>("Fonts/Font");
             SpriteBatch _spriteBatch = new SpriteBatch(graphicsDevice);
-            AnimatedSprite buttonSprite = new AnimatedSprite(buttonSpriteSheet, "idle");
+            _selectSound = _content.Load<SoundEffect>("menuSelectSound");
 
+            AnimatedSprite buttonSprite = new AnimatedSprite(buttonSpriteSheet, "idle");
             _saves = Global.SaveManager.GetAllGameSaves();  // List of GameSave objects
             Global.SaveManager.PrintAllSavedData();
             // Create button for Save Slot 1
+
+
+
             var LoadSaveOneButton = new Button(buttonSprite, buttonFont)
             {
                 Position = new Vector2(300, 200),
@@ -87,9 +93,10 @@ namespace Game.Custom.GameStates
             ];
         }
 
+
         private void TryLoadSave(int index, GameTime gameTime)
         {
-            if (index < _saves.Count && _saves[index].GameId != 0)
+ _selectSound.Play();            ;if (index < _saves.Count && _saves[index].GameId != 0)
             {
                 int gameId = _saves[index].GameId;
                 Console.WriteLine($"Loading GameId: {gameId}");
@@ -105,7 +112,7 @@ namespace Game.Custom.GameStates
 
         private void CreateNewSave()
         {
-            const int MaxSaves = 3;
+ _selectSound.Play();            const int MaxSaves = 3;
 
             if (_saves.Count >= MaxSaves)
             {
@@ -125,7 +132,7 @@ namespace Game.Custom.GameStates
 
         private void UpdateButtonText(int slot)
         {
-            // Update the button text after creating a new save
+ _selectSound.Play();            // Update the button text after creating a new save
             switch (slot)
             {
                 case 1:
@@ -145,7 +152,7 @@ namespace Game.Custom.GameStates
 
         private void BackButton_Click(object sender, EventArgs e)
         {
-            _game.ChangeState(new MenuState(_game, _graphicsDevice, _content));
+ _selectSound.Play();            _game.ChangeState(new MenuState(_game, _graphicsDevice, _content));
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
