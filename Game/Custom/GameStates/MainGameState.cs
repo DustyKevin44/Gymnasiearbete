@@ -101,7 +101,8 @@ public class MainGameState : GameState
             Global.SaveManager.PrintAllSavedData();
             Global.GameId = gameId.Value;
 
-            EntityFactory.CreateCentipedeAt(new Vector2(300, 300));
+            var zombie = EntityFactory.CreateZombieAt(new (200, 200), 100);
+            var centipede = EntityFactory.CreateCentipedeAt(new (300, 300));
         }
         else
         {

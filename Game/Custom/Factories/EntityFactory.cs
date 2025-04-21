@@ -119,7 +119,7 @@ public static class EntityFactory
         Skeleton.Attach(new Transform2(position));
         Skeleton.Attach(new VelocityComponent(Vector2.Zero));
         Skeleton.Attach(new Behavior(2, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
-        Skeleton.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["skeleton"], "skeletonAnimation") { Color = colors[Global.Random.Next(0, 5)] });
+        Skeleton.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation") { Color = colors[Global.Random.Next(0, 5)] });
         Skeleton.Attach(new HealthComponent(Hp, 100));
         Skeleton.Attach(SkeletonCollision);
         Skeleton.Attach(SkeletonHurt);
@@ -129,6 +129,28 @@ public static class EntityFactory
         SkeletonHit.Parent = Skeleton;
         SkeletonCollision.Parent = Skeleton;
         return Skeleton;
+    }
+
+    public static Entity CreateZombieAt(Vector2 position, float Hp)
+    {
+        var zombieCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
+        var zombieHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
+        var zombieHit = new HitBox(new RectangleF(0, 0, 16, 16));
+
+        var zombie = Global.World.CreateEntity();
+        zombie.Attach(new Transform2(position));
+        zombie.Attach(new VelocityComponent(Vector2.Zero));
+        zombie.Attach(new Behavior(2, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
+        zombie.Attach(new SpriteComponent(Global.ContentLibrary.Textures["player"]) { Color = Color.LightGreen });
+        zombie.Attach(new HealthComponent(Hp, 100));
+        zombie.Attach(zombieCollision);
+        zombie.Attach(zombieHurt);
+        zombie.Attach(zombieHit);
+
+        zombieCollision.Parent = zombie;
+        zombieHurt.Parent = zombie;
+        zombieHit.Parent = zombie;
+        return zombie;
     }
 
     public static Entity CreateCentipedeAt(Vector2 position)
@@ -151,6 +173,7 @@ public static class EntityFactory
         var segmentCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
         var segmentHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
         var segmentHit = new HitBox(new RectangleF(0, 0, 16, 16));
+
         var entity = Global.World.CreateEntity();
         entity.Attach(new Transform2(position));
         entity.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation"));

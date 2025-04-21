@@ -56,11 +56,11 @@ public class RenderSystem() : EntityDrawSystem(Aspect.All(typeof(Transform2)).On
                     sprite.Texture,
                     transform.Position + offset.Position,
                     sprite.SourceRectangle,                                 // Source rectangle (null uses the whole texture)
-                    Color.White,                                            // Tint color
+                    sprite.Color,                                           // Tint color
                     transform.Rotation + offset.Rotation + sprite.Rotation, // Rotation
                     sprite.Origin,                                          // Origin (center of the texture)
                     transform.Scale * offset.Scale * sprite.Scale,          // Scale factor
-                    SpriteEffects.None,                                     // Effects
+                    sprite.Effects,                                         // Effects
                     0f                                                      // Layer depth
                 );
             }

@@ -15,7 +15,7 @@ public class BehaviorSystem : EntityUpdateSystem
     private ComponentMapper<Behavior> _behaviorMapper;
     private ComponentMapper<AnimatedSprite> _animatedSpriteMapper;
 
-    public BehaviorSystem() : base(Aspect.All(typeof(Transform2), typeof(VelocityComponent), typeof(Behavior), typeof(AnimatedSprite))) { }
+    public BehaviorSystem() : base(Aspect.All(typeof(Transform2), typeof(VelocityComponent), typeof(Behavior))) { }
 
     public override void Initialize(IComponentMapperService mapperService)
     {
