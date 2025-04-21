@@ -96,9 +96,8 @@ public class MainGameState : GameState
 
         if (gameId.HasValue)
         {
-            SaveManager saveManager = new();
-            saveManager.LoadGame(gameId.Value);
-            saveManager.PrintAllSavedData();
+            Global.SaveManager.LoadGame(gameId.Value);
+            Global.SaveManager.PrintAllSavedData();
             Global.GameId = gameId.Value;
         }
         else

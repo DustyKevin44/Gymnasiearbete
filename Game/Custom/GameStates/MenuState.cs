@@ -31,18 +31,18 @@ public class MenuState : GameState
         SpriteBatch _spriteBatch = new SpriteBatch(graphicsDevice);
         AnimatedSprite buttonSprite = new AnimatedSprite(buttonSpriteSheet, "idle");
         _selectSound = _content.Load<SoundEffect>("menuSelectSound");
-        var newGameButton = new Button(buttonSprite, buttonFont)
+        var continueButton = new Button(buttonSprite, buttonFont)
         {
             Position = new Vector2(300, 200),
-            Text = "New Game"
+            Text = "Continue"
         };
 
-        newGameButton.Click += NewGameButton_Click;
+        continueButton.Click += ContinueButton_Click;
 
         var loadGameButton = new Button(buttonSprite, buttonFont)
         {
             Position = new Vector2(300, 250),
-            Text = "Load Game"
+            Text = "Load"
         };
 
         loadGameButton.Click += LoadGameButton_Click;
@@ -56,24 +56,36 @@ public class MenuState : GameState
         quitGameButton.Click += QuitGameButton_Click;
 
         _UI = [
-            newGameButton,
+            continueButton,
             loadGameButton,
             quitGameButton,
         ];
     }
-    private void NewGameButton_Click(object sender, EventArgs e)
+    private void ContinueButton_Click(object sender, EventArgs e)
     {
-_selectSound.Play();
-        _game.ChangeState(new MainGameState(_game, _graphicsDevice, _content));
+        _selectSound.Play();
+        var save = Global.SaveManager.GetLastPlayedSave();
+        
+        if (save.HasValue)
+        {
+            var gameState = Global.SaveManager.StartFromSave(_game, _graphicsDevice, _content, save.Value.GameId);
+            _game.ChangeState(gameState);
+        }
+        else
+        {
+            Console.WriteLine("No saves");
+        }
     }
 
     private void LoadGameButton_Click(object sender, EventArgs e)
-    {_selectSound.Play();
+    {
+        _selectSound.Play();
         _game.ChangeState(new LoadMenuState(_game, _graphicsDevice, _content));
     }
 
     private void QuitGameButton_Click(object sender, EventArgs e)
-    {_selectSound.Play(); Thread.Sleep(500);
+    {
+        _selectSound.Play(); Thread.Sleep(500);
         _game.Exit();
         Console.WriteLine("Exit game");
     }
