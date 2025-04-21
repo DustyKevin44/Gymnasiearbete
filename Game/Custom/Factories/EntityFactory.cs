@@ -32,19 +32,18 @@ public static class EntityFactory
         void MainMenu(GameTime gameTime)
         {
             Global.SaveManager.SaveGame(Global.GameId, Global.World, gameTime);
-            Global.Game.ChangeState(new MenuState(Global.Game, Global.GraphicsDevice, Global.ContentManager)); // TODO: Fix menu, just ends it right now.
+            Global.Game.ChangeState(new MenuState(Global.Game, Global.GraphicsDevice, Global.ContentManager));
         }
 
         var equipment = new Equipment(["hand"]);
         var collisionBox = new CollisionBox(new RectangleF(0, 0, 20, 20));
         var hurtBox = new HurtBox(new RectangleF(0, 0, 20, 20));
+
         var player = Global.World.CreateEntity();
         player.Attach(new Transform2(position));
         player.Attach(new HealthComponent(Hp, 100));
         player.Attach(new VelocityComponent(Vector2.Zero));
         player.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["player"], "runRight"));
-
-        //player.Attach(new SpriteComponent(Global.ContentLibrary.Textures["player"]));
         player.Attach(collisionBox);
         player.Attach(hurtBox);
         player.Attach(equipment);
@@ -61,12 +60,11 @@ public static class EntityFactory
                 { StdActions.MainAttack, new Keybind(mouseButton: MouseButton.Left) }
             })
         );
-        Global.Players.Add(player);
 
         equipment.Parent = player;
         collisionBox.Parent = player;
         hurtBox.Parent = player;
-
+        Global.Players.Add(player);
         return player;
     }
 
@@ -81,7 +79,6 @@ public static class EntityFactory
         sword.Attach(new Item(Global.ContentLibrary.Textures["swords"]));
         sword.Attach(equipable);
         sword.Attach(hitbox);
-        
         sword.Attach(new MeleeAttack(20, 0.3f, Static.MeleeType.Slash));
         sword.Attach(new SpriteComponent(swordSprite, new(0, 0, 32, 32)) { Rotation = MathHelper.ToRadians(-45), Origin = new(0, 30) });
 
@@ -95,10 +92,11 @@ public static class EntityFactory
         var slimeCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
         var slimeHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
         var slimeHit = new HitBox(new RectangleF(0, 0, 16, 16));
+
         var slime = Global.World.CreateEntity();
         slime.Attach(new Transform2(position));
         slime.Attach(new VelocityComponent(Vector2.Zero));
-        slime.Attach(new Behavior(2, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
+        slime.Attach(new Behavior(2, default, Global.Players.First())); // <-- Maybe allow for multiple targets in the future
         slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation") { Color = colors[Global.Random.Next(0, 5)] });
         slime.Attach(new HealthComponent(Hp, 100));
         slime.Attach(slimeCollision);
@@ -117,6 +115,7 @@ public static class EntityFactory
         var SkeletonCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
         var SkeletonHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
         var SkeletonHit = new HitBox(new RectangleF(0, 0, 16, 16));
+
         var Skeleton = Global.World.CreateEntity();
         Skeleton.Attach(new Transform2(position));
         Skeleton.Attach(new VelocityComponent(Vector2.Zero));
@@ -162,7 +161,10 @@ public static class EntityFactory
         head.Attach(new VelocityComponent(Vector2.Zero));
         head.Get<AnimatedSprite>().Color = Color.Red;
 
-        var last = CreateCentipedeSegmentAt(position - new Vector2(32f, 0), 360f, head); // The second segment has no rotation contraint
+        // The second segments contraint will be relative to the world since the first segments rotation is constant (mostly)
+        // and because each segments rotation and length is practically the childs constraint, we set the second (or the heads child's)
+        // rotation contraint to 2pi so that the head can freely look around.
+        var last = CreateCentipedeSegmentAt(position - new Vector2(32f, 0), 360f, head);
         for (int i = 0; i < 4; i++)
         {
             last = CreateCentipedeSegmentAt(last.Get<Transform2>().Position - new Vector2(32f, 0), 45f, last);

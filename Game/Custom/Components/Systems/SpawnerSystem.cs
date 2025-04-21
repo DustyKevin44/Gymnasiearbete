@@ -1,9 +1,6 @@
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.Graphics;
-using MonoGame.Extended.Tweening;
 using MonoGame.Extended.ECS.Systems;
 using MonoGame.Extended.ECS;
-using System.Threading;
 using System;
 using Game.Custom.Factories;
 

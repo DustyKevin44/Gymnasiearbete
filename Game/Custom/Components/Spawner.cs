@@ -1,9 +1,8 @@
 using System;
-using System.Runtime.InteropServices;
-using Autofac;
 using Microsoft.Xna.Framework;
 
 namespace Game.Custom.Components;
+
 
 public class SpawnerComponent(Vector2 position, Vector2 size, string type, float cooldown, float? cooldownVariance=null)
 {
@@ -14,5 +13,4 @@ public class SpawnerComponent(Vector2 position, Vector2 size, string type, float
     public float? CooldownVariance = cooldownVariance; // The variance in spawning on cooldown. Will increase or decrease the next cooldown.
     public float NextSpawn = cooldown;
     public TimeSpan Elapsed = TimeSpan.Zero; // Time elapsed since last spawn.
-    
 }
