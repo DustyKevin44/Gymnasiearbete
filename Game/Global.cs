@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Game.Custom.Debug;
 using Game.Custom.Saving;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -68,10 +69,15 @@ public class ContentLibrary
 {
     public Dictionary<string, Texture2D> Textures = [];
     public Dictionary<string, SpriteSheet> Animations = [];
+    public Dictionary<string, SoundEffect> SoundEffects = [];
 
     public void SaveTexture(Texture2D texture, string Name)
     {
         Textures[Name] = texture;
+    }
+     public void SaveSoundEffects(SoundEffect soundEffects, string Name)
+    {
+        SoundEffects[Name] = soundEffects;
     }
 
     public void SaveAnimation(SpriteSheet spriteSheet, string Name)

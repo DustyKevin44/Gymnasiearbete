@@ -102,16 +102,6 @@
 /processor:TiledMapTilesetProcessor
 /build:grassTileset.tsx
 
-#begin grassTileset.tsx
-/importer:TiledMapTilesetImporter
-/processor:TiledMapTilesetProcessor
-/build:grassTileset.tsx
-
-#begin GrassTileset2.0.tsx
-/importer:TiledMapTilesetImporter
-/processor:TiledMapTilesetProcessor
-/build:GrassTileset2.0.tsx
-
 #begin GrassTileset2.0.tsx
 /importer:TiledMapTilesetImporter
 /processor:TiledMapTilesetProcessor
@@ -128,18 +118,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:grassTilesetImageReal.png
-
-#begin grassTilesetImages.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:grassTilesetImages.png
 
 #begin grassTilesetImages.png
 /importer:TextureImporter
@@ -194,6 +172,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:player2.png
+
+#begin playerRunRight.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:playerRunRight.png
 
 #begin slimeSheet.png
 /importer:TextureImporter

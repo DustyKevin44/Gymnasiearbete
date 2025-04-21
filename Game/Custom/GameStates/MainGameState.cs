@@ -70,8 +70,8 @@ public class MainGameState : GameState
 
 
         var entityTexture = _content.Load<Texture2D>("slimeSheet");
-        Texture2DAtlas atlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
-        var spriteSheet = new SpriteSheet("SpriteSheet/slime", atlas);
+        Texture2DAtlas slimeAtlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
+        var spriteSheet = new SpriteSheet("SpriteSheet/slime", slimeAtlas);
         spriteSheet.DefineAnimation("slimeAnimation", builder =>
         {
             builder.IsLooping(true)
@@ -90,9 +90,40 @@ public class MainGameState : GameState
         });
 
         Global.ContentLibrary.Animations.Add("slime", spriteSheet);
+
+        #region Player Animations
+        
+        var playerTexture = _content.Load<Texture2D>("playerRunRight");
+        Texture2DAtlas playerAtlas = Texture2DAtlas.Create("Atlas/player", playerTexture, 32, 32);
+        var playerSpriteSheet = new SpriteSheet("SpriteSheet/player", playerAtlas);
+        playerSpriteSheet.DefineAnimation("runRight", builder =>
+        {
+            builder.IsLooping(true)
+                .AddFrame(0, TimeSpan.FromSeconds(0.4))
+                .AddFrame(1, TimeSpan.FromSeconds(0.4))
+                .AddFrame(2, TimeSpan.FromSeconds(0.4))
+                .AddFrame(3, TimeSpan.FromSeconds(0.4))
+                .AddFrame(4, TimeSpan.FromSeconds(0.4))
+                .AddFrame(5, TimeSpan.FromSeconds(0.4))
+                .AddFrame(6, TimeSpan.FromSeconds(0.4))
+                .AddFrame(7, TimeSpan.FromSeconds(0.4))
+                .AddFrame(8, TimeSpan.FromSeconds(0.4));
+        });
+
+        playerSpriteSheet.DefineAnimation("idleAnimation", builder =>
+        {
+            builder.IsLooping(true)
+                .AddFrame(3, TimeSpan.FromSeconds(0.2))
+                .AddFrame(4, TimeSpan.FromSeconds(0.2));
+        });
+        Global.ContentLibrary.Animations.Add("player", spriteSheet);
+
         Global.ContentLibrary.Textures["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
+
+        #endregion
+
         var spawner = Global.World.CreateEntity();
-        spawner.Attach(new SpawnerComponent(new(0,0), new(100,100), "Slime", 2.0f));
+        spawner.Attach(new SpawnerComponent(new(200,200), new(100,100), "Slime", 2.0f));
         
 
         if (gameId.HasValue)
@@ -114,6 +145,7 @@ public class MainGameState : GameState
                     Global.Random.Next(-10, 10)), 100f
                 );
             }
+
             var player = EntityFactory.CreatePlayerAt(Vector2.Zero, 100f);
             var eq = player.Get<Equipment>();
             eq.Equip("hand", EntityFactory.CreateSwordAt(Vector2.Zero));
@@ -158,21 +190,7 @@ public class MainGameState : GameState
 
     public override void LoadContent()
     {
-        _solidTiles = [];
-        var collisionLayer = _map.GetLayer<TiledMapTileLayer>("Tile Layer 1");
-        if (collisionLayer != null)
-        {
-            for (ushort x = 0; x < collisionLayer.Width; x++)
-            {
-                for (ushort y = 0; y < collisionLayer.Height; y++)
-                {
-                    if (collisionLayer.TryGetTile(x, y, out var tile) && tile.Value.GlobalIdentifier != 0)
-                    {
-                        _solidTiles.Add(new Point(x, y)); // Store only tile coordinates
-                    }
-                }
-            }
-        }
+        
     }
 
     public override void Update(GameTime gameTime)

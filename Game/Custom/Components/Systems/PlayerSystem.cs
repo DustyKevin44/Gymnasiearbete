@@ -74,7 +74,10 @@ public class PlayerSystem : EntityUpdateSystem
             if (direction != Vector2.Zero)
                 direction.Normalize();
             player.Direction = direction;
-
+            if(player.Direction.X > 0)
+            {
+                
+            }
             velocity.Velocity += direction * 1000f * gameTime.GetElapsedSeconds();
 
             if (velocity.Velocity.X < 0.01 && velocity.Velocity.X > -0.01)
