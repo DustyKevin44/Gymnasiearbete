@@ -92,7 +92,7 @@ public class MainGameState : GameState
         Global.ContentLibrary.Animations.Add("slime", spriteSheet);
 
         #region Player Animations
-        
+
         var playerTexture = _content.Load<Texture2D>("playerRunRight");
         Texture2DAtlas playerAtlas = Texture2DAtlas.Create("Atlas/player", playerTexture, 32, 32);
         var playerSpriteSheet = new SpriteSheet("SpriteSheet/player", playerAtlas);
@@ -116,15 +116,15 @@ public class MainGameState : GameState
                 .AddFrame(3, TimeSpan.FromSeconds(0.2))
                 .AddFrame(4, TimeSpan.FromSeconds(0.2));
         });
-        Global.ContentLibrary.Animations.Add("player", spriteSheet);
+        Global.ContentLibrary.Animations.Add("player", playerSpriteSheet);
 
         Global.ContentLibrary.Textures["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
 
         #endregion
 
         var spawner = Global.World.CreateEntity();
-        spawner.Attach(new SpawnerComponent(new(200,200), new(100,100), "Slime", 2.0f));
-        
+        spawner.Attach(new SpawnerComponent(new(200, 200), new(100, 100), "Slime", 2.0f));
+
 
         if (gameId.HasValue)
         {
@@ -132,8 +132,8 @@ public class MainGameState : GameState
             Global.SaveManager.PrintAllSavedData();
             Global.GameId = gameId.Value;
 
-            var zombie = EntityFactory.CreateZombieAt(new (200, 200), 100);
-            var centipede = EntityFactory.CreateCentipedeAt(new (300, 300));
+            var zombie = EntityFactory.CreateZombieAt(new(200, 200), 100);
+            var centipede = EntityFactory.CreateCentipedeAt(new(300, 300));
         }
         else
         {
@@ -151,7 +151,7 @@ public class MainGameState : GameState
             eq.Equip("hand", EntityFactory.CreateSwordAt(Vector2.Zero));
             var collisionbox = new CollisionBox(new RectangleF(10f, 10f, 50f, 50f));
             var hurtbox = new HurtBox(new RectangleF(0, 0, 50, 50));
-            
+
             obstacle = Global.World.CreateEntity();
             obstacle.Attach(new Transform2(new(100, 100)));
             obstacle.Attach(collisionbox);
@@ -190,7 +190,7 @@ public class MainGameState : GameState
 
     public override void LoadContent()
     {
-        
+
     }
 
     public override void Update(GameTime gameTime)

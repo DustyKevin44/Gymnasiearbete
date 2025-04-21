@@ -38,4 +38,3 @@ project.fragment.lock.json
 # Ensure no specific package files are tracked accidentally
 **/packages/
 packages.config
-Game/Content/obj/DesktopGL/net8.0/Content/.mgstats
