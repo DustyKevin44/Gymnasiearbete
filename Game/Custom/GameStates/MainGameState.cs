@@ -135,7 +135,7 @@ public class MainGameState : GameState
         // slimeSpawner.Attach(new SpawnerComponent(new(0,0), new(500,500), new("slime"), 1f));
 
         // Load the Tiled map
-        _map = _content.Load<TiledMap>("tileSetWith2Tileset"); // Use the name of your Tiled map file
+        _map = _content.Load<TiledMap>("tileMapGyar"); // Use the name of your Tiled map file
 
         // Initialize the TiledMapRenderer
         _mapRenderer = new TiledMapRenderer(_graphicsDevice, _map);
