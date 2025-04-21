@@ -1,3 +1,5 @@
+using System;
+using System.Numerics;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.Tweening;
 
@@ -30,5 +32,10 @@ public static class Utils
     {
         component = mapper.Get(entityId);
         return mapper.Has(entityId);
+    }
+
+    public static Vector2 FromAngle(float radians)
+    {
+        return new Vector2((float)MathF.Cos(radians), (float)MathF.Sin(radians));
     }
 }

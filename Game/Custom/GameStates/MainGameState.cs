@@ -17,6 +17,7 @@ using Game.Custom.Factories;
 using Game.Custom.Debug;
 using Game.Custom.Saving;
 using Game.Custom.Utilities;
+using Game.Custom.Experimental;
 
 namespace Game.Custom.GameStates;
 
@@ -54,9 +55,9 @@ public class MainGameState : GameState
             .AddSystem(new BehaviorSystem())
             .AddSystem(new PlayerSystem())
             .AddSystem(new AliveSystem())
-            .AddSystem(new ProceduralAnimationSystem())
             .AddSystem(new TweenerSystem())
             .AddSystem(new SpawnerSystem())
+            .AddSystem(new SegmentSystem())
             .AddSystem(new DebugSystem())
             .AddSystem(new RenderSystem())
             .AddSystem(new DebugRenderSystem())
@@ -99,6 +100,8 @@ public class MainGameState : GameState
             Global.SaveManager.LoadGame(gameId.Value);
             Global.SaveManager.PrintAllSavedData();
             Global.GameId = gameId.Value;
+
+            EntityFactory.CreateCentipedeAt(new Vector2(300, 300));
         }
         else
         {

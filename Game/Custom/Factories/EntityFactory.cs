@@ -5,7 +5,6 @@ using Game.Custom.Components.Systems;
 using Game.Custom.Experimental;
 using Game.Custom.GameStates;
 using Game.Custom.Input;
-using Game.Custom.Saving;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
@@ -88,35 +87,6 @@ public static class EntityFactory
         return sword;
     }
 
-    public static Entity CreateSlimySlimeAt(Vector2 position, float Hp)
-    {
-        var slimeCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
-
-        var slime = Global.World.CreateEntity();
-        slime.Attach(new Transform2(position));
-        slime.Attach(new VelocityComponent(Vector2.Zero));
-        slime.Attach(new Behavior(1, default, Global.Players.FirstOrDefault(defaultValue: null)));
-        slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation"));
-        slime.Attach(new HealthComponent(Hp, 100));
-        slime.Attach(slimeCollision);
-
-        slime.Attach(new Skeleton([
-            new ChainComponent(Vector2.Zero, Global.Players.FirstOrDefault(), [
-                new Joint(Vector2.Zero, 10f, 0f),
-                new Joint(Vector2.Zero, 10f, 0f),
-                new Joint(Vector2.Zero, 10f, 0f),
-            ]),
-            new ChainComponent(new Vector2(10, 10), null, [
-                new Joint(Vector2.Zero, 10f, 0f),
-                new Joint(Vector2.Zero, 10f, 0f),
-                new Joint(Vector2.Zero, 10f, 0f),
-            ]),
-        ]));
-
-        slimeCollision.Parent = slime;
-        return slime;
-    }
-
     public static Entity CreateSlimeAt(Vector2 position, float Hp)
     {
         Color[] colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
@@ -161,22 +131,38 @@ public static class EntityFactory
         return Skeleton;
     }
 
-
     public static Entity CreateCentipedeAt(Vector2 position)
     {
-        var centipide = Global.World.CreateEntity();
-        centipide.Attach(new Skeleton([
-            new ChainComponent(position, null, [
-                new Joint(Vector2.Zero, 10f, 0f),
-                new Joint(Vector2.Zero, 10f, 0f),
-                new Joint(Vector2.Zero, 10f, 0f),
-                new Joint(Vector2.Zero, 10f, 0f),
-                new Joint(Vector2.Zero, 10f, 0f),
-            ])
-        ]));
+        var head = CreateCentipedeSegmentAt(position, 0f, null);
+        head.Attach(new Behavior(2, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
+        head.Attach(new VelocityComponent(Vector2.Zero));
+        head.Get<AnimatedSprite>().Color = Color.Red;
 
+        var last = CreateCentipedeSegmentAt(position - new Vector2(32f, 0), 360f, head); // The second segment has no rotation contraint
+        for (int i = 0; i < 4; i++)
+        {
+            last = CreateCentipedeSegmentAt(last.Get<Transform2>().Position - new Vector2(32f, 0), 45f, last);
+        }
+        return head;
+    }
 
+    private static Entity CreateCentipedeSegmentAt(Vector2 position, float maxAngle, Entity parent)
+    {
+        var segmentCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
+        var segmentHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
+        var segmentHit = new HitBox(new RectangleF(0, 0, 16, 16));
+        var entity = Global.World.CreateEntity();
+        entity.Attach(new Transform2(position));
+        entity.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation"));
+        entity.Attach(new SegmentComponent(parent, 32f, MathHelper.ToRadians(maxAngle)));
+        entity.Attach(new DirectionComponent(0f));
+        entity.Attach(segmentCollision);
+        entity.Attach(segmentHurt);
+        entity.Attach(segmentHit);
 
-        return centipide;
+        segmentCollision.Parent = entity;
+        segmentHurt.Parent = entity;
+        segmentHit.Parent = entity;
+        return entity;
     }
 }
