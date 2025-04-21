@@ -7,6 +7,7 @@
 *.sln.docstates
 ipch/
 .vscode/
+*.mgstats
 
 # MonoGame specific files
 *.mgcb
