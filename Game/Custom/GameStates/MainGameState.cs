@@ -15,8 +15,6 @@ using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
 using Game.Custom.Factories;
 using Game.Custom.Debug;
-using Game.Custom.Saving;
-using Game.Custom.Utilities;
 using Game.Custom.Experimental;
 
 namespace Game.Custom.GameStates;
@@ -27,9 +25,7 @@ public class MainGameState : GameState
     private TiledMap _map;
     private TiledMapRenderer _mapRenderer;
     private HashSet<Point> _solidTiles = [];
-
     private SpriteBatch _spriteBatch;
-    private Entity obstacle;
 
     public MainGameState(Game game, GraphicsDevice graphicsDevice, ContentManager content, int? gameId = null)
         : base(game, graphicsDevice, content)
@@ -40,7 +36,7 @@ public class MainGameState : GameState
 
     private void Initialize(GraphicsDevice _graphicsDevice, int? gameId)
     {
-        Global.Unload();
+        Global.Unload(); // Remove all Global values
 
         var collisionSystem = new CollisionComponent(new RectangleF(int.MinValue / 2, int.MinValue / 2, int.MaxValue, int.MaxValue));
         collisionSystem.Initialize();
@@ -50,24 +46,23 @@ public class MainGameState : GameState
 
         // Initialize the world
         World world = new WorldBuilder()
-            .AddSystem(new MovementSystem())
-            .AddSystem(new EntityColliderSystem())
-            .AddSystem(new BehaviorSystem())
-            .AddSystem(new PlayerSystem())
-            .AddSystem(new AliveSystem())
-            .AddSystem(new TweenerSystem())
-            .AddSystem(new SpawnerSystem())
-            .AddSystem(new SegmentSystem())
-            .AddSystem(new DebugSystem())
-            .AddSystem(new RenderSystem())
-            .AddSystem(new DebugRenderSystem())
+            .AddSystem(new SpawnerSystem())         // Spawn enemies first
+            .AddSystem(new BehaviorSystem())        // Handle behaviours
+            .AddSystem(new PlayerSystem())          //      - player behaviour
+            .AddSystem(new MovementSystem())        // Handle movement
+            .AddSystem(new TweenerSystem())         //      - tween (position, ...)
+            .AddSystem(new SegmentSystem())         //      - move segments
+            .AddSystem(new EntityColliderSystem())  // Handle Collisions
+            .AddSystem(new AliveSystem())           // Remove dead entities
+            .AddSystem(new DebugSystem())           // Debug (select entities)
+            .AddSystem(new RenderSystem())          // Render game
+            .AddSystem(new DebugRenderSystem())     //      - Debug render (colliders)
             .Build();
 
         Global.SetWorld(world); // <-- some systems need Globals and thus this is here
 
         var swordsTexture = _content.Load<Texture2D>("swords");
         Global.ContentLibrary.SaveTexture(swordsTexture, "swords");
-
 
         var entityTexture = _content.Load<Texture2D>("slimeSheet");
         Texture2DAtlas slimeAtlas = Texture2DAtlas.Create("Atlas/slime", entityTexture, 32, 32);
@@ -90,8 +85,6 @@ public class MainGameState : GameState
         });
 
         Global.ContentLibrary.Animations.Add("slime", spriteSheet);
-
-        #region Player Animations
 
         var playerTexture = _content.Load<Texture2D>("playerRunRight");
         Texture2DAtlas playerAtlas = Texture2DAtlas.Create("Atlas/player", playerTexture, 32, 32);
@@ -117,57 +110,22 @@ public class MainGameState : GameState
                 .AddFrame(4, TimeSpan.FromSeconds(0.2));
         });
         Global.ContentLibrary.Animations.Add("player", playerSpriteSheet);
-
         Global.ContentLibrary.Textures["player"] = _content.Load<Texture2D>("player2"); // Ensure you have a "player" texture
 
-        #endregion
-
-        var spawner = Global.World.CreateEntity();
-        spawner.Attach(new SpawnerComponent(new(200, 200), new(100, 100), "Slime", 2.0f));
-
-
-        if (gameId.HasValue)
+        if (!gameId.HasValue)
         {
-            Global.SaveManager.LoadGame(gameId.Value);
-            Global.SaveManager.PrintAllSavedData();
-            Global.GameId = gameId.Value;
-
-            var zombie = EntityFactory.CreateZombieAt(new(200, 200), 100);
-            var centipede = EntityFactory.CreateCentipedeAt(new(300, 300));
-        }
-        else
-        {
-
-            for (int i = 0; i < 1; i++)
-            {
-                EntityFactory.CreateSlimeAt(new Vector2(
-                    Global.Random.Next(-10, 10),
-                    Global.Random.Next(-10, 10)), 100f
-                );
-            }
-
-            var player = EntityFactory.CreatePlayerAt(Vector2.Zero, 100f);
-            var eq = player.Get<Equipment>();
-            eq.Equip("hand", EntityFactory.CreateSwordAt(Vector2.Zero));
-            var collisionbox = new CollisionBox(new RectangleF(10f, 10f, 50f, 50f));
-            var hurtbox = new HurtBox(new RectangleF(0, 0, 50, 50));
-
-            obstacle = Global.World.CreateEntity();
-            obstacle.Attach(new Transform2(new(100, 100)));
-            obstacle.Attach(collisionbox);
-            obstacle.Attach(hurtbox);
-            obstacle.Attach(new HealthComponent(100, 100f));
-            collisionbox.Parent = obstacle;
-            hurtbox.Parent = obstacle;
+            throw new ArgumentException("Missing GameId");
         }
 
+        // Load saved game
+        Global.SaveManager.LoadGame(gameId.Value);
+        Global.SaveManager.PrintAllSavedData();
+        Global.GameId = gameId.Value;
 
-
-
-
-
-        // var slimeSpawner = Global.World.CreateEntity();
-        // slimeSpawner.Attach(new SpawnerComponent(new(0,0), new(500,500), new("slime"), 1f));
+        // Testing
+        var zombie = EntityFactory.CreateZombieAt(new(200, 200), 100);
+        var centipede = EntityFactory.CreateCentipedeAt(new(300, 300));
+        Global.World.CreateEntity().Attach(new SpawnerComponent(new(200, 200), new(100, 100), "Slime", 2.0f));
 
         // Load the Tiled map
         _map = _content.Load<TiledMap>("tileMapGyar"); // Use the name of your Tiled map file
@@ -182,9 +140,7 @@ public class MainGameState : GameState
         {
             var entity = Global.World.GetEntity(i);
             if (entity.Has<CollisionBox>())
-            {
                 Global.CollisionSystem.Insert(entity.Get<CollisionBox>());
-            }
         }
     }
 

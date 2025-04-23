@@ -96,7 +96,7 @@ public static class EntityFactory
         var slime = Global.World.CreateEntity();
         slime.Attach(new Transform2(position));
         slime.Attach(new VelocityComponent(Vector2.Zero));
-        slime.Attach(new Behavior(2, default, Global.Players.First())); // <-- Maybe allow for multiple targets in the future
+        slime.Attach(new Behavior(TargetingBehaviour.Avoid, 10000f, 100f, 100f, Global.Players.First())); // <-- Maybe allow for multiple targets in the future
         slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation") { Color = colors[Global.Random.Next(0, 5)] });
         slime.Attach(new HealthComponent(Hp, 100));
         slime.Attach(slimeCollision);
@@ -119,7 +119,7 @@ public static class EntityFactory
         var Skeleton = Global.World.CreateEntity();
         Skeleton.Attach(new Transform2(position));
         Skeleton.Attach(new VelocityComponent(Vector2.Zero));
-        Skeleton.Attach(new Behavior(2, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
+        Skeleton.Attach(new Behavior(TargetingBehaviour.GoTowards, 5000f, 100f, 100f, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
         Skeleton.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation") { Color = colors[Global.Random.Next(0, 5)] });
         Skeleton.Attach(new HealthComponent(Hp, 100));
         Skeleton.Attach(SkeletonCollision);
@@ -141,7 +141,7 @@ public static class EntityFactory
         var zombie = Global.World.CreateEntity();
         zombie.Attach(new Transform2(position));
         zombie.Attach(new VelocityComponent(Vector2.Zero));
-        zombie.Attach(new Behavior(2, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
+        zombie.Attach(new Behavior(TargetingBehaviour.GoTowards, 7000f, 100f, 100f, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
         zombie.Attach(new SpriteComponent(Global.ContentLibrary.Textures["player"]) { Color = Color.LightGreen });
         zombie.Attach(new HealthComponent(Hp, 100));
         zombie.Attach(zombieCollision);
@@ -157,7 +157,7 @@ public static class EntityFactory
     public static Entity CreateCentipedeAt(Vector2 position)
     {
         var head = CreateCentipedeSegmentAt(position, 0f, null);
-        head.Attach(new Behavior(2, default, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
+        head.Attach(new Behavior(TargetingBehaviour.GoTowards, 15000f, 100f, 100f, Global.Players.FirstOrDefault(defaultValue: null))); // <-- Maybe allow for multiple targets in the future
         head.Attach(new VelocityComponent(Vector2.Zero));
         head.Get<AnimatedSprite>().Color = Color.Red;
 

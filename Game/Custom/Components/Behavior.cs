@@ -1,31 +1,28 @@
-using AStarSharp;
 using MonoGame.Extended.ECS;
-using System.Collections.Generic;
-using System;
+using Game.Custom.Components.Systems;
+using MonoGame.Extended.Timers;
 
 namespace Game.Custom.Components;
 
-public class Behavior(int type, TimeSpan elapsed = default, Entity target = null)
+public class Behavior
 {
-    public enum EnemyState
-    {
-        Idle, Active, Moseying
-    }
+    public EnemyState State = EnemyState.Idle;
+    public TargetingBehaviour Type;
+    public float MoveSpeed;
+    public float ViewRadius;
+    public float Distance;
+    public Entity Target;
 
-    public enum EnemySearchState
-    {
-        Searching, Found, Alerted, Unreachable
-    }
+    public CountdownTimer IdleTimer = new(5);
 
-    public EnemyState State;
-    public EnemySearchState SearchState;
-    
-    public int StepsTraveled;
-    public float EnemyMoveSpeed;
-    
-    public Entity Target = target;
-    public int Type { get; set; } = type;
-    
-    public TimeSpan Elapsed { get; set; } = elapsed;
-    public enum DirectionFacing;
+    public Behavior(TargetingBehaviour type, float moveSpeed, float viewRadius, float distance, Entity target = null)
+    {
+        Type = type;
+        MoveSpeed = moveSpeed;
+        ViewRadius = viewRadius;
+        Distance = distance;
+        Target = target;
+
+        IdleTimer.Completed += (_, _) => { State = (State == EnemyState.Idle) ? EnemyState.Moseying : EnemyState.Idle; };
+    }
 }

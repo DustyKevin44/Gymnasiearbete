@@ -32,6 +32,5 @@ public class MovementSystem : EntityUpdateSystem
             if (velocity.Velocity.LengthSquared() < 0.01f)
                 velocity.Velocity = Vector2.Zero; // Prevent tiny drift
         }
-
     }
 }

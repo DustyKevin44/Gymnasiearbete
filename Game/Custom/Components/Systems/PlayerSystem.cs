@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Game.Custom.Input;
 using Game.Custom.Static;
@@ -6,6 +8,7 @@ using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
+using MonoGame.Extended.Graphics;
 
 namespace Game.Custom.Components.Systems;
 
@@ -27,6 +30,7 @@ public class PlayerSystem : EntityUpdateSystem
     private ComponentMapper<VelocityComponent> _velocityMapper;
     private ComponentMapper<Equipment> _equipmentMapper;
     private ComponentMapper<Transform2> _transformMapper;
+    private ComponentMapper<AnimatedSprite> _animatedSpriteMapper;
 
     public PlayerSystem() : base(Aspect.All(typeof(PlayerComponent<StdActions>), typeof(VelocityComponent))) { }
 
@@ -36,6 +40,7 @@ public class PlayerSystem : EntityUpdateSystem
         _velocityMapper = mapperService.GetMapper<VelocityComponent>();
         _equipmentMapper = mapperService.GetMapper<Equipment>();
         _transformMapper = mapperService.GetMapper<Transform2>();
+        _animatedSpriteMapper = mapperService.GetMapper<AnimatedSprite>();
     }
 
     public override void Update(GameTime gameTime)
@@ -50,9 +55,6 @@ public class PlayerSystem : EntityUpdateSystem
         {
             var player = _playerMapper.Get(entity);
             var velocity = _velocityMapper.Get(entity);
-            
-            if (Utils.TryGet(entity, out HealthComponent hp))
-                System.Console.WriteLine(hp.Health);
 
             player.DashTimer.Update(gameTime);
 
@@ -74,10 +76,34 @@ public class PlayerSystem : EntityUpdateSystem
             if (direction != Vector2.Zero)
                 direction.Normalize();
             player.Direction = direction;
-            if(player.Direction.X > 0)
+
+            if (Utils.TryGet(_animatedSpriteMapper, entity, out AnimatedSprite animatedSprite))
             {
-                
+                try
+                {
+                    if (player.Direction.X > 0)
+                    {
+                        animatedSprite.SetAnimation("runRight");
+                    }
+                    else if (player.Direction.X < 0)
+                    {
+                        animatedSprite.SetAnimation("runLeft");
+                    }
+                    else
+                    {
+                        if (animatedSprite.CurrentAnimation == "runRight")
+                        {
+                            animatedSprite.SetAnimation("IdleRight");
+                        }
+                        else if (animatedSprite.CurrentAnimation == "runLeft")
+                        {
+                            animatedSprite.SetAnimation("IdleLeft");
+                        }
+                    }
+                }
+                catch (KeyNotFoundException) { }
             }
+
             velocity.Velocity += direction * 1000f * gameTime.GetElapsedSeconds();
 
             if (velocity.Velocity.X < 0.01 && velocity.Velocity.X > -0.01)

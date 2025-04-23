@@ -47,7 +47,6 @@ public class HitBox : ColliderBox
             if (!Utils.TryGet(Parent, out MeleeAttack mAttack)) return;
             if (!Utils.TryGet(hurtBox.Parent, out HealthComponent healthC)) return;
             healthC.Health -= mAttack.Damage;
-            Console.WriteLine(healthC.Health);
         }
     }
 

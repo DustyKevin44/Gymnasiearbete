@@ -83,7 +83,7 @@ public class DebugSystem() : EntitySystem(Aspect.All(typeof(Transform2))), IUpda
             var relBBox = GetRelativeBBox(_selectedEntity.Id);
             Global.SpriteBatch.DrawRectangle(relBBox.Position + _selectedEntity.Get<Transform2>().Position - relBBox.Size / 2, relBBox.Size, Color.DeepPink, 2f);
         }
-        catch (System.NullReferenceException)
+        catch (NullReferenceException)
         {
             Console.WriteLine("Null me");
         }
