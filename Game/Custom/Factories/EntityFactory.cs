@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Game.Custom.Components;
@@ -5,12 +6,15 @@ using Game.Custom.Components.Systems;
 using Game.Custom.Experimental;
 using Game.Custom.GameStates;
 using Game.Custom.Input;
+using Game.Custom.Static;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.Graphics;
 using MonoGame.Extended.Input;
+using MonoGame.Extended.Tweening;
 
 namespace Game.Custom.Factories;
 
@@ -191,5 +195,27 @@ public static class EntityFactory
         segmentHurt.Parent = entity;
         segmentHit.Parent = entity;
         return entity;
+    }
+
+    public static Entity CreateProjectileAt(Vector2 position, RangedAttack ranged, Vector2 direction)
+    {
+        Texture2D sprite;
+
+        switch (ranged.RangedType)
+        {
+            case RangedType.Mango:
+                sprite = Global.ContentLibrary.Textures["mango"];
+                break;
+            default:
+                throw new Exception("RangedType '" + ranged.RangedType + "' not implemented.");
+        }
+
+        var projectile = Global.World.CreateEntity();
+        projectile.Attach(new Transform2(position));
+        projectile.Attach(new VelocityComponent(direction * ranged.Speed));
+        projectile.Attach(new HitBox(new RectangleF(Vector2.Zero, new(10, 10))));
+        projectile.Attach(new SpriteComponent(sprite));
+
+        return projectile;
     }
 }

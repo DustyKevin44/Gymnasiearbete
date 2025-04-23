@@ -23,10 +23,11 @@ public class MeleeAttack(float damage, float cooldown, MeleeType type) : Attack(
 }
 
 
-public class RangedAttack(float damage, float range, float cooldown, RangedType type) : Attack(damage, cooldown)
+public class RangedAttack(float damage, float range, float speed, float cooldown, RangedType type) : Attack(damage, cooldown)
 {
     public readonly RangedType RangedType = type;
     public float Range = range;
+    public float Speed = speed;
 }
 
 

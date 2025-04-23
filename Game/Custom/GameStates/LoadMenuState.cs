@@ -121,7 +121,7 @@ namespace Game.Custom.GameStates
             int gameId = Global.SaveManager.CreateNewSave(saveName);
 
             _saves = Global.SaveManager.GetAllGameSaves();
-            Global.SaveManager.AddEntity(gameId, new(0, 0), "Player", 100);
+            Global.SaveManager.AddEntity(gameId, new(400, 400), "Player", 100);
 
             Console.WriteLine($"Created new save in slot {_saves.Count} with GameId: {gameId}");
             UpdateButtonText(_saves.Count);
