@@ -5,6 +5,7 @@ using Game.Custom.Input;
 using Game.Custom.Static;
 using Game.Custom.Utilities;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
@@ -32,7 +33,7 @@ public class PlayerSystem : EntityUpdateSystem
     private ComponentMapper<Transform2> _transformMapper;
     private ComponentMapper<AnimatedSprite> _animatedSpriteMapper;
 
-    public PlayerSystem() : base(Aspect.All(typeof(PlayerComponent<StdActions>), typeof(VelocityComponent))) { }
+    public PlayerSystem() : base(Aspect.All(typeof(PlayerComponent<StdActions>), typeof(VelocityComponent), typeof(Transform2))) { }
 
     public override void Initialize(IComponentMapperService mapperService)
     {
@@ -46,7 +47,7 @@ public class PlayerSystem : EntityUpdateSystem
     public override void Update(GameTime gameTime)
     {
         int host = ActiveEntities.FirstOrDefault(-1);
-        if (host != -1 && _transformMapper.Has(host))
+        if (host != -1)
         {
             Global.Camera.LookAt(_transformMapper.Get(host).Position);
         }
@@ -55,6 +56,7 @@ public class PlayerSystem : EntityUpdateSystem
         {
             var player = _playerMapper.Get(entity);
             var velocity = _velocityMapper.Get(entity);
+            var transform = _transformMapper.Get(entity);
 
             player.DashTimer.Update(gameTime);
 
@@ -121,6 +123,7 @@ public class PlayerSystem : EntityUpdateSystem
             if (_equipmentMapper.Has(entity))
             {
                 var equipment = _equipmentMapper.Get(entity);
+                var mouseDirection = transform.Position - Mouse.GetState().Position.ToVector2();
 
                 if (player.IsActionJustPressed(StdActions.MainAttack) && equipment.TryGet("hand", out Entity Weapon))
                 {
@@ -139,7 +142,7 @@ public class PlayerSystem : EntityUpdateSystem
                         var ranged = Weapon.Get<RangedAttack>();
                         if (ranged.IsOffCooldown(gameTime))
                         {
-                            Ranged.Attack(ranged);
+                            Ranged.Attack(Weapon, mouseDirection);
                             ranged.previousTimeUsed = gameTime.TotalGameTime.Seconds;
                         }
                     }
