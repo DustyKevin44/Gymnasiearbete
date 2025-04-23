@@ -94,27 +94,27 @@ public class MainGameState : GameState
         #region Player Animations
 
         var playerTexture = _content.Load<Texture2D>("playerRunRight");
-        Texture2DAtlas playerAtlas = Texture2DAtlas.Create("Atlas/player", playerTexture, 32, 32);
+        Texture2DAtlas playerAtlas = Texture2DAtlas.Create("Atlas/player", playerTexture, 32, 64);
         var playerSpriteSheet = new SpriteSheet("SpriteSheet/player", playerAtlas);
         playerSpriteSheet.DefineAnimation("runRight", builder =>
         {
             builder.IsLooping(true)
-                .AddFrame(0, TimeSpan.FromSeconds(0.4))
-                .AddFrame(1, TimeSpan.FromSeconds(0.4))
-                .AddFrame(2, TimeSpan.FromSeconds(0.4))
-                .AddFrame(3, TimeSpan.FromSeconds(0.4))
-                .AddFrame(4, TimeSpan.FromSeconds(0.4))
-                .AddFrame(5, TimeSpan.FromSeconds(0.4))
-                .AddFrame(6, TimeSpan.FromSeconds(0.4))
-                .AddFrame(7, TimeSpan.FromSeconds(0.4))
-                .AddFrame(8, TimeSpan.FromSeconds(0.4));
+                .AddFrame(0, TimeSpan.FromSeconds(0.1))
+                .AddFrame(1, TimeSpan.FromSeconds(0.1))
+                .AddFrame(2, TimeSpan.FromSeconds(0.1))
+                .AddFrame(3, TimeSpan.FromSeconds(0.1))
+                .AddFrame(4, TimeSpan.FromSeconds(0.1))
+                .AddFrame(5, TimeSpan.FromSeconds(0.1))
+                .AddFrame(6, TimeSpan.FromSeconds(0.1))
+                .AddFrame(7, TimeSpan.FromSeconds(0.1))
+                .AddFrame(8, TimeSpan.FromSeconds(0.1));
         });
 
         playerSpriteSheet.DefineAnimation("idleAnimation", builder =>
         {
             builder.IsLooping(true)
-                .AddFrame(3, TimeSpan.FromSeconds(0.2))
-                .AddFrame(4, TimeSpan.FromSeconds(0.2));
+                .AddFrame(0, TimeSpan.FromSeconds(0.5))
+                .AddFrame(1, TimeSpan.FromSeconds(0.5));
         });
         Global.ContentLibrary.Animations.Add("player", playerSpriteSheet);
 
