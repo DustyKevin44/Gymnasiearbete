@@ -17,6 +17,9 @@ using Game.Custom.Factories;
 using Game.Custom.Experimental;
 using System.Linq;
 using Game.Custom.Utilities;
+using MonoGame.Extended.Collisions.Layers;
+using MonoGame.Extended.Collisions.QuadTree;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Game.Custom.GameStates;
 
@@ -40,7 +43,7 @@ public class MainGameState : GameState
     {
         Global.Unload(); // Remove all Global values
 
-        var collisionSystem = new CollisionComponent(new RectangleF(int.MinValue / 2, int.MinValue / 2, int.MaxValue, int.MaxValue));
+        var collisionSystem = new CollisionComponent(new RectangleF(0, 0, 32 * 50, 32 * 50));
         collisionSystem.Initialize();
 
         _spriteBatch = new SpriteBatch(_graphicsDevice);
@@ -107,30 +110,31 @@ public class MainGameState : GameState
                 .AddFrame(1, TimeSpan.FromSeconds(0.1));
         });
         playerSpriteSheet.DefineAnimation("runRight", builder =>
-      {
-          builder.IsLooping(true)
-              .AddFrame(10, TimeSpan.FromSeconds(0.1))
-              .AddFrame(11, TimeSpan.FromSeconds(0.1))
-              .AddFrame(12, TimeSpan.FromSeconds(0.1))
-              .AddFrame(13, TimeSpan.FromSeconds(0.1))
-              .AddFrame(14, TimeSpan.FromSeconds(0.1))
-              .AddFrame(15, TimeSpan.FromSeconds(0.1))
-              .AddFrame(16, TimeSpan.FromSeconds(0.1))
-              .AddFrame(17, TimeSpan.FromSeconds(0.1));
-      });
-
+        {
+            builder.IsLooping(true)
+                .AddFrame(10, TimeSpan.FromSeconds(0.1))
+                .AddFrame(11, TimeSpan.FromSeconds(0.1))
+                .AddFrame(12, TimeSpan.FromSeconds(0.1))
+                .AddFrame(13, TimeSpan.FromSeconds(0.1))
+                .AddFrame(14, TimeSpan.FromSeconds(0.1))
+                .AddFrame(15, TimeSpan.FromSeconds(0.1))
+                .AddFrame(16, TimeSpan.FromSeconds(0.1))
+                .AddFrame(17, TimeSpan.FromSeconds(0.1));
+        });
 
         playerSpriteSheet.DefineAnimation("idle", builder =>
         {
-            builder.IsLooping(false)
-                .AddFrame(0, TimeSpan.FromSeconds(100))
-                .AddFrame(1, TimeSpan.FromSeconds(100));
+            builder.IsLooping(true)
+                .AddFrame(0, TimeSpan.FromSeconds(1));
         });
 
         Global.ContentLibrary.Animations.Add("player", playerSpriteSheet);
 
         // Old player
         Global.ContentLibrary.Textures["player"] = _content.Load<Texture2D>("player2");
+
+        // Load Sound Effects
+        Global.ContentLibrary.SaveSoundEffects(_content.Load<SoundEffect>("Hurt"), "Hurt");
 
         if (!gameId.HasValue)
         {
@@ -142,17 +146,18 @@ public class MainGameState : GameState
         Global.SaveManager.PrintAllSavedData();
         Global.GameId = gameId.Value;
 
-        // Give player sword (TODO: change to store in database)
-        if (Global.Players.Count != 0)
-        {
-            var sword = EntityFactory.CreateSwordAt(new(16, 32), null);
-            Global.Players.First().Get<Equipment>().Equip("hand", sword);
-        }
+        // // Give player sword (TODO: change to store in database)
+        // TODO: Fix sword attack moving the player to {Nan, Nan}
+        // if (Global.Players.Count != 0)
+        // {
+        //     var sword = EntityFactory.CreateSwordAt(new(16, 32), null);
+        //     Global.Players.First().Get<Equipment>().Equip("hand", sword);
+        // }
 
         // Testing
         // var centipede = EntityFactory.CreateCentipedeAt(new(300, 300));
         spawner = Global.World.CreateEntity();
-        spawner.Attach(new SpawnerComponent(new(22*32, 6*32), new(7*32, 6*32), "Slime", 7.0f, 2f));
+        spawner.Attach(new SpawnerComponent(new(22 * 32, 6 * 32), new(7 * 32, 6 * 32), "Slime", 7.0f, 2f));
 
         // Load the Tiled map
         _map = _content.Load<TiledMap>("tileMapGyar"); // Use the name of your Tiled map file
@@ -163,14 +168,61 @@ public class MainGameState : GameState
         var viewportAdapter = new ScalingViewportAdapter(_graphicsDevice, 200, 150);
         Global.Camera = new OrthographicCamera(viewportAdapter);
 
+        var enemyHitLayer = new Layer(new QuadTreeSpace(new(0, 0, 32 * 50, 32 * 30)));
+        var enemyCollisionLayer = new Layer(new QuadTreeSpace(new(0, 0, 32 * 50, 32 * 30)));
+        var enemyHurtLayer = new Layer(new QuadTreeSpace(new(0, 0, 32 * 50, 32 * 30)));
+        var playerHitLayer = new Layer(new QuadTreeSpace(new(0, 0, 32 * 50, 32 * 30)));
+        var playerCollisionLayer = new Layer(new QuadTreeSpace(new(0, 0, 32 * 50, 32 * 30)));
+        var playerHurtLayer = new Layer(new QuadTreeSpace(new(0, 0, 32 * 50, 32 * 30)));
+
         for (int i = 0; i < Global.World.EntityCount; i++)
         {
             var entity = Global.World.GetEntity(i);
-            if (entity.Has<CollisionBox>())
+
+            if (Utils.TryGet(entity, out HitBox hitBox))
             {
-                Global.CollisionSystem.Insert(entity.Get<CollisionBox>());
+                if (Utils.TryGet(entity, out Equipable eq) && Global.Players.Contains(eq.Parent))
+                {
+                    playerHitLayer.Space.Insert(hitBox);
+                }
+                else if (entity.Has<Behavior>())
+                {
+                    enemyHitLayer.Space.Insert(hitBox);
+                }
+            }
+            if (Utils.TryGet(entity, out CollisionBox collisionBox))
+            {
+                if (entity.Has<PlayerComponent<StdActions>>())
+                {
+                    playerCollisionLayer.Space.Insert(collisionBox);
+                }
+                else if (entity.Has<Behavior>())
+                {
+                    enemyCollisionLayer.Space.Insert(collisionBox);
+                }
+            }
+            if (Utils.TryGet(entity, out HitBox hurtBox))
+            {
+                if (entity.Has<PlayerComponent<StdActions>>())
+                {
+                    playerHurtLayer.Space.Insert(hurtBox);
+                }
+                else if (entity.Has<Behavior>())
+                {
+                    enemyHurtLayer.Space.Insert(hurtBox);
+                }
             }
         }
+
+        Global.CollisionSystem.Add("PlayerHit", playerHitLayer);
+        Global.CollisionSystem.Add("PlayerCollision", playerCollisionLayer);
+        Global.CollisionSystem.Add("PlayerHurt", playerHurtLayer);
+        Global.CollisionSystem.Add("EnemyHit", enemyHitLayer);
+        Global.CollisionSystem.Add("EnemyCollision", enemyCollisionLayer);
+        Global.CollisionSystem.Add("EnemyHurt", enemyHurtLayer);
+
+        Global.CollisionSystem.AddCollisionBetweenLayer(playerHitLayer, enemyHurtLayer);
+        Global.CollisionSystem.AddCollisionBetweenLayer(playerHurtLayer, enemyHitLayer);
     }
 
     public override void LoadContent() { }

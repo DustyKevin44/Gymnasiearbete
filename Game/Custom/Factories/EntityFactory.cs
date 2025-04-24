@@ -40,12 +40,12 @@ public static class EntityFactory
         }
 
         var equipment = new Equipment(["hand"]);
-        var collisionBox = new CollisionBox(new RectangleF(0, 0, 20, 20));
-        var hurtBox = new HurtBox(new RectangleF(0, 0, 20, 20));
+        var collisionBox = new CollisionBox(new RectangleF(0, 20, 20, 20), "playerCollision");
+        var hurtBox = new HurtBox(new RectangleF(0, 20, 20, 20), "PlayerHurt");
 
         var player = Global.World.CreateEntity();
         player.Attach(new Transform2(position));
-        player.Attach(new HealthComponent(Hp, 200));
+        player.Attach(new HealthComponent(Hp, int.MaxValue));
         player.Attach(new VelocityComponent(Vector2.Zero));
         player.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["player"], "idle"));
         player.Attach(collisionBox);
@@ -75,7 +75,7 @@ public static class EntityFactory
     public static Entity CreateSwordAt(Vector2 position, Entity equipedBy)
     {
         var equipable = new Equipable();
-        var hitbox = new HitBox(new RectangleF(-20, -40, 40, 40), false);
+        var hitbox = new HitBox(new RectangleF(-20, -40, 40, 40), "PlayerHit", false);
         var swordSprite = Global.ContentLibrary.Textures["swords"];
 
         var sword = Global.World.CreateEntity();
@@ -93,9 +93,9 @@ public static class EntityFactory
     public static Entity CreateSlimeAt(Vector2 position, float Hp)
     {
         Color[] colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
-        var slimeCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
-        var slimeHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
-        var slimeHit = new HitBox(new RectangleF(0, 0, 16, 16));
+        var slimeCollision = new CollisionBox(new RectangleF(0, 0, 16, 16), "EnemyCollision");
+        var slimeHurt = new HurtBox(new RectangleF(0, 0, 16, 16), "EnemyHurt");
+        var slimeHit = new HitBox(new RectangleF(14, 14, 20, 20), "EnemyHit");
 
         var slime = Global.World.CreateEntity();
         slime.Attach(new Transform2(position));
@@ -116,9 +116,9 @@ public static class EntityFactory
     public static Entity CreateSkeletonAt(Vector2 position, float Hp)
     {
         Color[] colors = [Color.Black, Color.White, Color.Aqua, Color.Green, Color.Yellow];
-        var SkeletonCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
-        var SkeletonHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
-        var SkeletonHit = new HitBox(new RectangleF(0, 0, 16, 16));
+        var SkeletonCollision = new CollisionBox(new RectangleF(0, 0, 16, 16), "EnemyCollision");
+        var SkeletonHurt = new HurtBox(new RectangleF(0, 0, 16, 16), "EnemyHurt");
+        var SkeletonHit = new HitBox(new RectangleF(0, 0, 16, 16), "EnemyHit");
 
         var Skeleton = Global.World.CreateEntity();
         Skeleton.Attach(new Transform2(position));
@@ -138,9 +138,9 @@ public static class EntityFactory
 
     public static Entity CreateZombieAt(Vector2 position, float Hp)
     {
-        var zombieCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
-        var zombieHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
-        var zombieHit = new HitBox(new RectangleF(0, 0, 16, 16));
+        var zombieCollision = new CollisionBox(new RectangleF(0, 0, 16, 16), "EnemyCollision");
+        var zombieHurt = new HurtBox(new RectangleF(0, 0, 16, 16), "EnemyHurt");
+        var zombieHit = new HitBox(new RectangleF(0, 0, 16, 16), "EnemyHit");
 
         var zombie = Global.World.CreateEntity();
         zombie.Attach(new Transform2(position));
@@ -178,9 +178,9 @@ public static class EntityFactory
 
     private static Entity CreateCentipedeSegmentAt(Vector2 position, float maxAngle, Entity parent)
     {
-        var segmentCollision = new CollisionBox(new RectangleF(0, 0, 16, 16));
-        var segmentHurt = new HurtBox(new RectangleF(0, 0, 16, 16));
-        var segmentHit = new HitBox(new RectangleF(0, 0, 16, 16));
+        var segmentCollision = new CollisionBox(new RectangleF(0, 0, 16, 16), "EnemyCollision");
+        var segmentHurt = new HurtBox(new RectangleF(0, 0, 16, 16), "EnemyHurt");
+        var segmentHit = new HitBox(new RectangleF(0, 0, 16, 16), "EnemyHit");
 
         var entity = Global.World.CreateEntity();
         entity.Attach(new Transform2(position));
@@ -213,7 +213,7 @@ public static class EntityFactory
         var projectile = Global.World.CreateEntity();
         projectile.Attach(new Transform2(position));
         projectile.Attach(new VelocityComponent(direction * ranged.Speed));
-        projectile.Attach(new HitBox(new RectangleF(Vector2.Zero, new(10, 10))));
+        projectile.Attach(new HitBox(new RectangleF(Vector2.Zero, new(10, 10)), "PlayerHit"));
         projectile.Attach(new SpriteComponent(sprite));
 
         return projectile;

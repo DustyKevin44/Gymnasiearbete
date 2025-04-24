@@ -84,27 +84,27 @@ public class PlayerSystem : EntityUpdateSystem
             {
                 try
                 {
-                    Console.WriteLine(player.Direction.X);
-                    
-                    if (player.Direction.X > 0)
+                    if (direction == Vector2.Zero)
+                    {
+                        if (animatedSprite.CurrentAnimation != "idle")
+                        {
+                            animatedSprite.SetAnimation("idle");
+                        }
+                    }
+                    else if (direction.X > 0)
                     {
                         if (animatedSprite.CurrentAnimation != "runRight")
                         {
                             animatedSprite.SetAnimation("runRight");
                         }
                     }
-                    else if (player.Direction.X < 0)
+                    else
                     {
                         if (animatedSprite.CurrentAnimation != "runLeft")
                         {
                             animatedSprite.SetAnimation("runLeft");
                         }
                     }
-                    else if (player.Direction == Vector2.Zero)
-                    {
-                        animatedSprite.SetAnimation("idle");
-                    }
-                    
                 }
                 catch (KeyNotFoundException) { }
             }

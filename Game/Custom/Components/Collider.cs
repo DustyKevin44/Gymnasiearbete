@@ -10,13 +10,14 @@ using MonoGame.Extended.ECS;
 namespace Game.Custom.Components;
 
 
-public abstract class ColliderBox(IShapeF shape, bool enabled) : ICollisionActor
+public abstract class ColliderBox(IShapeF shape, bool enabled, string layer) : ICollisionActor
 {
     public IShapeF Shape = shape;
     public IShapeF Bounds => Shape;
     public Entity Parent;
     public Vector2 currentParentPosition;
     public bool IsEnabled = enabled;
+    public string LayerName = layer;
 
     public abstract void OnCollision(CollisionEventArgs collisionInfo);
 }
@@ -26,7 +27,7 @@ public class HitBox : ColliderBox
     public readonly HashSet<HurtBox> HurtBoxesHit = []; // Store collisions to ignore hitting the same enemy in 1 attack
     public bool IsPerFrameHitBox; // If true: hits enemies every frame, if false then hits once and never again until 'EmptyCollisions()' is called
 
-    public HitBox(IShapeF shape, bool enabled = true, bool isPerFrameHitBox = false) : base(shape, enabled)
+    public HitBox(IShapeF shape, string layer, bool enabled = true, bool isPerFrameHitBox = false) : base(shape, enabled, layer)
     {
         IsPerFrameHitBox = isPerFrameHitBox;
         Global.CollisionSystem.Insert(this);
@@ -56,17 +57,20 @@ public class HitBox : ColliderBox
 
 public class HurtBox : ColliderBox
 {
-    public HurtBox(IShapeF shape, bool enabled = true) : base(shape, enabled)
+    public HurtBox(IShapeF shape, string layer, bool enabled = true) : base(shape, enabled, layer)
     {
         Global.CollisionSystem.Insert(this);
     }
 
-    public override void OnCollision(CollisionEventArgs collisionInfo) { /* Hurt logic is handled by hitbox */ }
+    public override void OnCollision(CollisionEventArgs collisionInfo)
+    {
+        // Global.ContentLibrary.SoundEffects["Hurt"].Play();
+    }
 }
 
 public class CollisionBox : ColliderBox
 {
-    public CollisionBox(IShapeF shape, bool enabled = true) : base(shape, enabled)
+    public CollisionBox(IShapeF shape, string layer, bool enabled = true) : base(shape, enabled, layer)
     {
         Global.CollisionSystem.Insert(this);
     }

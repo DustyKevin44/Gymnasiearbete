@@ -92,7 +92,7 @@ namespace Game.Custom.Saving
                     command.ExecuteNonQuery();
                 }
                 var gameId = (int)connection.LastInsertRowId;
-                var playerId = Global.SaveManager.AddEntity(gameId, new(25*32, 25*32), "Player", 100, null);
+                var playerId = Global.SaveManager.AddEntity(gameId, new(25*32, 25*32), "Player", int.MaxValue, null);
                 return gameId;
             }
         }

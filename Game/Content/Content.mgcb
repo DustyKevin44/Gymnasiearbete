@@ -143,6 +143,12 @@
 /processorParam:TextureFormat=Color
 /build:HögerGrindStart.PNG
 
+#begin Hurt.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Hurt.wav
+
 #begin menuSelectSound.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
