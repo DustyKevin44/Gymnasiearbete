@@ -173,7 +173,7 @@
 /processorParam:TextureFormat=Color
 /build:player2.png
 
-#begin playerRunRight.png
+#begin playerTexture.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -183,7 +183,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:playerRunRight.png
+/build:playerTexture.png
 
 #begin slimeSheet.png
 /importer:TextureImporter

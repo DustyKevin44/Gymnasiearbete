@@ -13,7 +13,8 @@ using MonoGame.Extended.Graphics;
 
 namespace Game.Custom.Components.Systems;
 
-public enum StdActions {
+public enum StdActions
+{
     MOVE_LEFT,
     MOVE_RIGHT,
     MOVE_UP,
@@ -83,25 +84,27 @@ public class PlayerSystem : EntityUpdateSystem
             {
                 try
                 {
+                    Console.WriteLine(player.Direction.X);
+                    
                     if (player.Direction.X > 0)
                     {
-                        animatedSprite.SetAnimation("runRight");
+                        if (animatedSprite.CurrentAnimation != "runRight")
+                        {
+                            animatedSprite.SetAnimation("runRight");
+                        }
                     }
                     else if (player.Direction.X < 0)
                     {
-                        animatedSprite.SetAnimation("runLeft");
+                        if (animatedSprite.CurrentAnimation != "runLeft")
+                        {
+                            animatedSprite.SetAnimation("runLeft");
+                        }
                     }
-                    else
+                    else if (player.Direction == Vector2.Zero)
                     {
-                        if (animatedSprite.CurrentAnimation == "runRight")
-                        {
-                            animatedSprite.SetAnimation("IdleRight");
-                        }
-                        else if (animatedSprite.CurrentAnimation == "runLeft")
-                        {
-                            animatedSprite.SetAnimation("IdleLeft");
-                        }
+                        animatedSprite.SetAnimation("idle");
                     }
+                    
                 }
                 catch (KeyNotFoundException) { }
             }
