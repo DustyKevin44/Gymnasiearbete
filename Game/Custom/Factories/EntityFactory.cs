@@ -45,7 +45,7 @@ public static class EntityFactory
 
         var player = Global.World.CreateEntity();
         player.Attach(new Transform2(position));
-        player.Attach(new HealthComponent(Hp, 100));
+        player.Attach(new HealthComponent(Hp, 200));
         player.Attach(new VelocityComponent(Vector2.Zero));
         player.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["player"], "runRight"));
         player.Attach(collisionBox);
@@ -72,7 +72,7 @@ public static class EntityFactory
         return player;
     }
 
-    public static Entity CreateSwordAt(Vector2 position)
+    public static Entity CreateSwordAt(Vector2 position, Entity equipedBy)
     {
         var equipable = new Equipable();
         var hitbox = new HitBox(new RectangleF(-20, -40, 40, 40), false);
@@ -100,7 +100,7 @@ public static class EntityFactory
         var slime = Global.World.CreateEntity();
         slime.Attach(new Transform2(position));
         slime.Attach(new VelocityComponent(Vector2.Zero));
-        slime.Attach(new Behavior(TargetingBehaviour.Avoid, 10000f, 100f, 100f, Global.Players.First())); // <-- Maybe allow for multiple targets in the future
+        slime.Attach(new Behavior(TargetingBehaviour.GoTowards, 10000f, 100f, 100f, Global.Players.First())); // <-- Maybe allow for multiple targets in the future
         slime.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["slime"], "slimeAnimation") { Color = colors[Global.Random.Next(0, 5)] });
         slime.Attach(new HealthComponent(Hp, 100));
         slime.Attach(slimeCollision);

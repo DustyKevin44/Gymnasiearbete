@@ -3,9 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using Game.Custom.GameStates;
-using RenderingLibrary;
-using GumRuntime;
-using Gum.Wireframe;
 
 namespace Game;
 
@@ -15,12 +12,10 @@ public class Game : Microsoft.Xna.Framework.Game
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private OrthographicCamera _camera;
+
     // Game states
     private GameState _currentState;
     private GameState _nextState;
-
-    // GUI
-    public GraphicalUiElement Root;
 
     public void ChangeState(GameState state) { _nextState = state; }
 
@@ -42,11 +37,6 @@ public class Game : Microsoft.Xna.Framework.Game
         _graphics.PreferredBackBufferHeight = WindowSize.Y;
         _graphics.ApplyChanges();
 
-        // Gum GUI
-        var project = MonoGameGum.GumService.Default.Initialize(this, "GumProject/GumProject.gumx");
-        var screen = project.Screens.Find(item => item.Name == "TitleScreen"); // Loads the title screen
-        Root = screen.ToGraphicalUiElement(SystemManagers.Default, true);
-
         base.Initialize();
     }
 
@@ -62,8 +52,6 @@ public class Game : Microsoft.Xna.Framework.Game
             _nextState = null;
         }
 
-        MonoGameGum.GumService.Default.Update(this, gameTime, Root);
-
         _currentState.Update(gameTime);
         _currentState.PostUpdate(gameTime);
         
@@ -74,8 +62,7 @@ public class Game : Microsoft.Xna.Framework.Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
         _currentState.Draw(gameTime, _spriteBatch);  // Draw state
-        
-        MonoGameGum.GumService.Default.Draw();
+
         base.Draw(gameTime);
     }
 }

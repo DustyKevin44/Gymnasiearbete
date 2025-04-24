@@ -124,26 +124,34 @@ public class PlayerSystem : EntityUpdateSystem
             {
                 var equipment = _equipmentMapper.Get(entity);
                 var mouseDirection = transform.Position - Mouse.GetState().Position.ToVector2();
-
-                if (player.IsActionJustPressed(StdActions.MainAttack) && equipment.TryGet("hand", out Entity Weapon))
+                
+                if (equipment.TryGet("hand", out Entity Weapon))
                 {
-                    if (Weapon.Has<MeleeAttack>())
+                    if (Utils.TryGet(Weapon, out SpriteComponent sprite))
                     {
-                        var melee = Weapon.Get<MeleeAttack>();
-                        if (melee.IsOffCooldown(gameTime))
-                        {
-                            Melee.Attack(Weapon);
-                            melee.previousTimeUsed = gameTime.TotalGameTime.Seconds;
-                        }
+                        sprite.Rotation = mouseDirection.ToAngle() + MathHelper.PiOver2;
                     }
 
-                    if (Weapon.Has<RangedAttack>())
+                    if (player.IsActionJustPressed(StdActions.MainAttack))
                     {
-                        var ranged = Weapon.Get<RangedAttack>();
-                        if (ranged.IsOffCooldown(gameTime))
+                        if (Weapon.Has<MeleeAttack>())
                         {
-                            Ranged.Attack(Weapon, mouseDirection);
-                            ranged.previousTimeUsed = gameTime.TotalGameTime.Seconds;
+                            var melee = Weapon.Get<MeleeAttack>();
+                            if (melee.IsOffCooldown(gameTime))
+                            {
+                                Melee.Attack(Weapon);
+                                melee.previousTimeUsed = gameTime.TotalGameTime.Seconds;
+                            }
+                        }
+
+                        if (Weapon.Has<RangedAttack>())
+                        {
+                            var ranged = Weapon.Get<RangedAttack>();
+                            if (ranged.IsOffCooldown(gameTime))
+                            {
+                                Ranged.Attack(Weapon, mouseDirection);
+                                ranged.previousTimeUsed = gameTime.TotalGameTime.Seconds;
+                            }
                         }
                     }
                 }

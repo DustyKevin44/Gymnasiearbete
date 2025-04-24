@@ -67,6 +67,7 @@ namespace Game.Custom.Saving
                         PositionY REAL NOT NULL,
                         Type TEXT NOT NULL,
                         HP INTEGER NOT NULL,
+                        EquipedBy INTEGET NULL,
                         FOREIGN KEY (GameId) REFERENCES GameSaves(GameId)
                     );";
 
@@ -90,28 +91,11 @@ namespace Game.Custom.Saving
                     command.Parameters.AddWithValue("@name", saveName);
                     command.ExecuteNonQuery();
                 }
-                return (int)connection.LastInsertRowId;
+                var gameId = (int)connection.LastInsertRowId;
+                var playerId = Global.SaveManager.AddEntity(gameId, new(25*32, 25*32), "Player", 100, null);
+                return gameId;
             }
         }
-
-        // public void CreatePlayerForNewSave(int saveId)
-        // {
-        //     // Hitta GameId baserat på saveId (eller SaveName beroende på vad som skickas)
-        //     if (saveId == -1)
-        //     {
-        //         Console.WriteLine("Sparfilen med det angivna ID:t finns inte.");
-        //         return;
-        //     }
-
-        //     // Definiera position och HP för spelaren (det här kan justeras baserat på din logik)
-        //     Vector2 playerStartingPosition = new Vector2(100, 100);  // Exempelposition
-        //     int playerHP = 100; // Exempel på liv
-
-        //     // Skapa spelaren som en entity i databasen
-        //     AddEntity(saveId, playerStartingPosition, "Player", playerHP);
-
-        //     Console.WriteLine($"Spelare skapad för SaveId: {saveId}");
-        // }
 
         // Retrieves all saved games
         public List<GameSave> GetAllGameSaves()
@@ -169,12 +153,12 @@ namespace Game.Custom.Saving
         }
 
         // Adds an entity to a specific game save
-        public void AddEntity(int gameId, Vector2 position, string type, int hp)
+        public int AddEntity(int gameId, Vector2 position, string type, int hp, int? EntityIdEquipedBy)
         {
             using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
                 connection.Open();
-                string query = "INSERT INTO Entities (GameId, PositionX, PositionY, Type, HP) VALUES (@gid, @x, @y, @type, @hp);";
+                string query = "INSERT INTO Entities (GameId, PositionX, PositionY, Type, HP, EquipedBy) VALUES (@gid, @x, @y, @type, @hp, @equipedBy);";
 
                 using (var command = new SQLiteCommand(query, connection))
                 {
@@ -183,8 +167,11 @@ namespace Game.Custom.Saving
                     command.Parameters.AddWithValue("@y", position.Y);
                     command.Parameters.AddWithValue("@type", type);
                     command.Parameters.AddWithValue("@hp", hp);
+                    command.Parameters.AddWithValue("@equipedBy", EntityIdEquipedBy);
                     command.ExecuteNonQuery();
                 }
+
+                return (int)connection.LastInsertRowId;
             }
         }
 
@@ -221,14 +208,14 @@ namespace Game.Custom.Saving
         }
 
         // Retrieves all entities for a specific game save
-        public List<(int EntityId, Vector2 Position, string Type, int HP)> GetEntities(int gameId)
+        public List<(int EntityId, Vector2 Position, string Type, int HP, int? EntityIdEquipedBy)> GetEntities(int gameId)
         {
-            var entities = new List<(int, Vector2, string, int)>();
+            var entities = new List<(int, Vector2, string, int, int?)>();
 
             using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
                 connection.Open();
-                string query = "SELECT EntityId, PositionX, PositionY, Type, HP FROM Entities WHERE GameId = @gid;";
+                string query = "SELECT EntityId, PositionX, PositionY, Type, HP, EquipedBy FROM Entities WHERE GameId = @gid;";
 
                 using (var command = new SQLiteCommand(query, connection))
                 {
@@ -242,7 +229,8 @@ namespace Game.Custom.Saving
                                 reader.GetInt32(0),
                                 new Vector2(reader.GetFloat(1), reader.GetFloat(2)),
                                 reader.GetString(3),
-                                reader.GetInt32(4)
+                                reader.GetInt32(4),
+                                reader.IsDBNull(5) ? null : reader.GetInt32(5)
                             ));
                         }
                     }
@@ -287,18 +275,23 @@ namespace Game.Custom.Saving
 
                     if (entity.Has<PlayerComponent<StdActions>>())
                     {
-                        AddEntity(gameId, pos, "Player", hp);
+                        AddEntity(gameId, pos, "Player", hp, null);
                     }
                     else if (entity.Has<Behavior>())
                     {
-                        AddEntity(gameId, pos, "Slime", hp);
+                        AddEntity(gameId, pos, "Slime", hp, null);
                     }
                     else if (Utils.TryGet(entity, out MeleeAttack mAttack))
                     {
+                        if (Utils.TryGet(entity, out Equipable eq))
+                        {
+                            
+                        }
+
                         switch (mAttack.MeleeType)
                         {
                             case Static.MeleeType.Slash:
-                                AddEntity(gameId, pos, "Sword", int.MaxValue); // TODO: change database so that sword is not forced to have hp
+                                AddEntity(gameId, pos, "Sword", 0, null);
                                 break;
                         }
                     }
@@ -347,25 +340,32 @@ namespace Game.Custom.Saving
         // Starts the game from a specific save
         public void LoadGame(int gameId)
         {
-            List<(int EntityId, Vector2 Position, string Type, int HP)> existingEntities = GetEntities(gameId);
+            List<(int EntityId, Vector2 Position, string Type, int HP, int? EntityIdEquipedBy)> existingEntities = GetEntities(gameId);
             List<(int ItemId, string Name, int Quantity, string Place)> existingItems = GetItems(gameId);
             Console.WriteLine("Game is now starting to load, entities: " + existingEntities.Count + ", items: " + existingItems.Count);
             // Process entities
+
+            Dictionary<int, Entity> entityTable = [];
+
             foreach (var entity in existingEntities)
             {
+                Entity newEntity;
                 switch (entity.Type)
                 {
                     case "Player":
-                        Factories.EntityFactory.CreatePlayerAt(entity.Position, entity.HP);
+                        newEntity = Factories.EntityFactory.CreatePlayerAt(entity.Position, entity.HP);
                         break;
                     case "Slime":
-                        Factories.EntityFactory.CreateSlimeAt(entity.Position, entity.HP);
+                        newEntity = Factories.EntityFactory.CreateSlimeAt(entity.Position, entity.HP);
                         break;
-                    case "Sword":
-                        Factories.EntityFactory.CreateSwordAt(entity.Position);
-                        break;
-                        // Add more entity types as needed
+                    // TODO: fix saving sword into database
+                    // case "Sword":
+                    //     newEntity = Factories.EntityFactory.CreateSwordAt(entity.Position, entity.EntityIdEquipedBy.HasValue ? entityTable[entity.EntityIdEquipedBy.Value] : null);
+                    //     break;
+                    default:
+                        continue;
                 }
+                entityTable.Add(entity.EntityId, newEntity);
             }
 
             // Process items

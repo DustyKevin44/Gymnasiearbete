@@ -1,16 +1,12 @@
 using System;
 using Game.Custom.Components;
 using Game.Custom.Input;
-using Gum.Wireframe;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using MonoGame.Extended.Graphics;
-using MonoGameGum;
-using MonoGameGum.Forms;
-using MonoGameGum.Forms.Controls;
 
 namespace Game.Custom.Debug;
 
@@ -31,8 +27,8 @@ public class DebugSystem() : EntitySystem(Aspect.All(typeof(Transform2))), IUpda
         _spriteMapper = mapperService.GetMapper<SpriteComponent>();
         _animatedMapper = mapperService.GetMapper<AnimatedSprite>();
 
-        var button = Global.Game.Root.GetFrameworkElementByName<Button>("ButtonStandardInstance");
-        button.Click += (_, _) => { _selectedEntity?.Destroy(); _selectedEntity = null; };
+        // var button = Global.Game.Root.GetFrameworkElementByName<Button>("ButtonStandardInstance");
+        // button.Click += (_, _) => { _selectedEntity?.Destroy(); _selectedEntity = null; };
     }
 
     public void Update(GameTime gameTime)
@@ -40,11 +36,11 @@ public class DebugSystem() : EntitySystem(Aspect.All(typeof(Transform2))), IUpda
         if (!InputManager.MouseClicked)
             return;
 
-        if (GumService.Default.Cursor.WindowOver is GraphicalUiElement element) // Ignore clicks that are on UI elements
-        {
-            Console.WriteLine(element.Name);
-            return;
-        }
+        // if (GumService.Default.Cursor.WindowOver is GraphicalUiElement element) // Ignore clicks that are on UI elements
+        // {
+        //     Console.WriteLine(element.Name);
+        //     return;
+        // }
 
         var mousePosition = InputManager.MouseRectangle.Location.ToVector2();
         var worldPosition = Global.Camera.ScreenToWorld(mousePosition);
@@ -87,6 +83,5 @@ public class DebugSystem() : EntitySystem(Aspect.All(typeof(Transform2))), IUpda
         {
             Console.WriteLine("Null me");
         }
-
     }
 }

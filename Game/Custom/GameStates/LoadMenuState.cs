@@ -93,7 +93,8 @@ namespace Game.Custom.GameStates
 
         private void TryLoadSave(int index, GameTime gameTime)
         {
- _selectSound.Play();            ;if (index < _saves.Count && _saves[index].GameId != 0)
+            _selectSound.Play();
+            if (index < _saves.Count && _saves[index].GameId != 0)
             {
                 int gameId = _saves[index].GameId;
                 Console.WriteLine($"Loading GameId: {gameId}");
@@ -109,7 +110,8 @@ namespace Game.Custom.GameStates
 
         private void CreateNewSave()
         {
- _selectSound.Play();            const int MaxSaves = 3;
+            _selectSound.Play();
+            const int MaxSaves = 3;
 
             if (_saves.Count >= MaxSaves)
             {
@@ -121,7 +123,6 @@ namespace Game.Custom.GameStates
             int gameId = Global.SaveManager.CreateNewSave(saveName);
 
             _saves = Global.SaveManager.GetAllGameSaves();
-            Global.SaveManager.AddEntity(gameId, new(400, 400), "Player", 100);
 
             Console.WriteLine($"Created new save in slot {_saves.Count} with GameId: {gameId}");
             UpdateButtonText(_saves.Count);
@@ -129,7 +130,7 @@ namespace Game.Custom.GameStates
 
         private void UpdateButtonText(int slot)
         {
- _selectSound.Play();            // Update the button text after creating a new save
+            _selectSound.Play(); // Update the button text after creating a new save
             switch (slot)
             {
                 case 1:
@@ -149,7 +150,8 @@ namespace Game.Custom.GameStates
 
         private void BackButton_Click(object sender, EventArgs e)
         {
- _selectSound.Play();            _game.ChangeState(new MenuState(_game, _graphicsDevice, _content));
+            _selectSound.Play();
+            _game.ChangeState(new MenuState(_game, _graphicsDevice, _content));
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)

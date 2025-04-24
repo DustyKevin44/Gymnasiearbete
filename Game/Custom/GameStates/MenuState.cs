@@ -90,7 +90,8 @@ public class MenuState : GameState
 
     private void QuitGameButton_Click(object sender, EventArgs e)
     {
-        _selectSound.Play(); Thread.Sleep(500);
+        _selectSound.Play();
+        Thread.Sleep(500); // Allow sound to play before closing
         _game.Exit();
         Console.WriteLine("Exit game");
     }
