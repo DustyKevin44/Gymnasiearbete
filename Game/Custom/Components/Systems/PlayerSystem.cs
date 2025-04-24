@@ -95,11 +95,11 @@ public class PlayerSystem : EntityUpdateSystem
                     {
                         if (animatedSprite.CurrentAnimation == "runRight")
                         {
-                            animatedSprite.SetAnimation("IdleRight");
+                            animatedSprite.SetAnimation("idleAnimation");
                         }
                         else if (animatedSprite.CurrentAnimation == "runLeft")
                         {
-                            animatedSprite.SetAnimation("IdleLeft");
+                            animatedSprite.SetAnimation("idleAnimation");
                         }
                     }
                 }
