@@ -47,7 +47,7 @@ public static class EntityFactory
         player.Attach(new Transform2(position));
         player.Attach(new HealthComponent(Hp, 100));
         player.Attach(new VelocityComponent(Vector2.Zero));
-        player.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["player"], "runRight"));
+        player.Attach(new AnimatedSprite(Global.ContentLibrary.Animations["player"], "idle"));
         player.Attach(collisionBox);
         player.Attach(hurtBox);
         player.Attach(equipment);

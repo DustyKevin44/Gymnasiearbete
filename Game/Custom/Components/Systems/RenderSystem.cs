@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -68,6 +69,8 @@ public class RenderSystem() : EntityDrawSystem(Aspect.All(typeof(Transform2)).On
             {
                 var animsprite = _animatedSpriteMapper.Get(entity);
                 animsprite.Update(gameTime);
+                Console.WriteLine(animsprite.CurrentAnimation);
+
                 Global.SpriteBatch.Draw(animsprite, transform.Position + offset.Position, transform.Rotation + offset.Rotation, transform.Scale * offset.Scale);
             }
         }

@@ -102,24 +102,25 @@ public class MainGameState : GameState
                 .AddFrame(2, TimeSpan.FromSeconds(0.1))
                 .AddFrame(1, TimeSpan.FromSeconds(0.1));
         });
-          playerSpriteSheet.DefineAnimation("runRight", builder =>
-        {
-            builder.IsLooping(true)
-                .AddFrame(1, TimeSpan.FromSeconds(0.1))
-                .AddFrame(2, TimeSpan.FromSeconds(0.1))
-                .AddFrame(3, TimeSpan.FromSeconds(0.1))
-                .AddFrame(4, TimeSpan.FromSeconds(0.1))
-                .AddFrame(5, TimeSpan.FromSeconds(0.1))
-                .AddFrame(6, TimeSpan.FromSeconds(0.1))
-                .AddFrame(7, TimeSpan.FromSeconds(0.1))
-                .AddFrame(8, TimeSpan.FromSeconds(0.1));
-        });
+        playerSpriteSheet.DefineAnimation("runRight", builder =>
+      {
+          builder.IsLooping(true)
+              .AddFrame(10, TimeSpan.FromSeconds(0.1))
+              .AddFrame(11, TimeSpan.FromSeconds(0.1))
+              .AddFrame(12, TimeSpan.FromSeconds(0.1))
+              .AddFrame(13, TimeSpan.FromSeconds(0.1))
+              .AddFrame(14, TimeSpan.FromSeconds(0.1))
+              .AddFrame(15, TimeSpan.FromSeconds(0.1))
+              .AddFrame(16, TimeSpan.FromSeconds(0.1))
+              .AddFrame(17, TimeSpan.FromSeconds(0.1));
+      });
 
 
-        playerSpriteSheet.DefineAnimation("idleAnimation", builder =>
+        playerSpriteSheet.DefineAnimation("idle", builder =>
         {
-            builder.IsLooping(true)
-                .AddFrame(0, TimeSpan.FromSeconds(0.5));
+            builder.IsLooping(false)
+                .AddFrame(0, TimeSpan.FromSeconds(100))
+                .AddFrame(1, TimeSpan.FromSeconds(100));
         });
 
         Global.ContentLibrary.Animations.Add("player", playerSpriteSheet);
